@@ -3,6 +3,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UIElements;
 
+//this scrpit is from the Unity netcode documentation. All it does is create the little buttons and call the network functions.
 public class multiplayerManager : MonoBehaviour
 {
     VisualElement rootVisualElement;

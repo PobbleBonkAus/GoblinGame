@@ -22,6 +22,18 @@ public class multiplayerPlayer : NetworkBehaviour
     const float MIN_Y = -60.0f;
     const float MAX_Y = 70.0f;
 
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        if (!IsOwner)
+        {
+            // Disable camera and input for non-local players
+            cam.gameObject.SetActive(false);
+            enabled = false; // Disable this script on non-owners
+            return;
+        }
+    }
+
     private void Awake()
     {
         playerControls = new PlayerInputActions();
@@ -30,14 +42,6 @@ public class multiplayerPlayer : NetworkBehaviour
 
     private void Start()
     {
-        if (!IsOwner)
-        {
-            // Disable camera and input for non-local players
-            cam.gameObject.SetActive(false);
-            enabled = false; // Disable this script on non-owners
-            return;
-        }
-
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
