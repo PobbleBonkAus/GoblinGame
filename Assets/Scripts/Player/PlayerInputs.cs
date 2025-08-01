@@ -9,7 +9,6 @@ public class PlayerInputs : MonoBehaviour
 
     public PhysicsGrabber playerPhysicsGrabber;
     public RigidbodyPlayerController playerController;
-    public CameraController cameraController;
 
     void OnEnable() => inputActions.Enable();
     void OnDisable() => inputActions.Disable();
@@ -20,7 +19,6 @@ public class PlayerInputs : MonoBehaviour
         playerInputActions = inputActions.FindActionMap("Player");
 
         playerController.move = playerInputActions.FindAction("Move");
-        cameraController.look = playerInputActions.FindAction("Look");
 
         playerInputActions.FindAction("Jump").started += playerController.DoJump;
         
@@ -31,7 +29,5 @@ public class PlayerInputs : MonoBehaviour
         playerInputActions.FindAction("Throw").canceled += playerPhysicsGrabber.DoThrow;
 
         playerInputActions.FindAction("Ragdoll").started += playerController.DoRagdoll;
-        playerInputActions.FindAction("ChangeCamera").started += cameraController.DoChangeCamera;
-
     }
 }

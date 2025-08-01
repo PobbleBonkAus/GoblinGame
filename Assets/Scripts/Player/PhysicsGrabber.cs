@@ -72,9 +72,12 @@ public class PhysicsGrabber : MonoBehaviour
     {
         if (grabbedObject != null)
         {
-            targetPosition = grabPoint.position - initialGrabPointRelative;
-            Vector3 direction = targetPosition - grabbedObject.transform.position;
-            grabbedObject.linearVelocity = direction * grabForce / Mathf.Max(1.0f, grabbedObject.mass);
+            if(Vector3.Distance(grabPoint.position, grabbedObject.transform.position) > 0.3) 
+            {
+                targetPosition = grabPoint.position - initialGrabPointRelative;
+                Vector3 direction = targetPosition - grabbedObject.transform.position;
+                grabbedObject.linearVelocity = direction * grabForce / Mathf.Max(1.0f, grabbedObject.mass);
+            }
         }
     }
 
