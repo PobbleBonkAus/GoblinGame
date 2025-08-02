@@ -21,13 +21,17 @@ public class RigidbodyPlayerController : MonoBehaviour
     public float ragdollTime = 3.0f;
     private bool isRagdolled = false;
 
+    [Header("References")]
+    [SerializeField] private PhysicsGrabber physicsGrabber;
+    [SerializeField] Transform playerVisuals;
+    [SerializeField] Transform cam;
+
     private Vector3 groundPoint;
 
     [SerializeField] Transform groundCheckOrigin;
     [SerializeField] float hoverFactor = 3.0f;
 
-    [SerializeField] Transform playerVisuals;
-    [SerializeField] Transform cam;
+
 
     Transform orientation;
 
@@ -44,7 +48,15 @@ public class RigidbodyPlayerController : MonoBehaviour
     void FixedUpdate()
     {
         Move();
-        TurnTowardsMoveDirection();
+        if (physicsGrabber.grabbing) 
+        {
+            TurnAwayFromCamera();
+        }
+        else
+        {
+            TurnTowardsMoveDirection();
+        }
+
     }
 
     void Move()
@@ -77,6 +89,14 @@ public class RigidbodyPlayerController : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSmoothTime);
         }
     }
+
+    void TurnAwayFromCamera() 
+    {
+        Quaternion targetRotation = Quaternion.LookRotation(cam.forward);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSmoothTime);
+        
+    }
+
     public void DoJump(InputAction.CallbackContext obj) 
     {
         if(IsGrounded())
@@ -117,9 +137,8 @@ public class RigidbodyPlayerController : MonoBehaviour
 
     public bool IsGrounded()
     {
-        Debug.DrawRay(transform.position, Vector3.down);
 
-        if(Physics.Raycast(groundCheckOrigin.position, Vector3.down,out RaycastHit hit, 1.5f)) 
+        if(Physics.Raycast(groundCheckOrigin.position, Vector3.down,out RaycastHit hit, 1.0f)) 
         {
             groundPoint = hit.point;
             return true;
@@ -130,6 +149,16 @@ public class RigidbodyPlayerController : MonoBehaviour
             return false;
         }
 
+    }
+
+    private void OnDrawGizmos()
+    {      
+        Gizmos.DrawRay(transform.position, Vector3.down);
+    }
+
+    private void OnPlayerJoined() 
+    {
+        Debug.Log("Joined!");
     }
 
 }

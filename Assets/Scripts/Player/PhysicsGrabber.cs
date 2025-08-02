@@ -3,9 +3,9 @@ using UnityEngine.InputSystem;
 
 public class PhysicsGrabber : MonoBehaviour
 {
-    [Header("References")]
-    public Transform interactRayOrigin;         
-    public Transform grabPoint;         
+ 
+    private Vector3 grabPoint;
+    public Vector3 globalGrabPoint;
 
     [Header("Settings")]
     public float interactRange = 3f;
@@ -14,7 +14,7 @@ public class PhysicsGrabber : MonoBehaviour
     public float useItemTimeoutDuration = 0.3f;
 
     private Rigidbody grabbedObject;
-    private bool grabbing = false;
+    public bool grabbing = false;
     private Vector3 initialGrabPointRelative;
     private Vector3 targetPosition;
 
@@ -30,6 +30,7 @@ public class PhysicsGrabber : MonoBehaviour
         if (grabbing)
         {
             MoveGrabbedObject();
+
             if (chargingThrow) 
             {
                 if (throwForceTimer < maxThrowForceTime)
@@ -39,21 +40,26 @@ public class PhysicsGrabber : MonoBehaviour
             }
         }
     }
-
     private void GrabObject()
     {
-        Ray ray = new Ray(interactRayOrigin.transform.position, interactRayOrigin.transform.forward * interactRange);
-       
-        if (Physics.Raycast(ray, out RaycastHit hit, interactRange))
-        {
-            if (hit.rigidbody != null)
-            {
-                if (!hit.rigidbody.CompareTag("Grabbable")) return;
+        Vector3 boxCenter = transform.position + transform.forward * (interactRange * 0.5f);
+        Vector3 boxHalfExtents = new Vector3(0.5f, 0.5f, interactRange * 0.5f);
+        Quaternion boxRotation = transform.rotation;
 
-                grabbedObject = hit.rigidbody;
-                initialGrabPointRelative = hit.point - grabbedObject.transform.position;
-                grabPoint.position = hit.point;
+        Collider[] hits = Physics.OverlapBox(boxCenter, boxHalfExtents, boxRotation);
+
+        foreach (var hit in hits)
+        {
+
+            if (hit.attachedRigidbody != null && hit.CompareTag("Grabbable"))
+            {         
+                grabbedObject = hit.attachedRigidbody;
+                Vector3 hitPoint = hit.ClosestPoint(boxCenter);
+
+                initialGrabPointRelative = hitPoint - grabbedObject.transform.position;
+                grabPoint = hitPoint;
                 grabbing = true;
+                break;
             }
         }
     }
@@ -67,20 +73,23 @@ public class PhysicsGrabber : MonoBehaviour
         }
     }
 
-    
+
     private void MoveGrabbedObject()
     {
         if (grabbedObject != null)
         {
-            if(Vector3.Distance(grabPoint.position, grabbedObject.transform.position) > 0.3) 
-            {
-                targetPosition = grabPoint.position - initialGrabPointRelative;
-                Vector3 direction = targetPosition - grabbedObject.transform.position;
-                grabbedObject.linearVelocity = direction * grabForce / Mathf.Max(1.0f, grabbedObject.mass);
-            }
+            // Recalculate the current target world position
+            Vector3 desiredWorldPosition = transform.position + transform.forward * interactRange;
+
+            // Move to match the original offset on the object (for realism)
+            targetPosition = desiredWorldPosition - initialGrabPointRelative;
+            globalGrabPoint = targetPosition;
+            Vector3 direction = targetPosition - grabbedObject.transform.position;
+
+            // Apply velocity toward the target
+            grabbedObject.linearVelocity = direction * grabForce;
         }
     }
-
     public void DoGrabObject(InputAction.CallbackContext obj) 
     {
         GrabObject();    
@@ -115,9 +124,16 @@ public class PhysicsGrabber : MonoBehaviour
 
     }
 
+
     private void OnDrawGizmos()
     {
-        Gizmos.DrawRay(interactRayOrigin.transform.position, interactRayOrigin.transform.forward * interactRange);
+        Gizmos.color = Color.green;
+        Vector3 boxCenter = transform.position + transform.forward * (interactRange * 0.5f);
+        Vector3 boxHalfExtents = new Vector3(0.5f, 0.5f, interactRange * 0.5f);
+        Quaternion boxRotation = transform.rotation;
+
+        Gizmos.matrix = Matrix4x4.TRS(boxCenter, boxRotation, Vector3.one);
+        Gizmos.DrawWireCube(Vector3.zero, boxHalfExtents * 2f);
     }
 }
 

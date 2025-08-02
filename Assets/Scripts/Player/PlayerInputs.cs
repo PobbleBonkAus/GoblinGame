@@ -27,7 +27,7 @@ public class PlayerInputs : MonoBehaviour
 
         playerInputActions.FindAction("Throw").started += playerPhysicsGrabber.DoChargeThrow;
         playerInputActions.FindAction("Throw").canceled += playerPhysicsGrabber.DoThrow;
-
+        
         playerInputActions.FindAction("Ragdoll").started += playerController.DoRagdoll;
     }
 }
