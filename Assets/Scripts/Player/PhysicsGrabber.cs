@@ -1,17 +1,21 @@
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
 public class PhysicsGrabber : MonoBehaviour
 {
- 
     private Vector3 grabPoint;
     public Vector3 globalGrabPoint;
 
     [Header("Settings")]
-    public float interactRange = 3f;
-    public float grabForce = 10f;
-    public float throwForce = 15f;
-    public float useItemTimeoutDuration = 0.3f;
+    [SerializeField] private float interactRange = 3f;
+    [SerializeField] private float grabForce = 10f;
+    [SerializeField] private float throwForce = 15f;
+    [SerializeField] private float useItemTimeoutDuration = 0.3f;
+    [SerializeField] private float minGrabMoveDistance = 0.2f;
+
+    [Header("references")]
+    [SerializeField] GameObject kinematicBody;
 
     private Rigidbody grabbedObject;
     public bool grabbing = false;
@@ -20,10 +24,14 @@ public class PhysicsGrabber : MonoBehaviour
 
 
     [Header("Throwing")]
-    public float maxThrowForceTime = 50.0f;
+    [SerializeField] private float maxThrowForceTime = 50.0f;
     private float throwForceTimer = 0.0f;
     private bool chargingThrow = false;
 
+    [Header("ItemStoring")]
+    [SerializeField] Transform storedItemTransform;
+    [SerializeField] float dropItemDistance = 1.0f;
+    Rigidbody storedItem = null;
 
     void FixedUpdate()
     {
@@ -35,9 +43,15 @@ public class PhysicsGrabber : MonoBehaviour
             {
                 if (throwForceTimer < maxThrowForceTime)
                 {
+                    initialGrabPointRelative = Vector3.Lerp(initialGrabPointRelative,transform.forward,throwForceTimer * 0.006f);
                     throwForceTimer += 1.0f;
                 }
             }
+        }
+
+        if(storedItem != null) 
+        {
+            storedItem.transform.SetPositionAndRotation(storedItemTransform.position, storedItemTransform.rotation);
         }
     }
     private void GrabObject()
@@ -50,8 +64,7 @@ public class PhysicsGrabber : MonoBehaviour
 
         foreach (var hit in hits)
         {
-
-            if (hit.attachedRigidbody != null && hit.CompareTag("Grabbable"))
+            if (hit.attachedRigidbody != null && hit.gameObject.layer == LayerMask.NameToLayer("Grabbable")) 
             {         
                 grabbedObject = hit.attachedRigidbody;
                 Vector3 hitPoint = hit.ClosestPoint(boxCenter);
@@ -59,6 +72,9 @@ public class PhysicsGrabber : MonoBehaviour
                 initialGrabPointRelative = hitPoint - grabbedObject.transform.position;
                 grabPoint = hitPoint;
                 grabbing = true;
+
+                grabbedObject.gameObject.layer = LayerMask.NameToLayer("GrabbedObject");
+                kinematicBody.SetActive(true);
                 break;
             }
         }
@@ -68,8 +84,10 @@ public class PhysicsGrabber : MonoBehaviour
     {
         if (grabbing)
         {
+            grabbedObject.gameObject.layer = LayerMask.NameToLayer("Grabbable");
             grabbedObject = null;
             grabbing = false;
+            kinematicBody.SetActive(false);
         }
     }
 
@@ -86,10 +104,39 @@ public class PhysicsGrabber : MonoBehaviour
             globalGrabPoint = targetPosition;
             Vector3 direction = targetPosition - grabbedObject.transform.position;
 
-            // Apply velocity toward the target
-            grabbedObject.linearVelocity = direction * grabForce;
+            if (Vector3.Distance(targetPosition, desiredWorldPosition) > minGrabMoveDistance) 
+            {
+                // Apply velocity toward the target
+                grabbedObject.linearVelocity = direction * grabForce;
+            }
+
         }
     }
+
+    public void StoreGrabbedItem() 
+    {
+        if (storedItem) 
+        {
+            DropStoredItem();
+        }
+        else if(grabbedObject != null)
+        {
+            storedItem = grabbedObject;
+            ReleaseObject();
+            storedItem.gameObject.layer = LayerMask.NameToLayer("StoredObject");
+            storedItem.transform.SetPositionAndRotation(storedItemTransform.position, storedItemTransform.rotation);
+            storedItem.gameObject.GetComponent<Rigidbody>().isKinematic = true;
+        }
+    }
+
+    public void DropStoredItem() 
+    {
+       // storedItem.position = storedItemTransform.position + storedItemTransform.forward * dropItemDistance;
+        storedItem.gameObject.layer = LayerMask.NameToLayer("Grabbable");
+        storedItem.gameObject.GetComponent<Rigidbody>().isKinematic = false;
+        storedItem = null;
+    }
+
     public void DoGrabObject(InputAction.CallbackContext obj) 
     {
         GrabObject();    
@@ -103,8 +150,7 @@ public class PhysicsGrabber : MonoBehaviour
     public void DoThrow(InputAction.CallbackContext obj) 
     {
         if (grabbedObject != null)
-        {
-            
+        {           
             Rigidbody releasedObject = grabbedObject;
             ReleaseObject();
             releasedObject.AddForce(transform.forward * throwForce * throwForceTimer);
@@ -114,16 +160,16 @@ public class PhysicsGrabber : MonoBehaviour
         }
     }
 
+
     public void DoChargeThrow(InputAction.CallbackContext obj) 
     {
         chargingThrow = true;
     }
 
-    public void DoPickUp() 
+    public void DoPickUp(InputAction.CallbackContext obj) 
     {
-
+        StoreGrabbedItem();
     }
-
 
     private void OnDrawGizmos()
     {

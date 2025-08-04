@@ -91,7 +91,7 @@ public class playerProceduralAnimator : MonoBehaviour
 
     private void Update()
     {
-        if (player.IsGrounded()) 
+        if (player.IsGrounded()  && !player.isRagdolled) 
         {
             UpdateFootTargetPositions();
             Step();
@@ -271,10 +271,12 @@ public class playerProceduralAnimator : MonoBehaviour
         leftFootLerp = 0;
         rightFootLerp = 0;
 
-        leftFoot.position = Vector3.Lerp(leftFoot.position, leftLegRenderer.transform.position, 0.6f);
+        Vector3 tuckOffset = transform.up * -0.25f;
+
+        leftFoot.position = Vector3.Lerp(leftFoot.position, leftLegRenderer.transform.position + tuckOffset, 0.6f);
         leftFootPreviousPosition = leftFoot.position;
         leftFootTargetPosition = leftFoot.position;
-        rightFoot.position = Vector3.Lerp(rightFoot.position, rightLegRenderer.transform.position, 0.6f);
+        rightFoot.position = Vector3.Lerp(rightFoot.position, rightLegRenderer.transform.position + tuckOffset, 0.6f);
         rightFootPreviousPosition = rightFoot.position;
         rightFootTargetPosition = rightFoot.position;
     }

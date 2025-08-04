@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 3
   tags:
   - Grabbable
+  - Sellable
+  - Junk
+  - Coin
   layers:
   - Default
   - TransparentFX
@@ -14,10 +17,10 @@ TagManager:
   - UI
   - Grabbable
   - Ground
-  - 
-  - 
-  - 
-  - 
+  - PlayerKinematic
+  - GrabbedObject
+  - StoredObject
+  - SellingPit
   - 
   - 
   - 

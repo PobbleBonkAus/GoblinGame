@@ -19,7 +19,7 @@ public class RigidbodyPlayerController : MonoBehaviour
 
     [Header("Ragdoll")]
     public float ragdollTime = 3.0f;
-    private bool isRagdolled = false;
+    public bool isRagdolled = false;
 
     [Header("References")]
     [SerializeField] private PhysicsGrabber physicsGrabber;
@@ -47,14 +47,18 @@ public class RigidbodyPlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        Move();
-        if (physicsGrabber.grabbing) 
+        if (!isRagdolled) 
         {
-            TurnAwayFromCamera();
-        }
-        else
-        {
-            TurnTowardsMoveDirection();
+            Move();
+            if (physicsGrabber.grabbing)
+            {
+                TurnAwayFromCamera();
+            }
+            else
+            {
+                TurnTowardsMoveDirection();
+            }
+
         }
 
     }
@@ -92,7 +96,15 @@ public class RigidbodyPlayerController : MonoBehaviour
 
     void TurnAwayFromCamera() 
     {
-        Quaternion targetRotation = Quaternion.LookRotation(cam.forward);
+        // Camera direction
+        Vector3 cameraDir = cam.forward;
+
+        // Calculate horizontal (Y axis) angle
+        Vector3 flatCameraForward = cameraDir;
+        flatCameraForward.y = 0;
+        flatCameraForward.Normalize();
+
+        Quaternion targetRotation = Quaternion.LookRotation(flatCameraForward);
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSmoothTime);
         
     }
