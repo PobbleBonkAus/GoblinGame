@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 1965682763246492374}
   m_Layer: 6
   m_Name: Hat
-  m_TagString: Untagged
+  m_TagString: Cosmetic
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -30,7 +30,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.48145, y: 0.23774482, z: 0.48145}
+  m_LocalScale: {x: 1.7852124, y: 0.88155574, z: 1.7852124}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}

@@ -168,9 +168,4 @@ public class RigidbodyPlayerController : MonoBehaviour
         Gizmos.DrawRay(transform.position, Vector3.down);
     }
 
-    private void OnPlayerJoined() 
-    {
-        Debug.Log("Joined!");
-    }
-
 }

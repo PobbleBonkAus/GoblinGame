@@ -16,6 +16,7 @@ public class PhysicsGrabber : MonoBehaviour
 
     [Header("references")]
     [SerializeField] GameObject kinematicBody;
+    [SerializeField] CosmeticHandler cosmeticHandler;
 
     private Rigidbody grabbedObject;
     public bool grabbing = false;
@@ -56,6 +57,8 @@ public class PhysicsGrabber : MonoBehaviour
     }
     private void GrabObject()
     {
+        if (!isActiveAndEnabled) return;
+        
         Vector3 boxCenter = transform.position + transform.forward * (interactRange * 0.5f);
         Vector3 boxHalfExtents = new Vector3(0.5f, 0.5f, interactRange * 0.5f);
         Quaternion boxRotation = transform.rotation;
@@ -115,17 +118,24 @@ public class PhysicsGrabber : MonoBehaviour
 
     public void StoreGrabbedItem() 
     {
-        if (storedItem) 
+        if (grabbedObject.CompareTag("Cosmetic")) 
         {
-            DropStoredItem();
+            cosmeticHandler.TryEquipCosmetic(grabbedObject.gameObject);
         }
-        else if(grabbedObject != null)
+        else
         {
-            storedItem = grabbedObject;
-            ReleaseObject();
-            storedItem.gameObject.layer = LayerMask.NameToLayer("StoredObject");
-            storedItem.transform.SetPositionAndRotation(storedItemTransform.position, storedItemTransform.rotation);
-            storedItem.gameObject.GetComponent<Rigidbody>().isKinematic = true;
+            if (storedItem)
+            {
+                DropStoredItem();
+            }
+            else if (grabbedObject != null)
+            {
+                storedItem = grabbedObject;
+                ReleaseObject();
+                storedItem.gameObject.layer = LayerMask.NameToLayer("StoredObject");
+                storedItem.transform.SetPositionAndRotation(storedItemTransform.position, storedItemTransform.rotation);
+                storedItem.gameObject.GetComponent<Rigidbody>().isKinematic = true;
+            }
         }
     }
 
@@ -168,7 +178,14 @@ public class PhysicsGrabber : MonoBehaviour
 
     public void DoPickUp(InputAction.CallbackContext obj) 
     {
-        StoreGrabbedItem();
+        if(storedItem != null)
+        {
+            DropStoredItem();
+        }
+        else
+        {
+            StoreGrabbedItem();
+        }
     }
 
     private void OnDrawGizmos()

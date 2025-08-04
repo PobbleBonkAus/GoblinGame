@@ -1969,6 +1969,7 @@ MonoBehaviour:
   useItemTimeoutDuration: 0.3
   minGrabMoveDistance: 0.2
   kinematicBody: {fileID: 7899023277092317841}
+  cosmeticHandler: {fileID: 3980494218557812091}
   grabbing: 0
   maxThrowForceTime: 20
   storedItemTransform: {fileID: 3702100610907232580}
@@ -1984,6 +1985,7 @@ GameObject:
   - component: {fileID: 2875734061182977641}
   - component: {fileID: 5624377197854774776}
   - component: {fileID: 4809271053423369850}
+  - component: {fileID: 3980494218557812091}
   m_Layer: 3
   m_Name: Body
   m_TagString: Untagged
@@ -2060,6 +2062,19 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &3980494218557812091
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7812182646489895528}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92272c2c85c4a22438d22d6133e4ecd3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cosmeticTransform: {fileID: 2875734061182977641}
 --- !u!1 &7860139988783120383
 GameObject:
   m_ObjectHideFlags: 0
