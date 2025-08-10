@@ -25,7 +25,7 @@ public class PlayerInputs : MonoBehaviour
         
         playerInputActions.FindAction("Jump").started += playerController.DoJump;
         
-        playerInputActions.FindAction("Grab").started += playerPhysicsGrabber.DoGrabObject;
+        playerInputActions.FindAction("Grab").performed += playerPhysicsGrabber.DoGrabObject;
         playerInputActions.FindAction("Grab").canceled += playerPhysicsGrabber.DoReleaseObject;
 
         playerInputActions.FindAction("Throw").started += playerPhysicsGrabber.DoChargeThrow;

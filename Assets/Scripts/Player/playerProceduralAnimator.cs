@@ -27,11 +27,18 @@ public class playerProceduralAnimator : MonoBehaviour
     [SerializeField] private LayerMask playerMask; // Only used to exclude self
     [SerializeField] private RigidbodyPlayerController player;
     [SerializeField] private Transform playerBody;
+
+
+    [Header("Bob")]
+    [SerializeField] private Transform headBobTransform;
+    [SerializeField] private Transform bodyBobTransform;
     [SerializeField] private float playerBobOffset = 0.7f;
     [SerializeField] private float playerBobAmplitude = 0.1f;
+
     [SerializeField] private float playerHeadOffset = 0.9f;
     [SerializeField] private float playerHeadAmplitude = 0.05f;
-    
+
+
     [Header("Arm params")]
     [SerializeField] private Transform grabbedBody;
     [SerializeField] private Transform leftHand;
@@ -42,10 +49,12 @@ public class playerProceduralAnimator : MonoBehaviour
     [SerializeField] private Transform leftHandTarget;
     [SerializeField] private Transform rightHandTarget;
 
+
     [Header("Grabbing params")]
     [SerializeField] PhysicsGrabber physicsGrabber;
 
     private Vector3 grabbedPoint;
+
     private Vector3 leftFootPreviousPosition;
     private Vector3 rightFootPreviousPosition;
 
@@ -91,17 +100,19 @@ public class playerProceduralAnimator : MonoBehaviour
 
     private void Update()
     {
-        if (player.IsGrounded()  && !player.isRagdolled) 
+        if (player.IsGrounded() && !player.isRagdolled) 
         {
             UpdateFootTargetPositions();
             Step();
-            BobPlayerWithLegs();
+            
         }
         else
         {
             TuckLegs();
         }
 
+        BobPlayerWithLegs();
+        
         UpdateArmTargetPositions();
         RotateHeadWithCamera();
 
@@ -110,21 +121,26 @@ public class playerProceduralAnimator : MonoBehaviour
         stepWaitTimer += Time.deltaTime;
     }
 
-    private void BobPlayerWithLegs() 
+    private void BobPlayerWithLegs()
     {
-        playerBody.transform.position = new Vector3(transform.position.x, 
-            transform.position.y + playerBobOffset + (Vector3.Distance(leftFoot.position, rightFoot.position) * playerBobAmplitude),
-            transform.position.z);
+        float footDistance = Vector3.Distance(leftFoot.position, rightFoot.position);
+        float headBobAmount = playerHeadAmplitude * footDistance;
+        Vector3 headBobOffset = transform.up * (playerHeadOffset + headBobAmount);
 
-        headTransform.position = new Vector3(transform.position.x,
-        transform.position.y + playerHeadOffset + (Vector3.Distance(leftFoot.position, rightFoot.position) * playerHeadAmplitude),
-        transform.position.z);
+        headBobTransform.position = playerRigidbody.transform.position + headBobOffset;
+
+        float bobAmount = playerBobAmplitude * footDistance;
+        Vector3 bobOffset = transform.up * (playerBobOffset + bobAmount);
+
+        bodyBobTransform.position = playerRigidbody.transform.position + bobOffset;
     }
+
 
     private void UpdateFootTargetPositions()
     {
         Vector3 velocity = body.GetComponent<Rigidbody>().linearVelocity;
         Vector3 offset = velocity * velocityFactor;
+
 
         // Step left foot
         if (stepLeftFoot && leftFootLerp >= 1f && stepWaitTimer >= stepWaitTime)
@@ -176,10 +192,10 @@ public class playerProceduralAnimator : MonoBehaviour
 
     private void UpdateArmTargetPositions() 
     {
-        if (physicsGrabber.grabbing) 
+        if (physicsGrabber.grabPressed && !player.isRagdolled) 
         {
-            leftHand.position = Vector3.Lerp(leftHand.position, physicsGrabber.globalGrabPoint, armLerpSpeed);
-            rightHand.position = Vector3.Lerp(rightHand.position, physicsGrabber.globalGrabPoint, armLerpSpeed);
+            leftHand.position = Vector3.Lerp(leftHand.position, physicsGrabber.transform.position + (transform.right * 0.4f), armLerpSpeed);
+            rightHand.position = Vector3.Lerp(rightHand.position, physicsGrabber.transform.position - (transform.right * 0.4f), armLerpSpeed);
         }
         else
         {
@@ -212,7 +228,7 @@ public class playerProceduralAnimator : MonoBehaviour
         pitchAngle += pitchOffset;
 
         // Clamp pitch
-        float clampedPitch = Mathf.Clamp(pitchAngle, -30f, 30f);
+        float clampedPitch = Mathf.Clamp(pitchAngle, -60f, 80f);
 
         if (yawAngle > 90f || yawAngle < -90f) 
         {
@@ -240,7 +256,6 @@ public class playerProceduralAnimator : MonoBehaviour
             hitPoint = hit.point;
             return true;
         }
-        Debug.Log("did not hit anything");
         hitPoint = origin - Vector3.up * 1f;
         return false;
     }
