@@ -85,8 +85,9 @@ public class PhysicsGrabber : MonoBehaviour
 
         // Store grab point relative to object
         initialGrabPointRelative = grabbedObject.transform.InverseTransformPoint(hitPoint);
-        // Store object offset relative to player root
-        grabOffsetFromPlayer = playerRoot.InverseTransformPoint(grabbedObject.position);
+        // Store object offset relative to player root this is important for when we rotate the player around, the object
+        // should orbit around the player, not the physics grab origin.
+        grabOffsetFromPlayer = playerRoot.InverseTransformPoint(hitPoint);
 
         grabPoint = hitPoint;
         grabbing = true;
@@ -127,6 +128,8 @@ public class PhysicsGrabber : MonoBehaviour
 
             Vector3 direction = targetPosition - grabbedObject.transform.position;
 
+            globalGrabPoint = grabbedObject.position - grabbedObject.transform.TransformVector(initialGrabPointRelative);
+
             if (direction.sqrMagnitude > minGrabMoveDistance * minGrabMoveDistance)
             {
                 grabbedObject.AddForce(direction * grabForce,ForceMode.Force);
@@ -136,23 +139,31 @@ public class PhysicsGrabber : MonoBehaviour
         }
     }
 
-    void RotateGrabObject() 
+    void RotateGrabObject()
     {
+        // Current world-space position of the grab point on the object
+        Vector3 currentGrabPoint = grabbedObject.transform.TransformPoint(initialGrabPointRelative);
 
-        // Apply torque to rotate the object to face the player's forward direction
-        Quaternion currentRotation = grabbedObject.rotation;
-        Quaternion targetRotation = Quaternion.LookRotation(transform.forward);
-        Quaternion deltaRotation = targetRotation * Quaternion.Inverse(currentRotation);
+        // Desired grab point in world space (where it should be relative to player)
+        Vector3 desiredGrabPoint = playerRoot.TransformPoint(grabOffsetFromPlayer);
 
+        // Get current and desired directions from object center to grab point
+        Vector3 currentDir = (currentGrabPoint - grabbedObject.worldCenterOfMass).normalized;
+        Vector3 desiredDir = (desiredGrabPoint - grabbedObject.worldCenterOfMass).normalized;
+
+        // Find rotation difference to align currentDir to desiredDir
+        Quaternion deltaRotation = Quaternion.FromToRotation(currentDir, desiredDir);
+
+        // Convert to axis-angle for torque calculation
         deltaRotation.ToAngleAxis(out float angle, out Vector3 axis);
-        if (angle > 180f) angle -= 360f;
+        if (angle > 180f) angle -= 360f; // Keep angles small for stability
 
-        // Convert angle to torque (scaled by grabForce)
-        Vector3 torque = axis * angle * grabForce * 0.1f; // Tweak the multiplier if needed
-        if (!float.IsNaN(torque.x) && !float.IsNaN(torque.y) && !float.IsNaN(torque.z))
-        {
-            grabbedObject.AddTorque(torque, ForceMode.Force);
-        }
+        // Apply torque proportional to angle
+        Vector3 torque = axis.normalized * (angle * Mathf.Deg2Rad * grabForce);
+        grabbedObject.AddTorque(torque, ForceMode.Force);
+
+        // Update global grab point for visuals
+        globalGrabPoint = currentGrabPoint;
     }
 
     public void StoreGrabbedItem()
@@ -231,7 +242,7 @@ public class PhysicsGrabber : MonoBehaviour
     {
         if (!grabbing && grabPressed && other.attachedRigidbody != null && throwLockOutTime < 0.0f)
         {
-            GrabObject(other.attachedRigidbody, transform.position);
+            GrabObject(other.attachedRigidbody, other.ClosestPointOnBounds(transform.position));
         }
     }
 }

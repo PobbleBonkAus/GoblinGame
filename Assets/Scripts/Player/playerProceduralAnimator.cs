@@ -13,6 +13,7 @@ public class playerProceduralAnimator : MonoBehaviour
     [Header("Leg params")]
     [SerializeField] float stepDistance = 3.0f;
     [SerializeField] float stepHeight = 0.2f;
+    [SerializeField] float footPlacementOffset = 0.2f;
     [SerializeField] float stepSpeed = 4.0f;
     [SerializeField] float stepWaitTime = 0.5f;
     [SerializeField] float velocityFactor = 0.4f;
@@ -52,6 +53,11 @@ public class playerProceduralAnimator : MonoBehaviour
 
     [Header("Grabbing params")]
     [SerializeField] PhysicsGrabber physicsGrabber;
+
+    [Header("Particle Effects")]
+    [SerializeField] ParticleSystem leftFootDust;
+    [SerializeField] ParticleSystem rightFootDust;
+
 
     private Vector3 grabbedPoint;
 
@@ -154,6 +160,7 @@ public class playerProceduralAnimator : MonoBehaviour
                     leftFootLerp = 0f;
                     stepLeftFoot = false;
                     stepWaitTimer = 0f;
+                    leftFootDust.Play();
                 }
                 else
                 {
@@ -177,6 +184,7 @@ public class playerProceduralAnimator : MonoBehaviour
                     rightFootLerp = 0f;
                     stepLeftFoot = true;
                     stepWaitTimer = 0f;
+                    rightFootDust.Play();
                 }
                 else
                 {
@@ -190,15 +198,29 @@ public class playerProceduralAnimator : MonoBehaviour
         }
     }
 
+    //updates the hand positions for the arm renderers
     private void UpdateArmTargetPositions() 
     {
+        //If the player is holding down the grab button and is not ragdolled, move the hands according to the physics grabber
         if (physicsGrabber.grabPressed && !player.isRagdolled) 
         {
-            leftHand.position = Vector3.Lerp(leftHand.position, physicsGrabber.transform.position + (transform.right * 0.4f), armLerpSpeed);
-            rightHand.position = Vector3.Lerp(rightHand.position, physicsGrabber.transform.position - (transform.right * 0.4f), armLerpSpeed);
+            if (physicsGrabber.grabbing) 
+            {
+                //move hands onto grab point on the grabbed object
+                leftHand.position = Vector3.Lerp(leftHand.position, physicsGrabber.globalGrabPoint + (transform.right * 0.4f), armLerpSpeed);
+                rightHand.position = Vector3.Lerp(rightHand.position, physicsGrabber.globalGrabPoint - (transform.right * 0.4f), armLerpSpeed);
+            }
+            else
+            {
+                //move hands in front of the player to show the player is trying to grab
+                leftHand.position = Vector3.Lerp(leftHand.position, physicsGrabber.transform.position + (transform.right * 0.4f), armLerpSpeed);
+                rightHand.position = Vector3.Lerp(rightHand.position, physicsGrabber.transform.position - (transform.right * 0.4f), armLerpSpeed);
+            }
+
         }
         else
         {
+            //THis is the default position
             leftHand.position = Vector3.Lerp(leftHand.position, leftHandTarget.position, armLerpSpeed);
             rightHand.position = Vector3.Lerp(rightHand.position, rightHandTarget.position, armLerpSpeed);
         }

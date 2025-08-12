@@ -26,7 +26,7 @@ public class ObjectDeposit : MonoBehaviour
             case "Sellable":
                 Debug.Log("found sellable" + interactableObject.name);
                 StartCoroutine(SpawnCoins(interactableObject.value));
-                Destroy(interactableObject);
+                Destroy(interactableObject.gameObject);
                 break;
             case "Junk":
                 Debug.Log("found junk " + interactableObject.name);
