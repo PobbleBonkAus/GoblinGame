@@ -13,6 +13,8 @@ public class PhysicsGrabber : MonoBehaviour
     [SerializeField] private float throwForce = 15f;
     [SerializeField] private float useItemTimeoutDuration = 0.3f;
     [SerializeField] private float minGrabMoveDistance = 0.2f;
+    [SerializeField] private float grabbedObjectLinearDrag = 5.0f;
+    [SerializeField] private float grabbedObjectAngularDrag = 5.0f;
 
     [Header("References")]
     [SerializeField] private GameObject kinematicBody;
@@ -21,15 +23,11 @@ public class PhysicsGrabber : MonoBehaviour
     [SerializeField] private SphereCollider grabCollider;
     [SerializeField] private Transform playerRoot; // Main pivot of player body
 
-    private Rigidbody grabbedObject;
-    public bool grabbing = false;
-    private Vector3 initialGrabPointRelative; // local point on object
-    private Vector3 targetPosition;
-    private Vector3 grabOffsetFromPlayer; // relative position from player root
-    public bool grabPressed = false;
 
     [Header("Throwing")]
     [SerializeField] private float maxThrowForceTime = 50.0f;
+    [SerializeField] private float throwLockOutDuration = 1.0f;
+    private float throwLockOutTime = 0.0f;
     private float throwForceTimer = 0.0f;
     private bool chargingThrow = false;
 
@@ -38,9 +36,21 @@ public class PhysicsGrabber : MonoBehaviour
     [SerializeField] private float dropItemDistance = 1.0f;
     private Rigidbody storedItem = null;
 
+    private Rigidbody grabbedObject;
+    public bool grabbing = false;
+    private Vector3 initialGrabPointRelative; // local point on object
+    private Vector3 targetPosition;
+    private Vector3 grabOffsetFromPlayer; // relative position from player root
+    public bool grabPressed = false;
+    private float grabbedObjectOriginalLinearDrag = 0.0f;
+    private float grabbedObjectOriginalAngularDrag = 0.0f;
+
+    
+
     void FixedUpdate()
     {
-        globalGrabPoint = transform.position + (transform.forward * 1.0f) - (transform.up * 0.2f);
+        globalGrabPoint = transform.position;
+        throwLockOutTime -= Time.fixedDeltaTime;
 
         if (grabbing)
         {
@@ -75,11 +85,17 @@ public class PhysicsGrabber : MonoBehaviour
 
         // Store grab point relative to object
         initialGrabPointRelative = grabbedObject.transform.InverseTransformPoint(hitPoint);
-
         // Store object offset relative to player root
         grabOffsetFromPlayer = playerRoot.InverseTransformPoint(grabbedObject.position);
+
         grabPoint = hitPoint;
         grabbing = true;
+
+        grabbedObjectOriginalLinearDrag = grabbedObject.linearDamping;
+        grabbedObjectOriginalAngularDrag = grabbedObject.angularDamping;
+
+        grabbedObject.linearDamping = grabbedObjectLinearDrag;
+        grabbedObject.angularDamping = grabbedObjectAngularDrag;
 
         grabbedObject.gameObject.layer = LayerMask.NameToLayer("GrabbedObject");
         kinematicBody.SetActive(true);
@@ -90,6 +106,9 @@ public class PhysicsGrabber : MonoBehaviour
         if (grabbing)
         {
             grabbedObject.gameObject.layer = LayerMask.NameToLayer("Grabbable");
+            grabbedObject.linearDamping = grabbedObjectOriginalLinearDrag;
+            grabbedObject.angularDamping = grabbedObjectOriginalAngularDrag;
+
             grabbedObject = null;
             grabbing = false;
             kinematicBody.SetActive(false);
@@ -110,15 +129,29 @@ public class PhysicsGrabber : MonoBehaviour
 
             if (direction.sqrMagnitude > minGrabMoveDistance * minGrabMoveDistance)
             {
-                grabbedObject.linearVelocity = direction * grabForce;
+                grabbedObject.AddForce(direction * grabForce,ForceMode.Force);
             }
 
-            // Set rotation to match player forward
-            Quaternion targetRotation = Quaternion.LookRotation(playerRoot.forward);
-            grabbedObject.MoveRotation(targetRotation);
+            RotateGrabObject();
+        }
+    }
 
-            // Update global grab point for visuals
-            globalGrabPoint = grabbedObject.transform.TransformPoint(initialGrabPointRelative);
+    void RotateGrabObject() 
+    {
+
+        // Apply torque to rotate the object to face the player's forward direction
+        Quaternion currentRotation = grabbedObject.rotation;
+        Quaternion targetRotation = Quaternion.LookRotation(transform.forward);
+        Quaternion deltaRotation = targetRotation * Quaternion.Inverse(currentRotation);
+
+        deltaRotation.ToAngleAxis(out float angle, out Vector3 axis);
+        if (angle > 180f) angle -= 360f;
+
+        // Convert angle to torque (scaled by grabForce)
+        Vector3 torque = axis * angle * grabForce * 0.1f; // Tweak the multiplier if needed
+        if (!float.IsNaN(torque.x) && !float.IsNaN(torque.y) && !float.IsNaN(torque.z))
+        {
+            grabbedObject.AddTorque(torque, ForceMode.Force);
         }
     }
 
@@ -171,6 +204,7 @@ public class PhysicsGrabber : MonoBehaviour
             ReleaseObject();
             releasedObject.AddForce(transform.forward * throwForce * throwForceTimer);
 
+            throwLockOutTime = throwLockOutDuration;
             throwForceTimer = 0.0f;
             chargingThrow = false;
         }
@@ -195,9 +229,9 @@ public class PhysicsGrabber : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-        if (!grabbing && grabPressed && other.attachedRigidbody != null)
+        if (!grabbing && grabPressed && other.attachedRigidbody != null && throwLockOutTime < 0.0f)
         {
-            GrabObject(other.attachedRigidbody, other.ClosestPoint(transform.position));
+            GrabObject(other.attachedRigidbody, transform.position);
         }
     }
 }

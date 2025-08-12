@@ -2490,20 +2490,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   globalGrabPoint: {x: 0, y: 0, z: 0}
   interactRange: 2
-  grabForce: 10
+  grabForce: 70
   throwForce: 15
   useItemTimeoutDuration: 0.3
   minGrabMoveDistance: 0.2
+  grabbedObjectLinearDrag: 0.5
+  grabbedObjectAngularDrag: 0.5
   kinematicBody: {fileID: 7899023277092317841}
   cosmeticHandler: {fileID: 3980494218557812091}
   player: {fileID: 4395257486556739307}
   grabCollider: {fileID: 865081390670594358}
   playerRoot: {fileID: 8726197476894970976}
-  grabbing: 0
-  grabPressed: 0
   maxThrowForceTime: 20
   storedItemTransform: {fileID: 3702100610907232580}
   dropItemDistance: 1
+  grabbing: 0
+  grabPressed: 0
 --- !u!135 &865081390670594358
 SphereCollider:
   m_ObjectHideFlags: 0
