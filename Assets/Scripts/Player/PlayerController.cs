@@ -147,7 +147,7 @@ public class RigidbodyPlayerController : MonoBehaviour
         }
         else if (IsGrounded())
         {
-            Debug.Log("jumping");
+            //Debug.Log("jumping");
             rb.useGravity = true;
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
         }
