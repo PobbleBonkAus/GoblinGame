@@ -242,7 +242,7 @@ Transform:
   m_GameObject: {fileID: 372146353561198775}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.82799995, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -261,6 +261,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerPhysicsGrabber: {fileID: 6208202181723915416}
+  playerAnimator: {fileID: 5469216572922779766}
   playerController: {fileID: 4395257486556739307}
   cameraController: {fileID: 6915619187968391567}
 --- !u!114 &5448757295609145070
@@ -2411,9 +2412,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   camera: {fileID: 3028761874667257503}
   headTransform: {fileID: 8726197476894970976}
-  headLerpSpeed: 1
+  headLerpSpeed: 40
   playerRigidbody: {fileID: 6211814258153673963}
-  pitchOffset: 30
+  initialPitchOffset: 0
+  yawCutoff: 45
+  pitchLimit: {x: -90, y: 90}
+  yawLimit: {x: -90, y: 90}
+  pitchCutoff: 75
+  pitchStrength: 3
+  pitchInput: 0
   stepDistance: 0.2
   stepHeight: 0.4
   footPlacementOffset: 0.2
@@ -2476,7 +2483,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 1.237}
-  m_LocalScale: {x: 1.1271057, y: 1.1271057, z: 1.1271057}
+  m_LocalScale: {x: 3.3813171, y: 3.3813171, z: 3.3813171}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2971403340400548124}

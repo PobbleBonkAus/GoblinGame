@@ -8,7 +8,15 @@ public class playerProceduralAnimator : MonoBehaviour
     [SerializeField] Transform headTransform;
     [SerializeField] private float headLerpSpeed;
     [SerializeField] Rigidbody playerRigidbody;
-    [SerializeField] private float pitchOffset = 0f; // positive = look more upwards
+    [SerializeField] public float initialPitchOffset = 0f; // positive = look more upwards
+    [SerializeField] public float yawCutoff = 45f;
+
+    [Header("Head Angle Params")]
+    [SerializeField] private Vector2 pitchLimit = Vector2.zero;
+    [SerializeField] private Vector2 yawLimit = Vector2.zero;
+    [SerializeField] public float pitchCutoff = 75f;
+    [SerializeField] public float pitchStrength = 0.1f;
+    [SerializeField] public float pitchInput = 0f;
 
     [Header("Leg params")]
     [SerializeField] float stepDistance = 3.0f;
@@ -236,33 +244,34 @@ public class playerProceduralAnimator : MonoBehaviour
         flatCameraForward.y = 0;
         flatCameraForward.Normalize();
 
-        Vector3 flatHeadForward = playerBody.forward;
+        Vector3 flatHeadForward = headTransform.forward;
         flatHeadForward.y = 0;
         flatHeadForward.Normalize();
 
         float yawAngle = Vector3.SignedAngle(flatHeadForward, flatCameraForward, Vector3.up);
 
+
         // Calculate vertical (X axis) angle with pitch offset
-        Vector3 headLocalForward = playerBody.InverseTransformDirection(cameraDir);
+        Vector3 headLocalForward = headTransform.InverseTransformDirection(cameraDir);
         float pitchAngle = Mathf.Atan2(headLocalForward.y, headLocalForward.z) * Mathf.Rad2Deg;
 
         // Apply user-defined offset
-        pitchAngle += pitchOffset;
+        pitchAngle += pitchInput * pitchStrength;
 
-        // Clamp pitch
-        float clampedPitch = Mathf.Clamp(pitchAngle, -60f, 80f);
 
-        if (yawAngle > 90f || yawAngle < -90f) 
+        if (Vector3.Angle(flatHeadForward, flatCameraForward) > pitchCutoff)
         {
-            yawAngle = 0f;
-            clampedPitch = 0f;
+            pitchAngle = 0;
+            yawAngle = 0;
         }
 
-        float clampedYaw = Mathf.Clamp(yawAngle, -90f, 90f);
+        // Clamp pitch
+        float clampedPitch = Mathf.Clamp(pitchAngle, pitchLimit.x, pitchLimit.y);
+        float clampedYaw = Mathf.Clamp(yawAngle, yawLimit.x, yawLimit.y);
 
 
         // Final head rotation in local space (pitch X, yaw Y, no roll)
-        Quaternion targetRotation = Quaternion.Euler(-clampedPitch, clampedYaw, 0f);
+        Quaternion targetRotation = Quaternion.Euler(-clampedPitch + initialPitchOffset, clampedYaw, 0f);
         Quaternion finalRotation = Quaternion.Lerp(headTransform.localRotation, targetRotation, Time.deltaTime * headLerpSpeed);
 
         headTransform.localRotation = finalRotation;
