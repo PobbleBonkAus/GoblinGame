@@ -8,6 +8,7 @@ public class PlayerInputs : MonoBehaviour
 
 
     public PhysicsGrabber playerPhysicsGrabber;
+    public playerProceduralAnimator playerAnimator;
     public RigidbodyPlayerController playerController;
     public PlayerCameraController cameraController;
 
@@ -20,9 +21,11 @@ public class PlayerInputs : MonoBehaviour
         playerInputActions = inputActions.FindActionMap("Player");
 
         playerController.move = playerInputActions.FindAction("Move");
+        playerAnimator.pitchInput = playerInputActions.FindAction("Look").ReadValue<float>();
 
         cameraController.look = playerInputActions.FindAction("Look");
         
+
         playerInputActions.FindAction("Jump").started += playerController.DoJump;
         
         playerInputActions.FindAction("Grab").performed += playerPhysicsGrabber.DoGrabObject;

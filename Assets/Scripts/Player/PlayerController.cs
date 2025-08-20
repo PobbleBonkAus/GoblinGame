@@ -61,7 +61,8 @@ public class RigidbodyPlayerController : MonoBehaviour
 
             if (physicsGrabber.grabPressed)
             {
-                TurnAwayFromCamera();
+                //TurnAwayFromCamera();
+                TurnTowardsMoveDirection();
             }
             else
             {

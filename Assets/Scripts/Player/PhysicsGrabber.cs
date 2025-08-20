@@ -242,7 +242,7 @@ public class PhysicsGrabber : MonoBehaviour
     {
         if (!grabbing && grabPressed && other.attachedRigidbody != null && throwLockOutTime < 0.0f)
         {
-            GrabObject(other.attachedRigidbody, other.ClosestPointOnBounds(transform.position));
+            GrabObject(other.attachedRigidbody, other.ClosestPoint(transform.position));
         }
     }
 }
