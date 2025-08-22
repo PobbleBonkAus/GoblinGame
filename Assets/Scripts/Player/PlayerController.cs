@@ -3,32 +3,44 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody))]
-public class RigidbodyPlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour
 {
+
     [Header("Movement")]
-    public float moveSpeed = 5f;
-    public float jumpForce = 5f;
-    public float rotationSmoothTime = 0.1f;
-    public float maxSpeed = 10.0f;
-    public float maxSlope = 30f;
+    [SerializeField] float moveSpeed = 5f;
+    [SerializeField] float rotationSmoothTime = 0.1f;
+    [SerializeField] float maxSpeed = 10.0f;
+    [SerializeField] float maxSlope = 30f;
     private Rigidbody rb;
 
-    [HideInInspector]
-    public InputAction move;
+
+    [HideInInspector] public InputAction move;
     private Vector2 moveInput;
 
 
     [Header("Ragdoll")]
-    public float ragdollTime = 3.0f;
-    public bool isRagdolled = false;
-    public float colliionRagdollLimit = 10.0f;
+    [HideInInspector] public bool isRagdolled = false;
+    [SerializeField] float ragdollTime = 3.0f;
+    [SerializeField] float ragdollTorqueKick = 3.0f;
+    [SerializeField] float ragdollJumpKick = 3.0f;
+    [SerializeField] float ragdollImpulse = 5.0f;
+    [SerializeField] float colliionRagdollLimit = 10.0f;
 
+    [Header("Jumping")]
+    [SerializeField] float jumpForce = 5f;
+    [SerializeField] float downwardsImpulse = 3f;
+    private bool jumpPressed = false;
+    private bool isJumpHeld = false;
+    [SerializeField] private float fallMultiplier = 4f;
+    [SerializeField] private float lowJumpMultiplier = 6f;
+    [SerializeField] private bool ragdollWhenJump = false;
+    [SerializeField] private float fallingTrigger = -1.0f;
 
     [Header("Self Righting")]
-    public float righteningForce = 100.0f;
-    public float righteningForceLerp = 0.5f;
-    public float righteningTrigger = 5.0f;
-    public float minRighteningAngle = 3.0f;
+    [SerializeField] float righteningForce = 100.0f;
+    [SerializeField] float righteningForceLerp = 0.5f;
+    [SerializeField] float righteningTrigger = 5.0f;
+    [SerializeField] float minRighteningAngle = 3.0f;
     float variedRighteningForce = 100.0f;
 
     [Header("References")]
@@ -53,11 +65,19 @@ public class RigidbodyPlayerController : MonoBehaviour
     }
 
 
+    void Start()
+    {
+        rb.Move(GameObject.FindGameObjectWithTag("PlayerSpawn").transform.position, Random.rotation);
+    }
+
     void FixedUpdate()
     {
         if (!isRagdolled) 
         {
-            Move();
+            if (!physicsGrabber.finesseMode) 
+            {
+                Move();
+            }
 
             if (physicsGrabber.grabPressed)
             {
@@ -73,6 +93,8 @@ public class RigidbodyPlayerController : MonoBehaviour
             RightenPlayer();
         }
 
+        ApplyBetterJump();
+
     }
 
 
@@ -85,10 +107,13 @@ public class RigidbodyPlayerController : MonoBehaviour
             moveInput = move.ReadValue<Vector2>();
             Vector3 cameraRight = Vector3.ProjectOnPlane(cam.right, Vector3.up);
             Vector3 cameraForward = Vector3.ProjectOnPlane(cam.forward, currentSlopeNormal);
+            Vector3 flatCameraForward = cameraForward;
+            flatCameraForward.y = 0;
+            flatCameraForward.Normalize();
 
-            Vector3 moveDirection = cameraForward * moveInput.y + cameraRight * moveInput.x;
+            Vector3 moveDirection = flatCameraForward * moveInput.y + cameraRight * moveInput.x;
 
-            Vector3 velocity = moveDirection.normalized * moveSpeed;
+            Vector3 velocity = moveDirection * moveSpeed;
             Vector3 currentYVelocity = Vector3.up * rb.linearVelocity.y;
 
             rb.AddForce(velocity + currentYVelocity);
@@ -140,20 +165,45 @@ public class RigidbodyPlayerController : MonoBehaviour
         
     }
 
-    public void DoJump(InputAction.CallbackContext obj) 
+
+    void ApplyBetterJump()
     {
-        if (isRagdolled && rb.linearVelocity.magnitude < 3.0f) 
+        if (rb.linearVelocity.y < fallingTrigger) // falling
         {
-            EndRagdoll();
+            rb.linearVelocity += Vector3.up * Physics.gravity.y * (fallMultiplier - 1f) * Time.fixedDeltaTime;
         }
-        else if (IsGrounded())
+        else if (rb.linearVelocity.y > 0f && !isJumpHeld) // early release
         {
-            //Debug.Log("jumping");
-            rb.useGravity = true;
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            rb.linearVelocity += Vector3.up * Physics.gravity.y * (lowJumpMultiplier - 1f) * Time.fixedDeltaTime;
         }
     }
 
+    public void DoJump(InputAction.CallbackContext ctx)
+    {
+        if (ctx.started) // button pressed
+        {
+            if (isRagdolled && rb.linearVelocity.magnitude < 3.0f && IsGrounded())
+            {
+                EndRagdoll();
+            }
+            else if (IsGrounded())
+            {
+                if (ragdollWhenJump) 
+                {
+                    isRagdolled = true;
+                    rb.AddRelativeTorque(Random.rotation.eulerAngles * ragdollJumpKick, ForceMode.Impulse);
+                }
+                jumpPressed = true;
+                isJumpHeld = true;
+                rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z); // reset Y
+                rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            }
+        }
+        else if (ctx.canceled) // button released
+        {
+            isJumpHeld = false;
+        }
+    }
     public void DoRagdoll(InputAction.CallbackContext obj) 
     {
         if (!isRagdolled) 
@@ -171,6 +221,9 @@ public class RigidbodyPlayerController : MonoBehaviour
     {
         isRagdolled = true;
         variedRighteningForce = 0.0f;
+        rb.AddForce(rb.linearVelocity * ragdollImpulse, ForceMode.Impulse);
+        rb.AddForce(transform.up * ragdollImpulse, ForceMode.Impulse);
+        rb.AddTorque(Random.rotation.eulerAngles * ragdollTorqueKick, ForceMode.Impulse);
         gameObject.layer = LayerMask.NameToLayer("Grabbable");
     }
 

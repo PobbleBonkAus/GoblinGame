@@ -8,19 +8,12 @@ public class playerProceduralAnimator : MonoBehaviour
     [SerializeField] Transform headTransform;
     [SerializeField] private float headLerpSpeed;
     [SerializeField] Rigidbody playerRigidbody;
-    [SerializeField] public float initialPitchOffset = 0f; // positive = look more upwards
-    [SerializeField] public float yawCutoff = 45f;
 
-    [Header("Head Angle Params")]
-    [SerializeField] private Vector2 pitchLimit = Vector2.zero;
-    [SerializeField] private Vector2 yawLimit = Vector2.zero;
-    [SerializeField] public float pitchCutoff = 75f;
-    [SerializeField] public float pitchStrength = 0.1f;
-    [SerializeField] public float pitchInput = 0f;
 
     [Header("Leg params")]
     [SerializeField] float stepDistance = 3.0f;
     [SerializeField] float stepHeight = 0.2f;
+    [SerializeField] float groundCheckDistance = 1.0f;
     [SerializeField] float footPlacementOffset = 0.2f;
     [SerializeField] float stepSpeed = 4.0f;
     [SerializeField] float stepWaitTime = 0.5f;
@@ -34,7 +27,7 @@ public class playerProceduralAnimator : MonoBehaviour
     [Header("Body params")]
     [SerializeField] Transform body;
     [SerializeField] private LayerMask playerMask; // Only used to exclude self
-    [SerializeField] private RigidbodyPlayerController player;
+    [SerializeField] private PlayerController player;
     [SerializeField] private Transform playerBody;
 
 
@@ -128,7 +121,7 @@ public class playerProceduralAnimator : MonoBehaviour
         BobPlayerWithLegs();
         
         UpdateArmTargetPositions();
-        RotateHeadWithCamera();
+        //RotateHeadWithCamera();
 
         DrawLegs();
         DrawArms();
@@ -233,7 +226,7 @@ public class playerProceduralAnimator : MonoBehaviour
             rightHand.position = Vector3.Lerp(rightHand.position, rightHandTarget.position, armLerpSpeed);
         }
     }
-
+    /*
     private void RotateHeadWithCamera()
     {
         // Camera direction
@@ -276,18 +269,18 @@ public class playerProceduralAnimator : MonoBehaviour
 
         headTransform.localRotation = finalRotation;
     }
-
+    */
     private bool TryGetFootTarget(Vector3 origin, Vector3 velocityOffset,out Vector3 hitPoint)
     {
         Vector3 rayStart = origin + velocityOffset;
         Vector3 direction = Vector3.down;
 
-        if (Physics.Raycast(rayStart, direction, out RaycastHit hit, 0.5f, raycastMask))
+        if (Physics.Raycast(rayStart, direction, out RaycastHit hit, groundCheckDistance, raycastMask))
         {
-            hitPoint = hit.point;
+            hitPoint = hit.point - (Vector3.up * footPlacementOffset);
             return true;
         }
-        hitPoint = origin - Vector3.up * 1f;
+        hitPoint = origin - Vector3.up;
         return false;
     }
 

@@ -9,6 +9,7 @@ TagManager:
   - Junk
   - Coin
   - Cosmetic
+  - PlayerSpawn
   layers:
   - Default
   - TransparentFX

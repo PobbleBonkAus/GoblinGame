@@ -19,7 +19,7 @@ public class PhysicsGrabber : MonoBehaviour
     [Header("References")]
     [SerializeField] private GameObject kinematicBody;
     [SerializeField] private CosmeticHandler cosmeticHandler;
-    [SerializeField] private RigidbodyPlayerController player;
+    [SerializeField] private PlayerController player;
     [SerializeField] private SphereCollider grabCollider;
     [SerializeField] private Transform playerRoot; // Main pivot of player body
 
@@ -36,16 +36,26 @@ public class PhysicsGrabber : MonoBehaviour
     [SerializeField] private float dropItemDistance = 1.0f;
     private Rigidbody storedItem = null;
 
+
     private Rigidbody grabbedObject;
-    public bool grabbing = false;
     private Vector3 initialGrabPointRelative; // local point on object
     private Vector3 targetPosition;
     private Vector3 grabOffsetFromPlayer; // relative position from player root
+    
     public bool grabPressed = false;
+    public bool grabbing = false;
+
     private float grabbedObjectOriginalLinearDrag = 0.0f;
     private float grabbedObjectOriginalAngularDrag = 0.0f;
 
-    
+    [Header("Finesse Mode")]
+    [HideInInspector] public bool finesseMode = false;
+    [SerializeField] private float finesseModeSpeed = 4.0f;
+    [SerializeField] private float finesseModeMaxDistance = 2.0f;
+    [HideInInspector] public InputAction finesseModeInput;
+    private Vector3 finesseOffset = Vector3.zero;
+
+
 
     void FixedUpdate()
     {
@@ -113,6 +123,9 @@ public class PhysicsGrabber : MonoBehaviour
             grabbedObject = null;
             grabbing = false;
             kinematicBody.SetActive(false);
+            finesseOffset = Vector3.zero;
+
+            finesseMode = false;
         }
     }
 
@@ -124,11 +137,30 @@ public class PhysicsGrabber : MonoBehaviour
             Vector3 desiredWorldPosition = playerRoot.TransformPoint(grabOffsetFromPlayer);
 
             // Maintain grab point on object
-            targetPosition = desiredWorldPosition - grabbedObject.transform.TransformVector(initialGrabPointRelative);
+            targetPosition = desiredWorldPosition - grabbedObject.transform.TransformVector(initialGrabPointRelative) + finesseOffset;
+
+
+            if (finesseMode) 
+            {
+
+                Vector3 finesseInput = new Vector3(finesseModeInput.ReadValue<Vector2>().x, finesseModeInput.ReadValue<Vector2>().y, 0.0f);
+                Vector3 localOffset =
+                      player.transform.right * finesseInput.x   // left/right
+                    + player.transform.up * finesseInput.y;  // up/down
+
+                finesseOffset += localOffset * finesseModeSpeed;
+                
+
+
+                if (finesseOffset.magnitude > finesseModeMaxDistance) finesseOffset = finesseOffset.normalized * finesseModeMaxDistance;
+
+            }
+
+
 
             Vector3 direction = targetPosition - grabbedObject.transform.position;
 
-            globalGrabPoint = grabbedObject.position - grabbedObject.transform.TransformVector(initialGrabPointRelative);
+            globalGrabPoint = grabbedObject.position - grabbedObject.transform.TransformVector(initialGrabPointRelative) + finesseOffset;
 
             if (direction.sqrMagnitude > minGrabMoveDistance * minGrabMoveDistance)
             {
@@ -205,6 +237,7 @@ public class PhysicsGrabber : MonoBehaviour
     {
         ReleaseObject();
         grabPressed = false;
+
     }
 
     public void DoThrow(InputAction.CallbackContext obj)
@@ -237,6 +270,25 @@ public class PhysicsGrabber : MonoBehaviour
             StoreGrabbedItem();
         }
     }
+
+    public void DoToggleFinesse(InputAction.CallbackContext obj) 
+    {
+        if (grabbing) 
+        {
+            if (finesseMode) 
+            {
+                grabbedObject.linearDamping = 3.0f;
+                finesseMode = false;
+            }
+            else
+            {
+                grabbedObject.linearDamping = 30.0f;
+                finesseMode = true;
+            }
+
+        }
+    }
+
 
     private void OnTriggerStay(Collider other)
     {

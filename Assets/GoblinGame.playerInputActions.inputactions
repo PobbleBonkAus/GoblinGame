@@ -9,7 +9,7 @@
                     "name": "Move",
                     "type": "Value",
                     "id": "92a57663-1bc4-4a99-a309-0035c6848e1b",
-                    "expectedControlType": "Vector2",
+                    "expectedControlType": "Stick",
                     "processors": "StickDeadzone",
                     "interactions": "",
                     "initialStateCheck": true
@@ -72,6 +72,15 @@
                     "name": "Throw",
                     "type": "Button",
                     "id": "ce370ff8-cc42-4c15-a0c8-c326ce3b3b8f",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "ToggleFinesse",
+                    "type": "Button",
+                    "id": "fe895b6c-6281-4cff-884d-401e1fd4b66e",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -373,6 +382,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "Throw",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a4deeeb1-d6c0-43eb-a1f7-31ab7d724b26",
+                    "path": "<Gamepad>/rightStickPress",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad",
+                    "action": "ToggleFinesse",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "79674dda-0b28-45ba-a091-936b9bf7fdc7",
+                    "path": "<Keyboard>/f",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "ToggleFinesse",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

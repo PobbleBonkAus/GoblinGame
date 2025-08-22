@@ -64,7 +64,7 @@ public class ObjectDeposit : MonoBehaviour
     IEnumerator SpitPlayerBackOut(GameObject player) 
     {
         yield return new WaitForSeconds(initialEjectDelay);
-        player.GetComponent<RigidbodyPlayerController>().isRagdolled = true;
+        player.GetComponent<PlayerController>().isRagdolled = true;
         player.GetComponent<Rigidbody>().AddForce(coinSpawn.forward * ejectionForce, ForceMode.Impulse);
         
     }
