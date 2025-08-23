@@ -8,6 +8,8 @@ public class PlayerController : MonoBehaviour
 
     [Header("Movement")]
     [SerializeField] float moveSpeed = 5f;
+    float currentMoveSpeed = 0f;
+    float moveDampening = 0f;
     [SerializeField] float rotationSmoothTime = 0.1f;
     [SerializeField] float maxSpeed = 10.0f;
     [SerializeField] float maxSlope = 30f;
@@ -68,6 +70,8 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         rb.Move(GameObject.FindGameObjectWithTag("PlayerSpawn").transform.position, Random.rotation);
+        currentMoveSpeed = moveSpeed;
+        moveDampening = rb.linearDamping;
     }
 
     void FixedUpdate()
@@ -79,17 +83,17 @@ public class PlayerController : MonoBehaviour
                 Move();
             }
 
-            if (physicsGrabber.grabPressed)
+            if (physicsGrabber.grabbing)
             {
-                //TurnAwayFromCamera();
-                TurnTowardsMoveDirection();
-            }
-            else
-            {
+                float distanceToGrabbedObject = Vector3.Distance(transform.position, physicsGrabber.globalGrabPoint);
+                if(distanceToGrabbedObject > 3.0f)
+                {
+                    rb.AddForce((physicsGrabber.globalGrabPoint - transform.position) * distanceToGrabbedObject);
+                }
 
-                TurnTowardsMoveDirection();
             }
 
+            TurnTowardsMoveDirection();
             RightenPlayer();
         }
 
@@ -113,7 +117,7 @@ public class PlayerController : MonoBehaviour
 
             Vector3 moveDirection = flatCameraForward * moveInput.y + cameraRight * moveInput.x;
 
-            Vector3 velocity = moveDirection * moveSpeed;
+            Vector3 velocity = moveDirection * currentMoveSpeed;
             Vector3 currentYVelocity = Vector3.up * rb.linearVelocity.y;
 
             rb.AddForce(velocity + currentYVelocity);
