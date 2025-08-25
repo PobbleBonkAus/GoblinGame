@@ -25,10 +25,10 @@ public class PhysicsGrabber : MonoBehaviour
 
 
     [Header("Throwing")]
-    [SerializeField] private float maxThrowForceTime = 50.0f;
+    [SerializeField] public float maxThrowForceTime = 50.0f;
     [SerializeField] private float throwLockOutDuration = 1.0f;
     private float throwLockOutTime = 0.0f;
-    private float throwForceTimer = 0.0f;
+    [HideInInspector] public float throwForceTimer = 0.0f;
     private bool chargingThrow = false;
 
     [Header("Item Storing")]
