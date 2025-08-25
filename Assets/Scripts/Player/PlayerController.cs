@@ -45,6 +45,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float minRighteningAngle = 3.0f;
     float variedRighteningForce = 100.0f;
 
+    [Header("Expressions")]
+    [SerializeField] Renderer[] eyeRenderers;
+    [SerializeField][Range(1, 4)] float eyeBlankStare;
+    [SerializeField][Range(1, 4)] float eyeDazed;
+    [SerializeField] GameObject eyeDazeGameObject;
+
     [Header("References")]
     [SerializeField] private PhysicsGrabber physicsGrabber;
     [SerializeField] Transform playerVisuals;
@@ -229,12 +235,20 @@ public class PlayerController : MonoBehaviour
         rb.AddForce(transform.up * ragdollImpulse, ForceMode.Impulse);
         rb.AddTorque(Random.rotation.eulerAngles * ragdollTorqueKick, ForceMode.Impulse);
         gameObject.layer = LayerMask.NameToLayer("Grabbable");
+
+        eyeDazeGameObject.SetActive(true);
+        eyeRenderers[0].material.SetFloat("_EyePlacement", eyeDazed);
+        eyeRenderers[1].material.SetFloat("_EyePlacement", eyeDazed);
     }
 
     private void EndRagdoll() 
     {
         isRagdolled = false;
         gameObject.layer = LayerMask.NameToLayer("Player");
+
+        eyeDazeGameObject.SetActive(false);
+        eyeRenderers[0].material.SetFloat("_EyePlacement", eyeBlankStare);
+        eyeRenderers[1].material.SetFloat("_EyePlacement", eyeBlankStare);
     }
 
    
