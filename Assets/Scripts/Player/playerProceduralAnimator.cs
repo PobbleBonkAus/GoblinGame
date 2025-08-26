@@ -83,10 +83,6 @@ public class playerProceduralAnimator : MonoBehaviour
     {
         playerLayer = LayerMask.NameToLayer("Player");
         raycastMask = ~(1 << playerLayer); // Everything except the Player layer
-    }
-
-    private void Start()
-    {
 
         // Detach feet so they stay in world space
         leftFoot.SetParent(null);
@@ -94,6 +90,13 @@ public class playerProceduralAnimator : MonoBehaviour
 
         leftHand.SetParent(null);
         rightHand.SetParent(null);
+
+    }
+
+    private void Start()
+    {
+        //leftHand.position = body.position;
+        //rightHand.position = body.position;
 
         leftHandTarget.position = leftHand.position;
         rightHandTarget.position = rightHand.position;
@@ -222,8 +225,8 @@ public class playerProceduralAnimator : MonoBehaviour
         else
         {
             //THis is the default position
-            leftHand.position = Vector3.Lerp(leftHand.position, leftHandTarget.position, armLerpSpeed);
-            rightHand.position = Vector3.Lerp(rightHand.position, rightHandTarget.position, armLerpSpeed);
+            leftHand.position = SpringLerp(leftHand.position, leftHandTarget.position, ref leftHandVel);
+            rightHand.position = SpringLerp(rightHand.position, rightHandTarget.position, ref rightHandVel);
         }
     }
     /*
@@ -303,6 +306,25 @@ public class playerProceduralAnimator : MonoBehaviour
                                               Vector3.Lerp(mid, rightFootTargetPosition, rightFootLerp),
                                               rightFootLerp);
         }
+    }
+
+
+    [SerializeField] float damping = 5f;
+    [SerializeField] float stiffness = 50f;
+
+    private Vector3 leftHandVel;
+    private Vector3 rightHandVel;
+
+    Vector3 SpringLerp(Vector3 current, Vector3 target, ref Vector3 velocity)
+    {
+        Vector3 displacement = target - current;
+        Vector3 springForce = stiffness * displacement;
+        Vector3 dampingForce = -damping * velocity;
+
+        Vector3 acceleration = springForce + dampingForce;
+        velocity += acceleration * Time.deltaTime;
+
+        return current + velocity * Time.deltaTime;
     }
 
     private void TuckLegs() 

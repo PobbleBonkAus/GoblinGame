@@ -75,7 +75,9 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        rb.Move(GameObject.FindGameObjectWithTag("PlayerSpawn").transform.position, Random.rotation);
+        rb.Move(GameObject.FindGameObjectWithTag("PlayerSpawn").transform.position, Quaternion.identity);
+        playerVisuals.gameObject.SetActive(true);
+
         currentMoveSpeed = moveSpeed;
         moveDampening = rb.linearDamping;
     }
