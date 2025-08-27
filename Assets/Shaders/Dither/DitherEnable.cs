@@ -7,12 +7,13 @@ public class DitherEnable : MonoBehaviour
     [Range(0f,1f)] public float alphaChange;
     public PhysicsGrabber physicsGrabber;
     bool grabPressed;
-
+    bool grabHold;
 
     private void Update()
     {
         grabPressed = physicsGrabber.grabPressed;
-        if (grabPressed)
+        grabHold = physicsGrabber.grabbing;
+        if (grabPressed && !grabHold)
         {
             colorAlpha(alphaChange);
         }

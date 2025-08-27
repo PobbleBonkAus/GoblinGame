@@ -15,6 +15,7 @@ public class PlayerInputs : MonoBehaviour
     void OnEnable() => inputActions.Enable();
     void OnDisable() => inputActions.Disable();
 
+    
     void Awake()
     {
         inputActions = GetComponent<PlayerInput>().actions;

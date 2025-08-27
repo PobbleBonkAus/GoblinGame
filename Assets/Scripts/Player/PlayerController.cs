@@ -65,6 +65,11 @@ public class PlayerController : MonoBehaviour
     Vector3 currentSlopeNormal = Vector3.zero;
     Transform orientation;
 
+    //Tutorial Things
+    [HideInInspector] public bool playerWalk;
+    [HideInInspector] public bool playerJump;
+    [HideInInspector] public bool playerGrab;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -127,6 +132,8 @@ public class PlayerController : MonoBehaviour
             Vector3 currentYVelocity = Vector3.up * rb.linearVelocity.y;
 
             rb.AddForce(velocity + currentYVelocity);
+
+            playerWalk = true;
         }
     }
 
@@ -143,7 +150,6 @@ public class PlayerController : MonoBehaviour
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSmoothTime);
             }
         }
-
     }
 
     void TurnAwayFromCamera() 
@@ -172,7 +178,6 @@ public class PlayerController : MonoBehaviour
             var axis = Vector3.Cross(transform.up, Vector3.up);
             rb.AddTorque(axis * angle * variedRighteningForce);
         }
-        
     }
 
 
@@ -207,6 +212,8 @@ public class PlayerController : MonoBehaviour
                 isJumpHeld = true;
                 rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z); // reset Y
                 rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+
+                playerJump = true;
             }
         }
         else if (ctx.canceled) // button released
