@@ -2026,11 +2026,11 @@ MonoBehaviour:
   armLerpSpeed: 0.1
   leftHandTarget: {fileID: 6158854973786108137}
   rightHandTarget: {fileID: 3680193907463791115}
+  damping: 9
+  stiffness: 500
   physicsGrabber: {fileID: 6208202181723915416}
   leftFootDust: {fileID: 5822926008086345850}
   rightFootDust: {fileID: 3385002379520747456}
-  damping: 5
-  stiffness: 50
 --- !u!1 &7724413338628849395
 GameObject:
   m_ObjectHideFlags: 0
@@ -2144,7 +2144,7 @@ Transform:
   m_GameObject: {fileID: 7802046003944811974}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 1.237}
+  m_LocalPosition: {x: 0, y: 0, z: 1.524}
   m_LocalScale: {x: 3.3813171, y: 3.3813171, z: 3.3813171}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2164,12 +2164,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   globalGrabPoint: {x: 0, y: 0, z: 0}
   interactRange: 2
-  grabForce: 70
+  largeObjectGrabForce: 10
+  smallObjectGrabForce: 100
   throwForce: 15
   useItemTimeoutDuration: 0.3
   minGrabMoveDistance: 0.2
   grabbedObjectLinearDrag: 10
   grabbedObjectAngularDrag: 10
+  maxGrabObjectRange: 3
+  heavyObjectMultiplier: 0.4
+  springSnapBackForce: -0.4
   kinematicBody: {fileID: 7899023277092317841}
   cosmeticHandler: {fileID: 3980494218557812091}
   player: {fileID: 4395257486556739307}
@@ -2180,20 +2184,11 @@ MonoBehaviour:
   throwForceTimer: 0
   storedItemTransform: {fileID: 3702100610907232580}
   dropItemDistance: 1
+  raisedObjectTransform: {fileID: 3306401962876573236}
+  raiseSpeed: 0.1
+  raisePressed: 0
   grabPressed: 0
   grabbing: 0
-  finesseMode: 0
-  finesseModeSpeed: 0.03
-  finesseModeMaxDistance: 2
-  finesseModeInput:
-    m_Name: 
-    m_Type: 0
-    m_ExpectedControlType: 
-    m_Id: f732c6dc-e328-49eb-98cd-5744cd4693d4
-    m_Processors: 
-    m_Interactions: 
-    m_SingletonActionBindings: []
-    m_Flags: 0
 --- !u!135 &865081390670594358
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -2213,7 +2208,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.5
+  m_Radius: 0.45
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &7812182646489895528
 GameObject:
@@ -2364,7 +2359,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1073106266114904444
 Transform:
   m_ObjectHideFlags: 0
@@ -2399,10 +2394,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.6
+  m_Radius: 0.7
   m_Height: 3
   m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 0.05, z: 0}
 --- !u!54 &5941997804589286083
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2592,6 +2587,7 @@ Transform:
   - {fileID: 108663793620656103}
   - {fileID: 8673194178085036460}
   - {fileID: 3702100610907232580}
+  - {fileID: 3306401962876573236}
   - {fileID: 1073106266114904444}
   - {fileID: 8782199234064376268}
   - {fileID: 8689652738958153101}
@@ -2637,9 +2633,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32df74830ce71e2418b6e9ec1ddf4910, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 30.45
+  moveSpeed: 8
   rotationSmoothTime: 0.1
-  maxSpeed: 6
+  maxSpeed: 10
   maxSlope: 46.5
   move:
     m_Name: Move
@@ -2656,6 +2652,7 @@ MonoBehaviour:
   ragdollJumpKick: 0.3
   ragdollImpulse: 0.3
   colliionRagdollLimit: 30
+  isInOcean: 0
   jumpForce: 13.2
   downwardsImpulse: 3
   fallMultiplier: 4
@@ -2677,6 +2674,8 @@ MonoBehaviour:
   cam: {fileID: 3028761874667257503}
   groundCheckOrigin: {fileID: 108663793620656103}
   hoverFactor: 3
+  heavyObjectMulitplier: 0
+  bouyancy: 1
 --- !u!114 &2910426281273310292
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2771,6 +2770,37 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.32
   m_Center: {x: 0, y: -0.87, z: 0}
+--- !u!1 &9013674627826794646
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3306401962876573236}
+  m_Layer: 3
+  m_Name: RaisedObjectOffset
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3306401962876573236
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9013674627826794646}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 2.342, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2722708969919576874}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &9207663726356224163
 GameObject:
   m_ObjectHideFlags: 0

@@ -164,7 +164,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""ToggleFinesse"",
+                    ""name"": ""RaiseObject"",
                     ""type"": ""Button"",
                     ""id"": ""fe895b6c-6281-4cff-884d-401e1fd4b66e"",
                     ""expectedControlType"": """",
@@ -474,22 +474,33 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""a4deeeb1-d6c0-43eb-a1f7-31ab7d724b26"",
-                    ""path"": ""<Gamepad>/rightStickPress"",
+                    ""path"": ""<Gamepad>/rightShoulder"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Gamepad"",
-                    ""action"": ""ToggleFinesse"",
+                    ""action"": ""RaiseObject"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
                     ""name"": """",
                     ""id"": ""79674dda-0b28-45ba-a091-936b9bf7fdc7"",
-                    ""path"": ""<Keyboard>/f"",
+                    ""path"": ""<Keyboard>/e"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""ToggleFinesse"",
+                    ""action"": ""RaiseObject"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e5e3a06d-8a95-46a9-b06c-50e8b9d40dbb"",
+                    ""path"": ""<Gamepad>/leftShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RaiseObject"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1085,7 +1096,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Player_Ragdoll = m_Player.FindAction("Ragdoll", throwIfNotFound: true);
         m_Player_StoreItem = m_Player.FindAction("StoreItem", throwIfNotFound: true);
         m_Player_Throw = m_Player.FindAction("Throw", throwIfNotFound: true);
-        m_Player_ToggleFinesse = m_Player.FindAction("ToggleFinesse", throwIfNotFound: true);
+        m_Player_RaiseObject = m_Player.FindAction("RaiseObject", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1187,7 +1198,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Ragdoll;
     private readonly InputAction m_Player_StoreItem;
     private readonly InputAction m_Player_Throw;
-    private readonly InputAction m_Player_ToggleFinesse;
+    private readonly InputAction m_Player_RaiseObject;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1232,9 +1243,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @Throw => m_Wrapper.m_Player_Throw;
         /// <summary>
-        /// Provides access to the underlying input action "Player/ToggleFinesse".
+        /// Provides access to the underlying input action "Player/RaiseObject".
         /// </summary>
-        public InputAction @ToggleFinesse => m_Wrapper.m_Player_ToggleFinesse;
+        public InputAction @RaiseObject => m_Wrapper.m_Player_RaiseObject;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1285,9 +1296,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Throw.started += instance.OnThrow;
             @Throw.performed += instance.OnThrow;
             @Throw.canceled += instance.OnThrow;
-            @ToggleFinesse.started += instance.OnToggleFinesse;
-            @ToggleFinesse.performed += instance.OnToggleFinesse;
-            @ToggleFinesse.canceled += instance.OnToggleFinesse;
+            @RaiseObject.started += instance.OnRaiseObject;
+            @RaiseObject.performed += instance.OnRaiseObject;
+            @RaiseObject.canceled += instance.OnRaiseObject;
         }
 
         /// <summary>
@@ -1323,9 +1334,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Throw.started -= instance.OnThrow;
             @Throw.performed -= instance.OnThrow;
             @Throw.canceled -= instance.OnThrow;
-            @ToggleFinesse.started -= instance.OnToggleFinesse;
-            @ToggleFinesse.performed -= instance.OnToggleFinesse;
-            @ToggleFinesse.canceled -= instance.OnToggleFinesse;
+            @RaiseObject.started -= instance.OnRaiseObject;
+            @RaiseObject.performed -= instance.OnRaiseObject;
+            @RaiseObject.canceled -= instance.OnRaiseObject;
         }
 
         /// <summary>
@@ -1683,12 +1694,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnThrow(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "ToggleFinesse" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "RaiseObject" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnToggleFinesse(InputAction.CallbackContext context);
+        void OnRaiseObject(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

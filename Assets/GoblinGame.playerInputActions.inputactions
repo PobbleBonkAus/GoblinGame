@@ -78,7 +78,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "ToggleFinesse",
+                    "name": "RaiseObject",
                     "type": "Button",
                     "id": "fe895b6c-6281-4cff-884d-401e1fd4b66e",
                     "expectedControlType": "",
@@ -388,22 +388,33 @@
                 {
                     "name": "",
                     "id": "a4deeeb1-d6c0-43eb-a1f7-31ab7d724b26",
-                    "path": "<Gamepad>/rightStickPress",
+                    "path": "<Gamepad>/rightShoulder",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Gamepad",
-                    "action": "ToggleFinesse",
+                    "action": "RaiseObject",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
                     "id": "79674dda-0b28-45ba-a091-936b9bf7fdc7",
-                    "path": "<Keyboard>/f",
+                    "path": "<Keyboard>/e",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "ToggleFinesse",
+                    "action": "RaiseObject",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e5e3a06d-8a95-46a9-b06c-50e8b9d40dbb",
+                    "path": "<Gamepad>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RaiseObject",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

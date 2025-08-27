@@ -8,10 +8,10 @@ public class InteractableRigidbody : MonoBehaviour
     
     public enum ObjectType 
     {
-        SMALL,
-        LARGE,
-        BREAKABLE,
-        EQUIPABLE,
+        SMALL, //Can be lifted above head, doesnt apply force on player
+        LARGE, //Cannot be equiped or lifted above head, applies force on player
+        BREAKABLE, //Breaks lol
+        EQUIPABLE, //Cosmetics
     }
 
 
