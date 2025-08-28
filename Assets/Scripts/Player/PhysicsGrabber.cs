@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
@@ -28,7 +30,7 @@ public class PhysicsGrabber : MonoBehaviour
     [SerializeField] private PlayerController player;
     [SerializeField] private SphereCollider grabCollider;
     [SerializeField] private Transform playerRoot; // Main pivot of player body
-
+    [SerializeField] private Transform head;
 
     [Header("Throwing")]
     [SerializeField] public float maxThrowForceTime = 50.0f;
@@ -167,7 +169,7 @@ public class PhysicsGrabber : MonoBehaviour
                     float distanceToGrabbedObject = Vector3.Distance(player.transform.position, globalGrabPoint);
                     if (distanceToGrabbedObject > maxGrabObjectRange)
                     {
-                        playerRigidbody.AddForce((globalGrabPoint - player.transform.position).normalized * distanceToGrabbedObject * heavyObjectMultiplier);
+                        playerRigidbody.AddForce((globalGrabPoint - player.transform.position) * heavyObjectMultiplier);
                                                
                     }
                     break;       
@@ -231,7 +233,7 @@ public class PhysicsGrabber : MonoBehaviour
             {
                 DropStoredItem();
             }
-            else if (grabbedObject != null)
+            else if (grabbedObject != null && objectType != ObjectType.LARGE)
             {
                 storedItem = grabbedObject;
                 ReleaseObject();
@@ -278,6 +280,9 @@ public class PhysicsGrabber : MonoBehaviour
     {
         if (grabbedObject != null)
         {
+            StopCoroutine(EnableHeadCollider());
+            StartCoroutine(EnableHeadCollider());
+            
             Rigidbody releasedObject = grabbedObject;
             ReleaseObject();
             releasedObject.AddForce(transform.forward * throwForce * throwForceTimer);
@@ -305,6 +310,14 @@ public class PhysicsGrabber : MonoBehaviour
         }
     }
 
+    IEnumerator<WaitForSeconds> EnableHeadCollider() 
+    {
+        head.GetComponent<MeshCollider>().enabled = false;
+       
+        yield return new WaitForSeconds(1.0f);
+
+        head.GetComponent<MeshCollider>().enabled = true;
+    }
 
 
     private void OnTriggerStay(Collider other)

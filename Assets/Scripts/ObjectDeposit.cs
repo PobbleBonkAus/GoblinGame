@@ -63,15 +63,15 @@ public class ObjectDeposit : MonoBehaviour
     {
         yield return new WaitForSeconds(initialEjectDelay);
         Debug.Log("Ejecting Junk");
-        interactableObject.GetComponent<Rigidbody>().AddForce(coinSpawn.forward * ejectionForce, ForceMode.Impulse);
+        interactableObject.GetComponent<Rigidbody>().linearVelocity = coinSpawn.forward * ejectionForce;
     }
 
     IEnumerator SpitPlayerBackOut(GameObject player) 
     {
         yield return new WaitForSeconds(initialEjectDelay);
         player.GetComponent<PlayerController>().isRagdolled = true;
-        player.GetComponent<Rigidbody>().AddForce(coinSpawn.forward * ejectionForce, ForceMode.Impulse);
-        
+        player.GetComponent<Rigidbody>().linearVelocity = coinSpawn.forward * ejectionForce;
+
     }
 
     private void OnTriggerEnter(Collider other)

@@ -19,11 +19,6 @@ public class Gyser : MonoBehaviour
         StartCoroutine("ShootWater");   
     }
 
-    private void FixedUpdate()
-    {
-        
-
-    }
 
     IEnumerator<WaitForSeconds> ShootWater() 
     {
@@ -39,11 +34,15 @@ public class Gyser : MonoBehaviour
         StartCoroutine("ShootWater");
     }
 
-    private void OnTriggerStay(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
         if (other.attachedRigidbody != null) 
         {
-            rigidbodies.Remove(other.attachedRigidbody);    
+            if (!rigidbodies.Contains(other.attachedRigidbody)) 
+            {
+                rigidbodies.Add(other.attachedRigidbody);
+            }
+ 
         }
     }
 
