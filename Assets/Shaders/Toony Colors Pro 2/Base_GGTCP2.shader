@@ -21,7 +21,9 @@ Shader "Base_GGTCP2"
 
 		[TCP2Header(Ramp Shading)]
 		
-		_RampThreshold ("Threshold", Range(0.01,1)) = 0.5
+		_RampThreshold ("Threshold", Range(0.01,1)) = 0.01
+		_RampSmoothing ("Smoothing", Range(0.001,1)) = 0.5
+		[IntRange] _BandsCount ("Bands Count", Range(1,20)) = 4
 		[TCP2Separator]
 		
 		[TCP2HeaderHelp(Specular)]
@@ -38,16 +40,8 @@ Shader "Base_GGTCP2"
 		[TCP2HeaderHelp(Rim Lighting)]
 		[Toggle(TCP2_RIM_LIGHTING)] _UseRim ("Enable Rim Lighting", Float) = 0
 		[TCP2ColorNoAlpha] _RimColor ("Rim Color", Color) = (0.8,0.8,0.8,0.5)
-		_RimMinVert ("Rim Min", Range(0,2)) = 0.5
-		_RimMaxVert ("Rim Max", Range(0,2)) = 1
-		[TCP2Separator]
-		
-		[TCP2HeaderHelp(Subsurface Scattering)]
-		[Toggle(TCP2_SUBSURFACE)] _UseSubsurface ("Enable Subsurface Scattering", Float) = 0
-		_SubsurfaceDistortion ("Distortion", Range(0,2)) = 0.2
-		_SubsurfacePower ("Power", Range(0.1,16)) = 3
-		_SubsurfaceScale ("Scale", Float) = 1
-		[TCP2ColorNoAlpha] _SubsurfaceColor ("Color", Color) = (0.5,0.5,0.5,1)
+		_RimMin ("Rim Min", Range(0,2)) = 0.5
+		_RimMax ("Rim Max", Range(0,2)) = 1
 		[TCP2Separator]
 		
 		[Toggle(TCP2_TEXTURED_THRESHOLD)] _UseTexturedThreshold ("Enable Textured Threshold", Float) = 0
@@ -62,6 +56,12 @@ Shader "Base_GGTCP2"
 		_SketchTexture ("Sketch Texture", 2D) = "black" {}
 		_SketchTexture_OffsetSpeed ("Sketch Texture UV Offset Speed", Float) = 120
 		[TCP2Separator]
+		
+		[TCP2HeaderHelp(Wind)]
+		[Toggle(TCP2_WIND)] _UseWind ("Enable Wind", Float) = 0
+		_WindDirection ("Direction", Vector) = (1,0,0,0)
+		_WindStrength ("Strength", Range(0,0.2)) = 0.025
+		_WindSpeed ("Speed", Range(0,10)) = 2.5
 		
 		[ToggleOff(_RECEIVE_SHADOWS_OFF)] _ReceiveShadowsOff ("Receive Shadows", Float) = 1
 
@@ -112,22 +112,23 @@ Shader "Base_GGTCP2"
 		CBUFFER_START(UnityPerMaterial)
 			
 			// Shader Properties
-			float _RimMinVert;
-			float _RimMaxVert;
+			float _WindSpeed;
+			float4 _WindDirection;
+			float _WindStrength;
 			float4 _BaseMap_ST;
 			fixed4 _BaseColor;
 			half4 _Emission;
 			float4 _StylizedThreshold_ST;
 			float _RampThreshold;
+			float _RampSmoothing;
+			float _BandsCount;
 			fixed4 _DiffuseTint;
+			float _RimMin;
+			float _RimMax;
 			fixed4 _RimColor;
 			float _SpecularSmoothness;
 			float _SpecularToonBands;
 			fixed4 _SpecularColor;
-			float _SubsurfaceDistortion;
-			float _SubsurfacePower;
-			float _SubsurfaceScale;
-			fixed4 _SubsurfaceColor;
 			float4 _SketchTexture_ST;
 			half _SketchTexture_OffsetSpeed;
 			fixed4 _SColor;
@@ -200,17 +201,18 @@ Shader "Base_GGTCP2"
 			//--------------------------------------
 			// Toony Colors Pro 2 keywords
 			#pragma shader_feature_local_fragment TCP2_SPECULAR
-			#pragma shader_feature_local TCP2_RIM_LIGHTING
+			#pragma shader_feature_local_fragment TCP2_RIM_LIGHTING
 		#pragma shader_feature_local _ _ALPHAPREMULTIPLY_ON
-			#pragma shader_feature_local_fragment TCP2_SUBSURFACE
 			#pragma shader_feature_local_fragment TCP2_SKETCH
 			#pragma shader_feature_local_fragment TCP2_TEXTURED_THRESHOLD
+			#pragma shader_feature_local_vertex TCP2_WIND
 
 			// vertex input
 			struct Attributes
 			{
 				float4 vertex       : POSITION;
 				float3 normal       : NORMAL;
+				half4 vertexColor   : COLOR;
 				float4 texcoord0 : TEXCOORD0;
 				UNITY_VERTEX_INPUT_INSTANCE_ID
 			};
@@ -229,7 +231,6 @@ Shader "Base_GGTCP2"
 			#endif
 				float4 screenPosition : TEXCOORD3;
 				float2 pack1 : TEXCOORD4; /* pack1.xy = texcoord0 */
-				float pack2 : TEXCOORD5; /* pack2.x = rim */
 				UNITY_VERTEX_INPUT_INSTANCE_ID
 				UNITY_VERTEX_OUTPUT_STEREO
 			};
@@ -254,10 +255,32 @@ Shader "Base_GGTCP2"
 				// Texture Coordinates
 				output.pack1.xy.xy = input.texcoord0.xy * _BaseMap_ST.xy + _BaseMap_ST.zw;
 				// Shader Properties Sampling
-				float __rimMinVert = ( _RimMinVert );
-				float __rimMaxVert = ( _RimMaxVert );
+				float __windTimeOffset = ( input.vertexColor.g );
+				float __windSpeed = ( _WindSpeed );
+				float __windFrequency = ( 1.0 );
+				float4 __windSineScale2 = ( float4(2.3,1.7,1.4,1.2) );
+				float __windSineStrength2 = ( .6 );
+				float3 __windDirection = ( _WindDirection.xyz );
+				float3 __windMask = ( input.vertexColor.rrr );
+				float __windStrength = ( _WindStrength );
 
 				float3 worldPos = mul(UNITY_MATRIX_M, input.vertex).xyz;
+				#if defined(TCP2_WIND)
+				// Wind Animation
+				float windTimeOffset = __windTimeOffset;
+				float windSpeed = __windSpeed;
+				float3 windFrequency = worldPos.xyz * __windFrequency;
+				float windPhase = (_Time.y + windTimeOffset) * windSpeed;
+				float3 windFactor = sin(windPhase + windFrequency);
+				float4 windSin2scale = __windSineScale2;
+				float windSin2strength = __windSineStrength2;
+				windFactor += sin(windPhase.xxx * windSin2scale.www + windFrequency * windSin2scale.xyz) * windSin2strength;
+				float3 windDir = normalize(__windDirection);
+				float3 windMask = __windMask;
+				float windStrength = __windStrength;
+				worldPos.xyz += windDir * windFactor * windMask * windStrength;
+				#endif
+				input.vertex.xyz = mul(UNITY_MATRIX_I_M, float4(worldPos, 1)).xyz;
 				VertexPositionInputs vertexInput = GetVertexPositionInputs(input.vertex.xyz);
 			#if defined(REQUIRES_VERTEX_SHADOW_COORD_INTERPOLATOR)
 				output.shadowCoord = GetShadowCoord(vertexInput);
@@ -281,16 +304,6 @@ Shader "Base_GGTCP2"
 
 				// clip position
 				output.positionCS = vertexInput.positionCS;
-
-				half3 viewDirWS = GetWorldSpaceNormalizeViewDir(vertexInput.positionWS);
-				half ndv = abs(dot(viewDirWS, vertexNormalInput.normalWS));
-				half ndvRaw = ndv;
-
-				#if defined(TCP2_RIM_LIGHTING)
-				half rim = 1 - ndvRaw;
-				rim = smoothstep(__rimMinVert, __rimMaxVert, rim);
-				output.pack2.x = rim;
-				#endif
 
 				return output;
 			}
@@ -317,21 +330,24 @@ Shader "Base_GGTCP2"
 				float __stylizedThreshold = ( TCP2_TEX2D_SAMPLE(_StylizedThreshold, _StylizedThreshold, input.pack1.xy * _StylizedThreshold_ST.xy + _StylizedThreshold_ST.zw).a );
 				float __stylizedThresholdScale = ( 1.0 );
 				float __rampThreshold = ( _RampThreshold );
+				float __rampSmoothing = ( _RampSmoothing );
+				float __bandsCount = ( _BandsCount );
 				float3 __diffuseTint = ( _DiffuseTint.rgb );
+				float __rimMin = ( _RimMin );
+				float __rimMax = ( _RimMax );
 				float3 __rimColor = ( _RimColor.rgb );
 				float __rimStrength = ( 1.0 );
 				float __specularSmoothness = ( _SpecularSmoothness );
 				float __specularToonBands = ( _SpecularToonBands );
 				float3 __specularColor = ( _SpecularColor.rgb );
-				float __subsurfaceDistortion = ( _SubsurfaceDistortion );
-				float __subsurfacePower = ( _SubsurfacePower );
-				float __subsurfaceScale = ( _SubsurfaceScale );
-				float3 __subsurfaceColor = ( _SubsurfaceColor.rgb );
 				float3 __sketchColor = ( float3(0,0,0) );
 				float3 __sketchTexture = ( TCP2_TEX2D_SAMPLE(_SketchTexture, _SketchTexture, screenUV * _ScreenParams.zw * _SketchTexture_ST.xy + _SketchTexture_ST.zw + hash22(floor(_Time.xx * _SketchTexture_OffsetSpeed.xx) / _SketchTexture_OffsetSpeed.xx)).aaa );
 				float __sketchThresholdScale = ( 1.0 );
 				float3 __shadowColor = ( _SColor.rgb );
 				float3 __highlightColor = ( _HColor.rgb );
+
+				half ndv = abs(dot(viewDirWS, normalWS));
+				half ndvRaw = ndv;
 
 				// main texture
 				half3 albedo = __albedo.rgb;
@@ -393,8 +409,11 @@ Shader "Base_GGTCP2"
 				half3 ramp;
 				
 				half rampThreshold = __rampThreshold;
+				half rampSmooth = __rampSmoothing * 0.5;
+				half bandsCount = __bandsCount;
 				ndl = saturate(ndl);
-				ramp = step(rampThreshold, ndl);
+				ramp = smoothstep(rampThreshold - rampSmooth, rampThreshold + rampSmooth, ndl);
+				ramp = (round(ramp * bandsCount) / bandsCount) * step(ndl, 1);
 
 				// apply attenuation
 				ramp *= atten;
@@ -406,8 +425,11 @@ Shader "Base_GGTCP2"
 				half3 color = half3(0,0,0);
 				// Rim Lighting
 				#if defined(TCP2_RIM_LIGHTING)
-				half rim = input.pack2.x;
+				half rim = 1 - ndvRaw;
 				rim = ( rim );
+				half rimMin = __rimMin;
+				half rimMax = __rimMax;
+				rim = smoothstep(rimMin, rimMax, rim);
 				half3 rimColor = __rimColor;
 				half rimStrength = __rimStrength;
 				emission.rgb += rim * rimColor * rimStrength;
@@ -427,15 +449,6 @@ Shader "Base_GGTCP2"
 				
 				//Apply specular
 				emission.rgb += spec * lightColor.rgb * __specularColor;
-				#endif
-				
-				//Subsurface Scattering for Main Light
-				#if defined(TCP2_SUBSURFACE)
-				half3 ssLight = lightDir + normalWS * __subsurfaceDistortion;
-				half ssDot = pow(saturate(dot(viewDirWS, -ssLight)), __subsurfacePower) * __subsurfaceScale;
-				half3 ssColor = (ssDot * __subsurfaceColor);
-				ssColor *= lightColor;
-				color.rgb *= albedo * ssColor;
 				#endif
 
 				// Additional lights loop
@@ -479,7 +492,8 @@ Shader "Base_GGTCP2"
 							half3 ramp;
 							
 							ndl = saturate(ndl);
-							ramp = step(rampThreshold, ndl);
+							ramp = smoothstep(rampThreshold - rampSmooth, rampThreshold + rampSmooth, ndl);
+							ramp = (round(ramp * bandsCount) / bandsCount) * step(ndl, 1);
 
 							// apply attenuation (shadowmaps & point/spot lights attenuation)
 							ramp *= atten;
@@ -503,16 +517,6 @@ Shader "Base_GGTCP2"
 							
 							//Apply specular
 							emission.rgb += spec * lightColor.rgb * __specularColor;
-							#endif
-							
-							//Subsurface Scattering for additional lights
-							#if defined(TCP2_SUBSURFACE)
-							half3 ssLight = lightDir + normalWS * __subsurfaceDistortion;
-							half ssDot = pow(saturate(dot(viewDirWS, -ssLight)), __subsurfacePower) * __subsurfaceScale;
-							half3 ssColor = (ssDot * __subsurfaceColor);
-							ssColor *= atten;
-							ssColor *= lightColor;
-							color.rgb *= albedo * ssColor;
 							#endif
 						}
 					}
@@ -555,7 +559,8 @@ Shader "Base_GGTCP2"
 					half3 ramp;
 					
 					ndl = saturate(ndl);
-					ramp = step(rampThreshold, ndl);
+					ramp = smoothstep(rampThreshold - rampSmooth, rampThreshold + rampSmooth, ndl);
+					ramp = (round(ramp * bandsCount) / bandsCount) * step(ndl, 1);
 
 					// apply attenuation (shadowmaps & point/spot lights attenuation)
 					ramp *= atten;
@@ -579,16 +584,6 @@ Shader "Base_GGTCP2"
 					
 					//Apply specular
 					emission.rgb += spec * lightColor.rgb * __specularColor;
-					#endif
-					
-					//Subsurface Scattering for additional lights
-					#if defined(TCP2_SUBSURFACE)
-					half3 ssLight = lightDir + normalWS * __subsurfaceDistortion;
-					half ssDot = pow(saturate(dot(viewDirWS, -ssLight)), __subsurfacePower) * __subsurfaceScale;
-					half3 ssColor = (ssDot * __subsurfaceColor);
-					ssColor *= atten;
-					ssColor *= lightColor;
-					color.rgb *= albedo * ssColor;
 					#endif
 				}
 				LIGHT_LOOP_END
@@ -644,16 +639,18 @@ Shader "Base_GGTCP2"
 				float4 vertex   : POSITION;
 				float3 normal   : NORMAL;
 				float4 texcoord0 : TEXCOORD0;
+				half4 vertexColor : COLOR;
 				UNITY_VERTEX_INPUT_INSTANCE_ID
 			};
 
 			struct Varyings
 			{
 				float4 positionCS     : SV_POSITION;
+				float3 normal         : NORMAL;
 			#if defined(DEPTH_NORMALS_PASS)
 				float3 normalWS : TEXCOORD0;
 			#endif
-				float4 pack0 : TEXCOORD1; /* pack0.xyz = positionWS  pack0.w = rim */
+				float3 pack0 : TEXCOORD1; /* pack0.xyz = positionWS */
 				float2 pack1 : TEXCOORD2; /* pack1.xy = texcoord0 */
 			#if defined(DEPTH_ONLY_PASS)
 				UNITY_VERTEX_INPUT_INSTANCE_ID
@@ -694,12 +691,35 @@ Shader "Base_GGTCP2"
 
 				// Texture Coordinates
 				output.pack1.xy.xy = input.texcoord0.xy * _BaseMap_ST.xy + _BaseMap_ST.zw;
+				// Shader Properties Sampling
+				float __windTimeOffset = ( input.vertexColor.g );
+				float __windSpeed = ( _WindSpeed );
+				float __windFrequency = ( 1.0 );
+				float4 __windSineScale2 = ( float4(2.3,1.7,1.4,1.2) );
+				float __windSineStrength2 = ( .6 );
+				float3 __windDirection = ( _WindDirection.xyz );
+				float3 __windMask = ( input.vertexColor.rrr );
+				float __windStrength = ( _WindStrength );
 
 				float3 worldPos = mul(UNITY_MATRIX_M, input.vertex).xyz;
+				#if defined(TCP2_WIND)
+				// Wind Animation
+				float windTimeOffset = __windTimeOffset;
+				float windSpeed = __windSpeed;
+				float3 windFrequency = worldPos.xyz * __windFrequency;
+				float windPhase = (_Time.y + windTimeOffset) * windSpeed;
+				float3 windFactor = sin(windPhase + windFrequency);
+				float4 windSin2scale = __windSineScale2;
+				float windSin2strength = __windSineStrength2;
+				windFactor += sin(windPhase.xxx * windSin2scale.www + windFrequency * windSin2scale.xyz) * windSin2strength;
+				float3 windDir = normalize(__windDirection);
+				float3 windMask = __windMask;
+				float windStrength = __windStrength;
+				worldPos.xyz += windDir * windFactor * windMask * windStrength;
+				#endif
+				input.vertex.xyz = mul(UNITY_MATRIX_I_M, float4(worldPos, 1)).xyz;
 				VertexPositionInputs vertexInput = GetVertexPositionInputs(input.vertex.xyz);
-				half3 viewDirWS = GetWorldSpaceNormalizeViewDir(vertexInput.positionWS);
-				half ndv = abs(dot(viewDirWS, worldNormalUv));
-				half ndvRaw = ndv;
+				output.normal = normalize(worldNormalUv);
 				output.pack0.xyz = vertexInput.positionWS;
 
 				#if defined(DEPTH_ONLY_PASS)
@@ -729,6 +749,7 @@ Shader "Base_GGTCP2"
 				#endif
 
 				float3 positionWS = input.pack0.xyz;
+				float3 normalWS = normalize(input.normal);
 
 				// Shader Properties Sampling
 				float4 __albedo = ( TCP2_TEX2D_SAMPLE(_BaseMap, _BaseMap, input.pack1.xy).rgba );
@@ -736,6 +757,9 @@ Shader "Base_GGTCP2"
 				float __alpha = ( __albedo.a * __mainColor.a );
 
 				half3 viewDirWS = GetWorldSpaceNormalizeViewDir(positionWS);
+				half ndv = abs(dot(viewDirWS, normalWS));
+				half ndvRaw = ndv;
+
 				half3 albedo = half3(1,1,1);
 				half alpha = __alpha;
 				half3 emission = half3(0,0,0);
@@ -787,6 +811,10 @@ Shader "Base_GGTCP2"
 			#pragma vertex ShadowDepthPassVertex
 			#pragma fragment ShadowDepthPassFragment
 
+			//--------------------------------------
+			// Toony Colors Pro 2 keywords
+			#pragma shader_feature_local_vertex TCP2_WIND
+
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl"
 
@@ -821,6 +849,10 @@ Shader "Base_GGTCP2"
 
 			#pragma vertex ShadowDepthPassVertex
 			#pragma fragment ShadowDepthPassFragment
+
+			//--------------------------------------
+			// Toony Colors Pro 2 keywords
+			#pragma shader_feature_local_vertex TCP2_WIND
 
 			ENDHLSL
 		}
@@ -857,5 +889,5 @@ Shader "Base_GGTCP2"
 	CustomEditor "ToonyColorsPro.ShaderGenerator.MaterialInspector_SG2"
 }
 
-/* TCP_DATA u config(ver:"2.9.18";unity:"6000.0.40f1";tmplt:"SG2_Template_URP";features:list["UNITY_5_4","UNITY_5_5","UNITY_5_6","UNITY_2017_1","UNITY_2018_1","UNITY_2018_2","UNITY_2018_3","UNITY_2019_1","UNITY_2019_2","UNITY_2019_3","UNITY_2019_4","UNITY_2020_1","UNITY_2021_1","UNITY_2021_2","UNITY_2022_2","ENABLE_DEPTH_NORMALS_PASS","ENABLE_FORWARD_PLUS","SPEC_LEGACY","SPECULAR","SPECULAR_TOON_BAND","SPECULAR_SHADER_FEATURE","EMISSION","SUBSURFACE_SCATTERING","SS_ALL_LIGHTS","SS_MULTIPLICATIVE","TEXTURED_THRESHOLD","TT_SHADER_FEATURE","DIFFUSE_TINT","SKETCH","SKETCH_SHADER_FEATURE","SKETCH_AMBIENT","AUTO_TRANSPARENT_BLENDING","SS_SHADER_FEATURE","CRISP_RAMP_NO_AA","TEMPLATE_LWRP","RIM_SHADER_FEATURE","RIM_VERTEX","RIM"];flags:list[];flags_extra:dict[];keywords:dict[RENDER_TYPE="Opaque",RampTextureDrawer="[TCP2Gradient]",RampTextureLabel="Ramp Texture",SHADER_TARGET="3.0",RIM_LABEL="Rim Lighting"];shaderProperties:list[];customTextures:list[];codeInjection:codeInjection(injectedFiles:list[];mark:False);matLayers:list[]) */
-/* TCP_HASH b77effde9491212568db42dc2f695b07 */
+/* TCP_DATA u config(ver:"2.9.18";unity:"6000.0.40f1";tmplt:"SG2_Template_URP";features:list["UNITY_5_4","UNITY_5_5","UNITY_5_6","UNITY_2017_1","UNITY_2018_1","UNITY_2018_2","UNITY_2018_3","UNITY_2019_1","UNITY_2019_2","UNITY_2019_3","UNITY_2019_4","UNITY_2020_1","UNITY_2021_1","UNITY_2021_2","UNITY_2022_2","ENABLE_DEPTH_NORMALS_PASS","ENABLE_FORWARD_PLUS","SPEC_LEGACY","SPECULAR","SPECULAR_TOON_BAND","SPECULAR_SHADER_FEATURE","EMISSION","SS_MULTIPLICATIVE","TEXTURED_THRESHOLD","TT_SHADER_FEATURE","DIFFUSE_TINT","SKETCH","SKETCH_SHADER_FEATURE","SKETCH_AMBIENT","AUTO_TRANSPARENT_BLENDING","SS_SHADER_FEATURE","RIM_SHADER_FEATURE","RIM","RAMP_BANDS_CRISP_NO_AA","WIND_ANIM","WIND_ANIM_SIN","WIND_SHADER_FEATURE","WIND_SIN_2","ALPHA_TO_COVERAGE","TEMPLATE_LWRP"];flags:list[];flags_extra:dict[];keywords:dict[RENDER_TYPE="Opaque",RampTextureDrawer="[TCP2Gradient]",RampTextureLabel="Ramp Texture",SHADER_TARGET="3.0",RIM_LABEL="Rim Lighting"];shaderProperties:list[,,,,,sp(name:"Ramp Threshold";imps:list[imp_mp_range(def:0.01;min:0.01;max:1;prop:"_RampThreshold";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"d0d52c54-5eb0-463d-8984-1a54580991d6";op:Multiply;lbl:"Threshold";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False)];customTextures:list[];codeInjection:codeInjection(injectedFiles:list[];mark:False);matLayers:list[]) */
+/* TCP_HASH b1fc5acea5d8e9fe9f13acf51e302304 */

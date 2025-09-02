@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-5510029174734524908
+--- !u!114 &-2884195067790324879
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}
@@ -20,17 +20,18 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Orange
-  m_Shader: {fileID: 4800000, guid: 5381baa1f0b4b8540ba239f5aee1c203, type: 3}
+  m_Name: Fog_TCP2
+  m_Shader: {fileID: 4800000, guid: caa131ca95b626249ba34f3101d9a9b9, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
-  - TCP2_TEXTURED_THRESHOLD
+  - TCP2_VERTICAL_FOG
+  - _ALPHAPREMULTIPLY_ON
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
+  m_CustomRenderQueue: 3000
   stringTagMap: {}
   disabledShaderPasses:
   - MOTIONVECTORS
@@ -39,7 +40,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BaseMap:
-        m_Texture: {fileID: 10309, guid: 0000000000000000f000000000000000, type: 0}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
@@ -78,17 +79,9 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _SketchTexture:
-        m_Texture: {fileID: 2800000, guid: b1b62855ddf91f140a6b405c3037c38d, type: 3}
-        m_Scale: {x: 3, y: 3}
-        m_Offset: {x: 0, y: 0}
     - _SpecGlossMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _StylizedThreshold:
-        m_Texture: {fileID: 2800000, guid: 60573ff7f60d93e4e88c01310ba411e5, type: 3}
-        m_Scale: {x: 5, y: 5}
         m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
         m_Texture: {fileID: 0}
@@ -107,7 +100,6 @@ Material:
     - _AddPrecomputedVelocity: 0
     - _AlphaClip: 0
     - _AlphaToMask: 0
-    - _BandsCount: 2
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
@@ -117,7 +109,7 @@ Material:
     - _Cutoff: 0.5
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
-    - _DstBlend: 0
+    - _DstBlend: 10
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
     - _GlossMapScale: 0
@@ -127,14 +119,13 @@ Material:
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueOffset: 0
-    - _RampSmoothing: 1
-    - _RampThreshold: 0.2
+    - _RampSmoothing: 0.5
+    - _RampThreshold: 0.5
     - _ReceiveShadows: 1
     - _ReceiveShadowsOff: 1
-    - _RenderingMode: 0
-    - _RimMax: 1
-    - _RimMin: 0.5
-    - _SketchTexture_OffsetSpeed: 100
+    - _RenderingMode: 2
+    - _RimMaxVert: 1
+    - _RimMinVert: 0.5
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
@@ -142,24 +133,29 @@ Material:
     - _SpecularToonBands: 3
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
+    - _SubsurfaceDistortion: 0.2
+    - _SubsurfacePower: 3
+    - _SubsurfaceScale: 1
     - _Surface: 0
     - _UseRim: 0
-    - _UseSketch: 0
     - _UseSpecular: 0
-    - _UseTexturedThreshold: 1
+    - _UseSubsurface: 0
+    - _UseVerticalFog: 1
+    - _VerticalFogSmoothness: -0.22
+    - _VerticalFogThreshold: -1.84
     - _WorkflowMode: 1
-    - _ZWrite: 1
+    - _ZWrite: 0
     - __dummy__: 0
     m_Colors:
-    - _BaseColor: {r: 0.98823535, g: 0.54901963, b: 0.37647063, a: 1}
+    - _BaseColor: {r: 1, g: 1, b: 1, a: 0.4}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _DiffuseTint: {r: 1, g: 1, b: 1, a: 1}
-    - _Emission: {r: 0, g: 0, b: 0, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _HColor: {r: 1, g: 0.79215693, b: 0.6039216, a: 1}
+    - _HColor: {r: 0.75, g: 0.75, b: 0.75, a: 1}
     - _RimColor: {r: 0.8, g: 0.8, b: 0.8, a: 0.5}
     - _SColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _SpecularColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    - _SubsurfaceColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    - _VerticalFogColor: {r: 0.8867924, g: 0.8867924, b: 0.8867924, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

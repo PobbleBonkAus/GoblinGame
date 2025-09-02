@@ -3,14 +3,16 @@
     "SubFolders": true,
     "OverwriteConfig": false,
     "LoadAllShaders": false,
-    "CustomOutputPath": "Shaders/Toony Colors Pro 2",
+    "CustomOutputPath": "\\Shaders\\Toony Colors Pro 2",
     "LastImplementationExportImportPath": "E:/Fork/GoblinGame/Assets",
     "OpenedFoldouts": [
         "LIGHTING",
         "STYLIZATION",
         "SPECIAL EFFECTS",
         "TRANSPARENCY/BLENDING",
-        "SHADER STATES"
+        "SHADER STATES",
+        "SURFACE",
+        "TERRAIN"
     ],
     "UseCustomFont": true,
     "CustomFont": {

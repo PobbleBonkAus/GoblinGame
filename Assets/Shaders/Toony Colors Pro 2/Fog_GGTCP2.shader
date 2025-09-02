@@ -1,10 +1,17 @@
 ﻿// Toony Colors Pro+Mobile 2
 // (c) 2014-2025 Jean Moreno
 
-Shader "Water_GGTCP2"
+Shader "Fog_GGTCP2"
 {
 	Properties
 	{
+		[Enum(Front, 2, Back, 1, Both, 0)] _Cull ("Render Face", Float) = 2.0
+		[TCP2ToggleNoKeyword] _ZWrite ("Depth Write", Float) = 1.0
+		[HideInInspector] _RenderingMode ("rendering mode", Float) = 0.0
+		[HideInInspector] _SrcBlend ("blending source", Float) = 1.0
+		[HideInInspector] _DstBlend ("blending destination", Float) = 0.0
+		[TCP2Separator]
+
 		[TCP2HeaderHelp(Base)]
 		_BaseColor ("Color", Color) = (1,1,1,1)
 		[TCP2ColorNoAlpha] _HColor ("Highlight Color", Color) = (0.75,0.75,0.75,1)
@@ -40,18 +47,13 @@ Shader "Water_GGTCP2"
 		[TCP2ColorNoAlpha] _SubsurfaceColor ("Color", Color) = (0.5,0.5,0.5,1)
 		[TCP2Separator]
 		
-		[TCP2HeaderHelp(Vertex Waves Animation)]
-		_WavesSpeed ("Speed", Float) = 2
-		_WavesHeight ("Height", Float) = 0.1
-		_WavesFrequency ("Frequency", Range(0,10)) = 1
-		
-		[TCP2HeaderHelp(Depth Based Effects)]
-		[TCP2ColorNoAlpha] _DepthColor ("Depth Color", Color) = (0,0,1,1)
-		[PowerSlider(5.0)] _DepthColorDistance ("Depth Color Distance", Range(0.01,3)) = 0.5
-		[PowerSlider(5.0)] _DepthAlphaDistance ("Depth Alpha Distance", Range(0.01,10)) = 0.5
-		_DepthAlphaMin ("Depth Alpha Min", Range(0,1)) = 0.5
-		[HideInInspector] _SineCount2 ("2 Sine Functions", Float) = 2
-		
+		[TCP2HeaderHelp(Vertical Fog)]
+		[Toggle(TCP2_VERTICAL_FOG)] _UseVerticalFog ("Enable Vertical Fog", Float) = 0
+		_VerticalFogThreshold ("Y Threshold", Float) = 0
+		_VerticalFogSmoothness ("Smoothness", Float) = 0.5
+		_VerticalFogColor ("Fog Color", Color) = (0.5,0.5,0.5,1)
+		[TCP2Separator]
+
 		[ToggleOff(_RECEIVE_SHADOWS_OFF)] _ReceiveShadowsOff ("Receive Shadows", Float) = 1
 
 		// Avoid compile error if the properties are ending with a drawer
@@ -63,9 +65,7 @@ Shader "Water_GGTCP2"
 		Tags
 		{
 			"RenderPipeline" = "UniversalPipeline"
-			"RenderType"="Transparent"
-			"Queue"="Transparent"
-			"IgnoreProjectors"="True"
+			"RenderType"="Opaque"
 		}
 
 		HLSLINCLUDE
@@ -97,22 +97,14 @@ Shader "Water_GGTCP2"
 
 		// Shader Properties
 		TCP2_TEX2D_WITH_SAMPLER(_BaseMap);
-		#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
 
 		CBUFFER_START(UnityPerMaterial)
 			
 			// Shader Properties
-			float _WavesFrequency;
-			float _WavesHeight;
-			float _WavesSpeed;
 			float _RimMinVert;
 			float _RimMaxVert;
 			float4 _BaseMap_ST;
 			fixed4 _BaseColor;
-			fixed4 _DepthColor;
-			float _DepthColorDistance;
-			float _DepthAlphaDistance;
-			float _DepthAlphaMin;
 			float _RampThreshold;
 			float _RampSmoothing;
 			fixed4 _RimColor;
@@ -125,6 +117,9 @@ Shader "Water_GGTCP2"
 			fixed4 _SubsurfaceColor;
 			fixed4 _SColor;
 			fixed4 _HColor;
+			float _VerticalFogThreshold;
+			float _VerticalFogSmoothness;
+			fixed4 _VerticalFogColor;
 		CBUFFER_END
 
 		//Specular help functions (from UnityStandardBRDF.cginc)
@@ -147,7 +142,9 @@ Shader "Water_GGTCP2"
 			{
 				"LightMode"="UniversalForward"
 			}
-			Blend DstColor Zero
+		Blend [_SrcBlend] [_DstBlend]
+		Cull [_Cull]
+		ZWrite [_ZWrite]
 
 			HLSLPROGRAM
 			// Required to compile gles 2.0 with standard SRP library
@@ -183,7 +180,9 @@ Shader "Water_GGTCP2"
 			// Toony Colors Pro 2 keywords
 			#pragma shader_feature_local_fragment TCP2_SPECULAR
 			#pragma shader_feature_local TCP2_RIM_LIGHTING
+		#pragma shader_feature_local _ _ALPHAPREMULTIPLY_ON
 			#pragma shader_feature_local_fragment TCP2_SUBSURFACE
+			#pragma shader_feature_local_fragment TCP2_VERTICAL_FOG
 
 			// vertex input
 			struct Attributes
@@ -206,9 +205,8 @@ Shader "Water_GGTCP2"
 			#ifdef _ADDITIONAL_LIGHTS_VERTEX
 				half3 vertexLights : TEXCOORD2;
 			#endif
-				float4 screenPosition : TEXCOORD3;
-				float2 pack1 : TEXCOORD4; /* pack1.xy = texcoord0 */
-				float pack2 : TEXCOORD5; /* pack2.x = rim */
+				float2 pack0 : TEXCOORD3; /* pack0.xy = texcoord0 */
+				float pack1 : TEXCOORD4; /* pack1.x = rim */
 				UNITY_VERTEX_INPUT_INSTANCE_ID
 				UNITY_VERTEX_OUTPUT_STEREO
 			};
@@ -231,37 +229,16 @@ Shader "Water_GGTCP2"
 				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
 
 				// Texture Coordinates
-				output.pack1.xy.xy = input.texcoord0.xy * _BaseMap_ST.xy + _BaseMap_ST.zw;
+				output.pack0.xy.xy = input.texcoord0.xy * _BaseMap_ST.xy + _BaseMap_ST.zw;
 				// Shader Properties Sampling
-				float __wavesFrequency = ( _WavesFrequency );
-				float __wavesHeight = ( _WavesHeight );
-				float __wavesSpeed = ( _WavesSpeed );
-				float4 __wavesSinOffsets1 = ( float4(1,2.2,0.6,1.3) );
-				float4 __wavesPhaseOffsets1 = ( float4(1,1.3,2.2,0.4) );
 				float __rimMinVert = ( _RimMinVert );
 				float __rimMaxVert = ( _RimMaxVert );
 
 				float3 worldPos = mul(UNITY_MATRIX_M, input.vertex).xyz;
-				
-				// Vertex water waves
-				float _waveFrequency = __wavesFrequency;
-				float _waveHeight = __wavesHeight;
-				float3 _vertexWavePos = worldPos.xyz * _waveFrequency;
-				float _phase = _Time.y * __wavesSpeed;
-				half4 vsw_offsets_x = __wavesSinOffsets1;
-				half4 vsw_ph_offsets_x = __wavesPhaseOffsets1;
-				half4 waveXZ = sin((_vertexWavePos.xxzz * vsw_offsets_x) + (_phase.xxxx * vsw_ph_offsets_x));
-				float waveFactorX = dot(waveXZ.xy, 1) * _waveHeight / 2;
-				float waveFactorZ = dot(waveXZ.zw, 1) * _waveHeight / 2;
-				input.vertex.y += (waveFactorX + waveFactorZ);
 				VertexPositionInputs vertexInput = GetVertexPositionInputs(input.vertex.xyz);
 			#if defined(REQUIRES_VERTEX_SHADOW_COORD_INTERPOLATOR)
 				output.shadowCoord = GetShadowCoord(vertexInput);
 			#endif
-				float4 clipPos = vertexInput.positionCS;
-
-				float4 screenPos = ComputeScreenPos(clipPos);
-				output.screenPosition.xyzw = screenPos;
 
 				VertexNormalInputs vertexNormalInput = GetVertexNormalInputs(input.normal);
 			#ifdef _ADDITIONAL_LIGHTS_VERTEX
@@ -285,7 +262,7 @@ Shader "Water_GGTCP2"
 				#if defined(TCP2_RIM_LIGHTING)
 				half rim = 1 - ndvRaw;
 				rim = smoothstep(__rimMinVert, __rimMaxVert, rim);
-				output.pack2.x = rim;
+				output.pack1.x = rim;
 				#endif
 
 				return output;
@@ -302,13 +279,9 @@ Shader "Water_GGTCP2"
 				half3 viewDirWS = GetWorldSpaceNormalizeViewDir(positionWS);
 
 				// Shader Properties Sampling
-				float4 __albedo = ( TCP2_TEX2D_SAMPLE(_BaseMap, _BaseMap, input.pack1.xy).rgba );
+				float4 __albedo = ( TCP2_TEX2D_SAMPLE(_BaseMap, _BaseMap, input.pack0.xy).rgba );
 				float4 __mainColor = ( _BaseColor.rgba );
 				float __alpha = ( __albedo.a * __mainColor.a );
-				float3 __depthColor = ( _DepthColor.rgb );
-				float __depthColorDistance = ( _DepthColorDistance );
-				float __depthAlphaDistance = ( _DepthAlphaDistance );
-				float __depthAlphaMin = ( _DepthAlphaMin );
 				float __ambientIntensity = ( 1.0 );
 				float __rampThreshold = ( _RampThreshold );
 				float __rampSmoothing = ( _RampSmoothing );
@@ -323,26 +296,9 @@ Shader "Water_GGTCP2"
 				float3 __subsurfaceColor = ( _SubsurfaceColor.rgb );
 				float3 __shadowColor = ( _SColor.rgb );
 				float3 __highlightColor = ( _HColor.rgb );
-
-				// Sample depth texture and calculate difference with local depth
-				float sceneDepth = SampleSceneDepth(input.screenPosition.xyzw.xy / input.screenPosition.xyzw.w);
-				if (unity_OrthoParams.w > 0.0)
-				{
-					// Orthographic camera
-					#if UNITY_REVERSED_Z
-						sceneDepth = ((_ProjectionParams.z - _ProjectionParams.y) * (1.0 - sceneDepth) + _ProjectionParams.y);
-					#else
-						sceneDepth = ((_ProjectionParams.z - _ProjectionParams.y) * (sceneDepth) + _ProjectionParams.y);
-					#endif
-				}
-				else
-				{
-					// Perspective camera
-					sceneDepth = LinearEyeDepth(sceneDepth, _ZBufferParams);
-				}
-				
-				float localDepth = LinearEyeDepth(positionWS.xyz, GetWorldToViewMatrix());
-				float depthDiff = abs(sceneDepth - localDepth);
+				float __verticalFogThreshold = ( _VerticalFogThreshold );
+				float __verticalFogSmoothness = ( _VerticalFogSmoothness );
+				float4 __verticalFogColor = ( _VerticalFogColor.rgba );
 
 				// main texture
 				half3 albedo = __albedo.rgb;
@@ -351,14 +307,6 @@ Shader "Water_GGTCP2"
 				half3 emission = half3(0,0,0);
 				
 				albedo *= __mainColor.rgb;
-				
-				// Depth-based color
-				half3 depthColor = __depthColor;
-				half3 depthColorDist = __depthColorDistance;
-				albedo.rgb = lerp(depthColor, albedo.rgb, saturate(depthColorDist * depthDiff));
-				
-				// Depth-based alpha
-				alpha *= saturate((__depthAlphaDistance * depthDiff) + __depthAlphaMin);
 
 				// main light: direction, color, distanceAttenuation, shadowAttenuation
 			#if defined(REQUIRES_VERTEX_SHADOW_COORD_INTERPOLATOR)
@@ -415,7 +363,7 @@ Shader "Water_GGTCP2"
 				half3 color = half3(0,0,0);
 				// Rim Lighting
 				#if defined(TCP2_RIM_LIGHTING)
-				half rim = input.pack2.x;
+				half rim = input.pack1.x;
 				rim = ( rim );
 				half3 rimColor = __rimColor;
 				half rimStrength = __rimStrength;
@@ -444,7 +392,7 @@ Shader "Water_GGTCP2"
 				half ssDot = pow(saturate(dot(viewDirWS, -ssLight)), __subsurfacePower) * __subsurfaceScale;
 				half3 ssColor = (ssDot * __subsurfaceColor);
 				ssColor *= lightColor;
-				color.rgb *= albedo * ssColor;
+				color.rgb += albedo * ssColor;
 				#endif
 
 				// Additional lights loop
@@ -511,7 +459,7 @@ Shader "Water_GGTCP2"
 							half3 ssColor = (ssDot * __subsurfaceColor);
 							ssColor *= atten;
 							ssColor *= lightColor;
-							color.rgb *= albedo * ssColor;
+							color.rgb += albedo * ssColor;
 							#endif
 						}
 					}
@@ -577,7 +525,7 @@ Shader "Water_GGTCP2"
 					half3 ssColor = (ssDot * __subsurfaceColor);
 					ssColor *= atten;
 					ssColor *= lightColor;
-					color.rgb *= albedo * ssColor;
+					color.rgb += albedo * ssColor;
 					#endif
 				}
 				LIGHT_LOOP_END
@@ -594,7 +542,29 @@ Shader "Water_GGTCP2"
 				// apply ambient
 				color += indirectDiffuse;
 
+				// Premultiply blending
+				#if defined(_ALPHAPREMULTIPLY_ON)
+					color.rgb *= alpha;
+				#endif
+
 				color += emission;
+				
+				// Vertical Fog
+				#if defined(TCP2_VERTICAL_FOG)
+				half vertFogThreshold = input.worldPosAndFog.xyz.y;
+				vertFogThreshold -= UNITY_MATRIX_M._m13;
+				half verticalFogThreshold = __verticalFogThreshold;
+				half verticalFogSmooothness = __verticalFogSmoothness;
+				half verticalFogMin = verticalFogThreshold - verticalFogSmooothness;
+				half verticalFogMax = verticalFogThreshold + verticalFogSmooothness;
+				half4 fogColor = __verticalFogColor;
+				#if defined(UNITY_PASS_FORWARDADD)
+					fogColor.rgb = half3(0, 0, 0);
+				#endif
+				half vertFogFactor = 1 - saturate((vertFogThreshold - verticalFogMin) / (verticalFogMax - verticalFogMin));
+				vertFogFactor *= fogColor.a;
+				color.rgb = lerp(color.rgb, fogColor.rgb, vertFogFactor);
+				#endif
 
 				return half4(color, alpha);
 			}
@@ -628,9 +598,8 @@ Shader "Water_GGTCP2"
 			#if defined(DEPTH_NORMALS_PASS)
 				float3 normalWS : TEXCOORD0;
 			#endif
-				float4 screenPosition : TEXCOORD1;
-				float4 pack1 : TEXCOORD2; /* pack1.xyz = positionWS  pack1.w = rim */
-				float2 pack2 : TEXCOORD3; /* pack2.xy = texcoord0 */
+				float4 pack0 : TEXCOORD1; /* pack0.xyz = positionWS  pack0.w = rim */
+				float2 pack1 : TEXCOORD2; /* pack1.xy = texcoord0 */
 			#if defined(DEPTH_ONLY_PASS)
 				UNITY_VERTEX_INPUT_INSTANCE_ID
 				UNITY_VERTEX_OUTPUT_STEREO
@@ -669,36 +638,14 @@ Shader "Water_GGTCP2"
 				float3 worldNormalUv = mul(UNITY_MATRIX_M, float4(input.normal, 1.0)).xyz;
 
 				// Texture Coordinates
-				output.pack2.xy.xy = input.texcoord0.xy * _BaseMap_ST.xy + _BaseMap_ST.zw;
-				// Shader Properties Sampling
-				float __wavesFrequency = ( _WavesFrequency );
-				float __wavesHeight = ( _WavesHeight );
-				float __wavesSpeed = ( _WavesSpeed );
-				float4 __wavesSinOffsets1 = ( float4(1,2.2,0.6,1.3) );
-				float4 __wavesPhaseOffsets1 = ( float4(1,1.3,2.2,0.4) );
+				output.pack1.xy.xy = input.texcoord0.xy * _BaseMap_ST.xy + _BaseMap_ST.zw;
 
 				float3 worldPos = mul(UNITY_MATRIX_M, input.vertex).xyz;
-				
-				// Vertex water waves
-				float _waveFrequency = __wavesFrequency;
-				float _waveHeight = __wavesHeight;
-				float3 _vertexWavePos = worldPos.xyz * _waveFrequency;
-				float _phase = _Time.y * __wavesSpeed;
-				half4 vsw_offsets_x = __wavesSinOffsets1;
-				half4 vsw_ph_offsets_x = __wavesPhaseOffsets1;
-				half4 waveXZ = sin((_vertexWavePos.xxzz * vsw_offsets_x) + (_phase.xxxx * vsw_ph_offsets_x));
-				float waveFactorX = dot(waveXZ.xy, 1) * _waveHeight / 2;
-				float waveFactorZ = dot(waveXZ.zw, 1) * _waveHeight / 2;
-				input.vertex.y += (waveFactorX + waveFactorZ);
 				VertexPositionInputs vertexInput = GetVertexPositionInputs(input.vertex.xyz);
 				half3 viewDirWS = GetWorldSpaceNormalizeViewDir(vertexInput.positionWS);
 				half ndv = abs(dot(viewDirWS, worldNormalUv));
 				half ndvRaw = ndv;
-
-				// Screen Space UV
-				float4 screenPos = ComputeScreenPos(vertexInput.positionCS);
-				output.screenPosition.xyzw = screenPos;
-				output.pack1.xyz = vertexInput.positionWS;
+				output.pack0.xyz = vertexInput.positionWS;
 
 				#if defined(DEPTH_ONLY_PASS)
 					output.positionCS = TransformObjectToHClip(input.vertex.xyz);
@@ -726,10 +673,10 @@ Shader "Water_GGTCP2"
 					UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
 				#endif
 
-				float3 positionWS = input.pack1.xyz;
+				float3 positionWS = input.pack0.xyz;
 
 				// Shader Properties Sampling
-				float4 __albedo = ( TCP2_TEX2D_SAMPLE(_BaseMap, _BaseMap, input.pack2.xy).rgba );
+				float4 __albedo = ( TCP2_TEX2D_SAMPLE(_BaseMap, _BaseMap, input.pack1.xy).rgba );
 				float4 __mainColor = ( _BaseColor.rgba );
 				float __alpha = ( __albedo.a * __mainColor.a );
 
@@ -793,6 +740,38 @@ Shader "Water_GGTCP2"
 
 		Pass
 		{
+			Name "DepthOnly"
+			Tags
+			{
+				"LightMode" = "DepthOnly"
+			}
+
+			ZWrite On
+			ColorMask 0
+			Cull [_Cull]
+
+			HLSLPROGRAM
+
+			// Required to compile gles 2.0 with standard srp library
+			#pragma prefer_hlslcc gles
+			#pragma exclude_renderers d3d11_9x
+			#pragma target 2.0
+
+			//--------------------------------------
+			// GPU Instancing
+			#pragma multi_compile_instancing
+
+			// using simple #define doesn't work, we have to use this instead
+			#pragma multi_compile DEPTH_ONLY_PASS
+
+			#pragma vertex ShadowDepthPassVertex
+			#pragma fragment ShadowDepthPassFragment
+
+			ENDHLSL
+		}
+
+		Pass
+		{
 			Name "DepthNormals"
 			Tags
 			{
@@ -823,5 +802,5 @@ Shader "Water_GGTCP2"
 	CustomEditor "ToonyColorsPro.ShaderGenerator.MaterialInspector_SG2"
 }
 
-/* TCP_DATA u config(ver:"2.9.18";unity:"6000.0.40f1";tmplt:"SG2_Template_URP";features:list["UNITY_5_4","UNITY_5_5","UNITY_5_6","UNITY_2017_1","UNITY_2018_1","UNITY_2018_2","UNITY_2018_3","UNITY_2019_1","UNITY_2019_2","UNITY_2019_3","UNITY_2019_4","UNITY_2020_1","UNITY_2021_1","UNITY_2021_2","UNITY_2022_2","ENABLE_DEPTH_NORMALS_PASS","ENABLE_FORWARD_PLUS","SPECULAR","SPEC_LEGACY","SPECULAR_TOON_BAND","SPECULAR_SHADER_FEATURE","RIM","RIM_VERTEX","RIM_SHADER_FEATURE","SUBSURFACE_SCATTERING","SS_ALL_LIGHTS","SS_MULTIPLICATIVE","SS_SHADER_FEATURE","VERTEX_SIN_WAVES","VSW_WORLDPOS","VSW_2","DEPTH_BUFFER_COLOR","DEPTH_BUFFER_ALPHA","VERTICAL_FOG_SHADER_FEATURE","VERTICAL_FOG_POS_OFFSET","VERTICAL_FOG_ALPHA","FOAM_ANIM","MULTIPLICATIVE_BLENDING","SHADER_BLENDING","WIND_SHADER_FEATURE","REFLECTION_SHADER_FEATURE","REFLECTION_FRESNEL","TEMPLATE_LWRP"];flags:list[];flags_extra:dict[];keywords:dict[RENDER_TYPE="Opaque",RampTextureDrawer="[TCP2Gradient]",RampTextureLabel="Ramp Texture",SHADER_TARGET="3.0",RIM_LABEL="Rim Lighting"];shaderProperties:list[];customTextures:list[];codeInjection:codeInjection(injectedFiles:list[];mark:False);matLayers:list[]) */
-/* TCP_HASH c114c2aee388eed1b7966b8db710cb68 */
+/* TCP_DATA u config(ver:"2.9.18";unity:"6000.0.40f1";tmplt:"SG2_Template_URP";features:list["UNITY_5_4","UNITY_5_5","UNITY_5_6","UNITY_2017_1","UNITY_2018_1","UNITY_2018_2","UNITY_2018_3","UNITY_2019_1","UNITY_2019_2","UNITY_2019_3","UNITY_2019_4","UNITY_2020_1","UNITY_2021_1","UNITY_2021_2","UNITY_2022_2","ENABLE_DEPTH_NORMALS_PASS","ENABLE_FORWARD_PLUS","SPEC_LEGACY","SPECULAR","SPECULAR_TOON_BAND","SPECULAR_SHADER_FEATURE","RIM","RIM_VERTEX","RIM_SHADER_FEATURE","SUBSURFACE_SCATTERING","SS_ALL_LIGHTS","SS_SHADER_FEATURE","VERTICAL_FOG","VERTICAL_FOG_SHADER_FEATURE","VERTICAL_FOG_POS_OFFSET","TEMPLATE_LWRP","AUTO_TRANSPARENT_BLENDING","VERTICAL_FOG_ALPHA"];flags:list[];flags_extra:dict[];keywords:dict[RENDER_TYPE="Opaque",RampTextureDrawer="[TCP2Gradient]",RampTextureLabel="Ramp Texture",SHADER_TARGET="3.0",RIM_LABEL="Rim Lighting"];shaderProperties:list[];customTextures:list[];codeInjection:codeInjection(injectedFiles:list[];mark:False);matLayers:list[]) */
+/* TCP_HASH 4be4c3ad7959f2cc9005f8d35875e897 */

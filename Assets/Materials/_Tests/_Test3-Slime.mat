@@ -7,12 +7,16 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: _Test3-Water
+  m_Name: _Test3-Slime
   m_Shader: {fileID: 4800000, guid: 1e413409b7dc7f840a199986c6477a4b, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
-  m_InvalidKeywords: []
+  m_ValidKeywords:
+  - TCP2_RIM_LIGHTING
+  - _RECEIVE_SHADOWS_OFF
+  m_InvalidKeywords:
+  - TCP2_REFLECTIONS
+  - _ALPHABLEND_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -36,6 +40,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _Cube:
+        m_Texture: {fileID: 8900000, guid: 0dad96dccfd8a344492d4cd202ff059b, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -53,7 +61,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _FoamTex:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 8fb047afdebaf424c9ca23547466319a, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
@@ -69,6 +77,10 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ParallaxMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ReflectionTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -100,17 +112,19 @@ Material:
     - _ClearCoatSmoothness: 0
     - _Cull: 2
     - _Cutoff: 0.5
-    - _DepthAlphaDistance: 0.7
-    - _DepthAlphaMin: 0.18
+    - _DepthAlphaDistance: 0.01
+    - _DepthAlphaMin: 0
     - _DepthColorDistance: 3
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
-    - _DstBlend: 0
+    - _DstBlend: 10
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
     - _FoamSmoothness: 0.2
     - _FoamSpread: 2
     - _FoamStrength: 0.8
+    - _FresnelMax: 1.5
+    - _FresnelMin: 0.6
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
@@ -122,10 +136,12 @@ Material:
     - _RampThreshold: 0.5
     - _RampThreshold1: 0.5
     - _ReceiveShadows: 1
-    - _ReceiveShadowsOff: 1
-    - _RimMaxVert: 1
+    - _ReceiveShadowsOff: 0
+    - _ReflectionSmoothness: 0.7
+    - _RenderingMode: 1
+    - _RimMaxVert: 1.7
     - _RimMaxVert1: 1
-    - _RimMinVert: 0.5
+    - _RimMinVert: 0.9
     - _RimMinVert1: 0.5
     - _SineCount2: 2
     - _Smoothness: 0.5
@@ -135,49 +151,56 @@ Material:
     - _SpecularSmoothness1: 0.2
     - _SpecularToonBands: 3
     - _SpecularToonBands1: 3
-    - _SrcBlend: 1
+    - _SrcBlend: 5
     - _SrcBlendAlpha: 1
-    - _SubsurfaceDistortion: 0.2
+    - _SubsurfaceDistortion: 0.59
     - _SubsurfaceDistortion1: 0.2
-    - _SubsurfacePower: 3
+    - _SubsurfacePower: 10.6
     - _SubsurfacePower1: 3
     - _SubsurfaceScale: 1
     - _SubsurfaceScale1: 1
     - _Surface: 0
-    - _UseRim: 0
+    - _UseReflections: 1
+    - _UseRim: 1
     - _UseSpecular: 0
     - _UseSubsurface: 0
     - _UseVerticalFog: 0
+    - _UseWind: 0
     - _VerticalFogSmoothness: 0.5
     - _VerticalFogThreshold: 0
-    - _WavesFrequency: 0.21
-    - _WavesHeight: 0.2
-    - _WavesSpeed: 1
+    - _WavesFrequency: 0.2
+    - _WavesHeight: 0.1
+    - _WavesSpeed: 0.2
+    - _WindSpeed: 2.5
+    - _WindStrength: 0.025
     - _WorkflowMode: 1
-    - _ZWrite: 1
+    - _ZWrite: 0
     - __dummy__: 0
     m_Colors:
-    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _BaseColor: {r: 0.454902, g: 1, b: 0.47058827, a: 1}
     - _BaseColor1: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _DepthColor: {r: 0.454902, g: 1, b: 0.47058827, a: 1}
+    - _DepthColor: {r: 0.04705883, g: 0.5137255, b: 0.69411767, a: 1}
     - _Emission: {r: 0, g: 0, b: 0, a: 1}
     - _Emission1: {r: 0, g: 0, b: 0, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _FoamColor: {r: 1, g: 1, b: 1, a: 1}
     - _FoamSpeed: {r: 2, g: 2, b: 2, a: 2}
-    - _HColor: {r: 0.75, g: 0.75, b: 0.75, a: 1}
+    - _HColor: {r: 0.7294118, g: 0.98823535, b: 0.78823537, a: 1}
     - _HColor1: {r: 0.75, g: 0.75, b: 0.75, a: 1}
-    - _RimColor: {r: 0.8, g: 0.8, b: 0.8, a: 0.5}
+    - _ReflectionColor: {r: 0.48427665, g: 0.48427665, b: 0.48427665, a: 1}
+    - _ReflectionCubemapColor: {r: 1, g: 1, b: 1, a: 1}
+    - _RimColor: {r: 0.79215693, g: 0.98823535, b: 0.7294118, a: 0.5}
     - _RimColor1: {r: 0.8, g: 0.8, b: 0.8, a: 0.5}
-    - _SColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
+    - _SColor: {r: 0.10980393, g: 0.5019608, b: 0.5019608, a: 1}
     - _SColor1: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
-    - _SpecularColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
     - _SpecularColor1: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _SubsurfaceColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _SubsurfaceColor1: {r: 0.5, g: 0.5, b: 0.5, a: 1}
     - _VerticalFogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    - _WindDirection: {r: 1, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &7655833009436709216
