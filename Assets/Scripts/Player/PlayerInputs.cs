@@ -23,8 +23,6 @@ public class PlayerInputs : MonoBehaviour
 
         playerController.move = playerInputActions.FindAction("Move");
         cameraController.look = playerInputActions.FindAction("Look");
-        playerPhysicsGrabber.finesseModeInput = playerInputActions.FindAction("Move");
-
 
         playerInputActions.FindAction("Jump").started += playerController.DoJump;
         
@@ -34,8 +32,8 @@ public class PlayerInputs : MonoBehaviour
         playerInputActions.FindAction("Throw").started += playerPhysicsGrabber.DoChargeThrow;
         playerInputActions.FindAction("Throw").canceled += playerPhysicsGrabber.DoThrow;
 
-        playerInputActions.FindAction("ToggleFinesse").performed += playerPhysicsGrabber.DoToggleFinesse;
-        
+        playerInputActions.FindAction("RaiseObject").started += playerPhysicsGrabber.DoRaiseObject;
+        playerInputActions.FindAction("RaiseObject").canceled += playerPhysicsGrabber.DoLowerObject;
 
         playerInputActions.FindAction("StoreItem").started += playerPhysicsGrabber.DoPickUp;
 

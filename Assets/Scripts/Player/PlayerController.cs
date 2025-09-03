@@ -27,6 +27,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float ragdollJumpKick = 3.0f;
     [SerializeField] float ragdollImpulse = 5.0f;
     [SerializeField] float colliionRagdollLimit = 10.0f;
+    [HideInInspector] public bool isInOcean;
 
     [Header("Jumping")]
     [SerializeField] float jumpForce = 5f;
@@ -60,7 +61,7 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] Transform groundCheckOrigin;
     [SerializeField] float hoverFactor = 3.0f;
-
+    [SerializeField] float heavyObjectMulitplier;
 
     Vector3 currentSlopeNormal = Vector3.zero;
     Transform orientation;
@@ -80,30 +81,25 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        rb.Move(GameObject.FindGameObjectWithTag("PlayerSpawn").transform.position, Random.rotation);
+        rb.Move(GameObject.FindGameObjectWithTag("PlayerSpawn").transform.position, Quaternion.identity);
+        playerVisuals.gameObject.SetActive(true);
+
         currentMoveSpeed = moveSpeed;
         moveDampening = rb.linearDamping;
     }
 
     void FixedUpdate()
     {
+        if(transform.position.y < -0.0f) 
+        {
+            //WE ARE IN THE SEEEEAAAAA
+            //fade to black
+            //spawn at nearest beach?
+        }
+
         if (!isRagdolled) 
         {
-            if (!physicsGrabber.finesseMode) 
-            {
-                Move();
-            }
-
-            if (physicsGrabber.grabbing)
-            {
-                float distanceToGrabbedObject = Vector3.Distance(transform.position, physicsGrabber.globalGrabPoint);
-                if(distanceToGrabbedObject > 3.0f)
-                {
-                    rb.AddForce((physicsGrabber.globalGrabPoint - transform.position) * distanceToGrabbedObject);
-                }
-
-            }
-
+            Move();
             TurnTowardsMoveDirection();
             RightenPlayer();
         }
@@ -117,26 +113,29 @@ public class PlayerController : MonoBehaviour
     {
         if (isRagdolled) return;
 
-        if(rb.linearVelocity.magnitude < maxSpeed) 
-        {
-            moveInput = move.ReadValue<Vector2>();
-            Vector3 cameraRight = Vector3.ProjectOnPlane(cam.right, Vector3.up);
-            Vector3 cameraForward = Vector3.ProjectOnPlane(cam.forward, currentSlopeNormal);
-            Vector3 flatCameraForward = cameraForward;
-            flatCameraForward.y = 0;
-            flatCameraForward.Normalize();
+        moveInput = move.ReadValue<Vector2>();
 
-            Vector3 moveDirection = flatCameraForward * moveInput.y + cameraRight * moveInput.x;
+        // Camera-relative movement (ignores camera tilt)
+        Vector3 cameraRight = Vector3.ProjectOnPlane(cam.right, Vector3.up).normalized;
+        Vector3 cameraForward = Vector3.ProjectOnPlane(cam.forward, Vector3.up).normalized;
+        Vector3 moveDirection = (cameraForward * moveInput.y + cameraRight * moveInput.x).normalized;
 
-            Vector3 velocity = moveDirection * currentMoveSpeed;
-            Vector3 currentYVelocity = Vector3.up * rb.linearVelocity.y;
+        // --- Handle slopes ---
+        if (currentSlopeNormal != Vector3.zero)
+            moveDirection = Vector3.ProjectOnPlane(moveDirection, currentSlopeNormal).normalized;
+
+        // Build horizontal velocity
+        Vector3 horizontalVelocity = moveDirection * currentMoveSpeed;
+
+        // Clamp horizontal speed only
+        horizontalVelocity = Vector3.ClampMagnitude(horizontalVelocity, maxSpeed);
+
+        // Preserve vertical velocity (gravity, jumps, falling)
+        float verticalVelocity = rb.linearVelocity.y;
 
             rb.AddForce(velocity + currentYVelocity);
-
-            playerWalk = true;
         }
     }
-
     void TurnTowardsMoveDirection()
     {
         if(moveInput.magnitude > 0.1f)
@@ -183,6 +182,8 @@ public class PlayerController : MonoBehaviour
 
     void ApplyBetterJump()
     {
+        if (isInOcean) return;
+
         if (rb.linearVelocity.y < fallingTrigger) // falling
         {
             rb.linearVelocity += Vector3.up * Physics.gravity.y * (fallMultiplier - 1f) * Time.fixedDeltaTime;
@@ -221,20 +222,24 @@ public class PlayerController : MonoBehaviour
             isJumpHeld = false;
         }
     }
-    public void DoRagdoll(InputAction.CallbackContext obj) 
+    public void DoRagdoll(InputAction.CallbackContext obj)
     {
-        if (!isRagdolled) 
+        if (!isRagdolled)
         {
             StartRagdoll();
         }
-        else 
+        else
         {
-            EndRagdoll();
+            if (!IsGrounded() || isInOcean) 
+            {
+                EndRagdoll();
+            }
+
         }
     }
 
 
-    private void StartRagdoll() 
+    public void StartRagdoll() 
     {
         isRagdolled = true;
         variedRighteningForce = 0.0f;
@@ -285,10 +290,4 @@ public class PlayerController : MonoBehaviour
             StartRagdoll();
         }
     }
-
-    private void OnDrawGizmos()
-    {      
-        Gizmos.DrawRay(transform.position, Vector3.down);
-    }
-
 }

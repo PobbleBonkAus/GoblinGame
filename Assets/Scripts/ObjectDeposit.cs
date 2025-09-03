@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class ObjectDeposit : MonoBehaviour
 {
@@ -12,6 +13,8 @@ public class ObjectDeposit : MonoBehaviour
     [SerializeField] private float maxEjectionAngle = 30.0f;
 
     [SerializeField] private Transform coinSpawn;
+
+    [SerializeField] UnityEvent OnDeposit;
 
     void RecieveObject(InteractableRigidbody interactableObject) 
     {
@@ -27,6 +30,7 @@ public class ObjectDeposit : MonoBehaviour
                 Debug.Log("found sellable" + interactableObject.name);
                 StartCoroutine(SpawnCoins(interactableObject.value));
                 Destroy(interactableObject.gameObject);
+                OnDeposit.Invoke();
                 break;
             case "Junk":
                 Debug.Log("found junk " + interactableObject.name);
@@ -42,6 +46,7 @@ public class ObjectDeposit : MonoBehaviour
         for(int i = 0; i < itemValue; i++)
         {
             SpawnCoin();
+            
             yield return new WaitForSeconds(coinSpacingTime);
         }
     }
@@ -58,15 +63,15 @@ public class ObjectDeposit : MonoBehaviour
     {
         yield return new WaitForSeconds(initialEjectDelay);
         Debug.Log("Ejecting Junk");
-        interactableObject.GetComponent<Rigidbody>().AddForce(coinSpawn.forward * ejectionForce, ForceMode.Impulse);
+        interactableObject.GetComponent<Rigidbody>().linearVelocity = coinSpawn.forward * ejectionForce;
     }
 
     IEnumerator SpitPlayerBackOut(GameObject player) 
     {
         yield return new WaitForSeconds(initialEjectDelay);
         player.GetComponent<PlayerController>().isRagdolled = true;
-        player.GetComponent<Rigidbody>().AddForce(coinSpawn.forward * ejectionForce, ForceMode.Impulse);
-        
+        player.GetComponent<Rigidbody>().linearVelocity = coinSpawn.forward * ejectionForce;
+
     }
 
     private void OnTriggerEnter(Collider other)

@@ -1,6 +1,9 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
+using static InteractableRigidbody;
 
 public class PhysicsGrabber : MonoBehaviour
 {
@@ -9,12 +12,17 @@ public class PhysicsGrabber : MonoBehaviour
 
     [Header("Settings")]
     [SerializeField] private float interactRange = 3f;
-    [SerializeField] private float grabForce = 10f;
+    [SerializeField] private float largeObjectGrabForce = 10f;
+    [SerializeField] private float smallObjectGrabForce = 100.0f;
     [SerializeField] private float throwForce = 15f;
     [SerializeField] private float useItemTimeoutDuration = 0.3f;
     [SerializeField] private float minGrabMoveDistance = 0.2f;
     [SerializeField] private float grabbedObjectLinearDrag = 5.0f;
     [SerializeField] private float grabbedObjectAngularDrag = 5.0f;
+    [SerializeField] private float maxGrabObjectRange = 3.0f;
+    [SerializeField] private float heavyObjectMultiplier = 0.4f;
+    [SerializeField] private float springSnapBackForce = -0.4f;
+    private float grabForce;
 
     [Header("References")]
     [SerializeField] private GameObject kinematicBody;
@@ -22,7 +30,7 @@ public class PhysicsGrabber : MonoBehaviour
     [SerializeField] private PlayerController player;
     [SerializeField] private SphereCollider grabCollider;
     [SerializeField] private Transform playerRoot; // Main pivot of player body
-
+    [SerializeField] private Transform head;
 
     [Header("Throwing")]
     [SerializeField] public float maxThrowForceTime = 50.0f;
@@ -36,30 +44,36 @@ public class PhysicsGrabber : MonoBehaviour
     [SerializeField] private float dropItemDistance = 1.0f;
     private Rigidbody storedItem = null;
 
+    [Header("Raising Objects")]
+    [SerializeField] Transform raisedObjectTransform;
+    [SerializeField] float raiseSpeed;
+
+    private bool raisingObject;
+    Vector3 raiseOffset = Vector3.zero;
 
     private Rigidbody grabbedObject;
+    private ObjectType objectType;
     private Vector3 initialGrabPointRelative; // local point on object
     private Vector3 targetPosition;
     private Vector3 grabOffsetFromPlayer; // relative position from player root
     
-    public bool grabPressed = false;
-    public bool grabbing = false;
+    [HideInInspector] public bool raisePressed = false;
+    [HideInInspector] public bool grabPressed = false;
+    [HideInInspector] public bool grabbing = false;
 
     private float grabbedObjectOriginalLinearDrag = 0.0f;
     private float grabbedObjectOriginalAngularDrag = 0.0f;
+    Rigidbody playerRigidbody;
 
-    [Header("Finesse Mode")]
-    [HideInInspector] public bool finesseMode = false;
-    [SerializeField] private float finesseModeSpeed = 4.0f;
-    [SerializeField] private float finesseModeMaxDistance = 2.0f;
-    [HideInInspector] public InputAction finesseModeInput;
-    private Vector3 finesseOffset = Vector3.zero;
-
-
+    private void Awake()
+    {
+        playerRigidbody = player.GetComponent<Rigidbody>();
+        grabForce = smallObjectGrabForce;
+    }
 
     void FixedUpdate()
     {
-        globalGrabPoint = transform.position;
+        //globalGrabPoint = transform.position;
         throwLockOutTime -= Time.fixedDeltaTime;
 
         if (grabbing)
@@ -97,7 +111,7 @@ public class PhysicsGrabber : MonoBehaviour
         initialGrabPointRelative = grabbedObject.transform.InverseTransformPoint(hitPoint);
         // Store object offset relative to player root this is important for when we rotate the player around, the object
         // should orbit around the player, not the physics grab origin.
-        grabOffsetFromPlayer = playerRoot.InverseTransformPoint(hitPoint);
+        grabOffsetFromPlayer = playerRoot.InverseTransformPoint(transform.position);
 
         grabPoint = hitPoint;
         grabbing = true;
@@ -109,6 +123,7 @@ public class PhysicsGrabber : MonoBehaviour
         grabbedObject.angularDamping = grabbedObjectAngularDrag;
 
         grabbedObject.gameObject.layer = LayerMask.NameToLayer("GrabbedObject");
+        objectType = grabbedObject.GetComponent<InteractableRigidbody>().type;
         kinematicBody.SetActive(true);
     }
 
@@ -123,48 +138,56 @@ public class PhysicsGrabber : MonoBehaviour
             grabbedObject = null;
             grabbing = false;
             kinematicBody.SetActive(false);
-            finesseOffset = Vector3.zero;
-
-            finesseMode = false;
         }
     }
 
+
     private void MoveGrabbedObject()
     {
+        float currentForce = grabForce;
         if (grabbedObject != null)
         {
-            // Target position based on original offset to player root
-            Vector3 desiredWorldPosition = playerRoot.TransformPoint(grabOffsetFromPlayer);
+            raiseOffset = (raisingObject ? raiseOffset = raisedObjectTransform.position : Vector3.zero);
 
-            // Maintain grab point on object
-            targetPosition = desiredWorldPosition - grabbedObject.transform.TransformVector(initialGrabPointRelative) + finesseOffset;
-
-
-            if (finesseMode) 
+            switch (objectType) 
             {
-
-                Vector3 finesseInput = new Vector3(finesseModeInput.ReadValue<Vector2>().x, finesseModeInput.ReadValue<Vector2>().y, 0.0f);
-                Vector3 localOffset =
-                      player.transform.right * finesseInput.x   // left/right
-                    + player.transform.up * finesseInput.y;  // up/down
-
-                finesseOffset += localOffset * finesseModeSpeed;
+                case (ObjectType.SMALL):
+                    // Target position based on original offset to player root
+                    currentForce = smallObjectGrabForce;
+                    if (raisingObject)
+                    {
+                        grabOffsetFromPlayer = raisedObjectTransform.localPosition;
+                    }
+                    else
+                    {
+                        grabOffsetFromPlayer = transform.localPosition;
+                    }
+                    break;
                 
-
-
-                if (finesseOffset.magnitude > finesseModeMaxDistance) finesseOffset = finesseOffset.normalized * finesseModeMaxDistance;
-
+                case (ObjectType.LARGE):
+                    currentForce = largeObjectGrabForce;
+                    float distanceToGrabbedObject = Vector3.Distance(player.transform.position, globalGrabPoint);
+                    if (distanceToGrabbedObject > maxGrabObjectRange)
+                    {
+                        playerRigidbody.AddForce((globalGrabPoint - player.transform.position) * heavyObjectMultiplier);
+                                               
+                    }
+                    break;       
             }
 
 
+            Vector3 desiredWorldPosition = playerRoot.TransformPoint(grabOffsetFromPlayer);
+
+            // Maintain grab point on object
+            targetPosition = desiredWorldPosition - grabbedObject.transform.TransformVector(initialGrabPointRelative);
 
             Vector3 direction = targetPosition - grabbedObject.transform.position;
 
-            globalGrabPoint = grabbedObject.position - grabbedObject.transform.TransformVector(initialGrabPointRelative) + finesseOffset;
+            globalGrabPoint = grabbedObject.position - grabbedObject.transform.TransformVector(initialGrabPointRelative);
 
             if (direction.sqrMagnitude > minGrabMoveDistance * minGrabMoveDistance)
             {
-                grabbedObject.AddForce(direction * grabForce,ForceMode.Force);
+                grabbedObject.AddForce(direction * currentForce, ForceMode.Force);
             }
 
             RotateGrabObject();
@@ -210,7 +233,7 @@ public class PhysicsGrabber : MonoBehaviour
             {
                 DropStoredItem();
             }
-            else if (grabbedObject != null)
+            else if (grabbedObject != null && objectType != ObjectType.LARGE)
             {
                 storedItem = grabbedObject;
                 ReleaseObject();
@@ -242,10 +265,26 @@ public class PhysicsGrabber : MonoBehaviour
 
     }
 
+    public void DoRaiseObject(InputAction.CallbackContext obj) 
+    {
+        raisingObject = true;
+        raisePressed = true;
+    }
+
+    public void DoLowerObject(InputAction.CallbackContext obj) 
+    {
+        raisingObject = false;
+        raisePressed = false;
+    }
+    
+
     public void DoThrow(InputAction.CallbackContext obj)
     {
         if (grabbedObject != null)
         {
+            StopCoroutine(EnableHeadCollider());
+            StartCoroutine(EnableHeadCollider());
+            
             Rigidbody releasedObject = grabbedObject;
             ReleaseObject();
             releasedObject.AddForce(transform.forward * throwForce * throwForceTimer);
@@ -273,22 +312,13 @@ public class PhysicsGrabber : MonoBehaviour
         }
     }
 
-    public void DoToggleFinesse(InputAction.CallbackContext obj) 
+    IEnumerator<WaitForSeconds> EnableHeadCollider() 
     {
-        if (grabbing) 
-        {
-            if (finesseMode) 
-            {
-                grabbedObject.linearDamping = 3.0f;
-                finesseMode = false;
-            }
-            else
-            {
-                grabbedObject.linearDamping = 30.0f;
-                finesseMode = true;
-            }
+        head.GetComponent<MeshCollider>().enabled = false;
+       
+        yield return new WaitForSeconds(1.0f);
 
-        }
+        head.GetComponent<MeshCollider>().enabled = true;
     }
 
 
