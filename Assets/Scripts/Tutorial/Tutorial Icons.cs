@@ -5,6 +5,8 @@ using Unity.VisualScripting;
 using System.Collections;
 using UnityEngine.Analytics;
 using UnityEngine.InputSystem.LowLevel;
+using UnityEngine.InputSystem;
+
 public class TutorialIcons : MonoBehaviour
 {
     [Header("Sprites")]
@@ -15,6 +17,7 @@ public class TutorialIcons : MonoBehaviour
     [SerializeField] Image imageIcon;
     [SerializeField] Image imageAction;
     [SerializeField] Image imageStrikeout;
+    [SerializeField] GameObject tutorialPanel;
 
     [Header("Timing")]
     [SerializeField] float strikeoutSpeed;
@@ -26,69 +29,63 @@ public class TutorialIcons : MonoBehaviour
 
     [Header("Player Controller")]
     [SerializeField] PlayerController playerController;
-    private bool tutorialWalk = false;
-    private bool tutorialJump = false;
-    private bool tutorialGrab = false;
-    private void Awake()
-    {
-        iconCurrentState = iconState.Walk;
-    }
-    private void Update()
-    {
-        IconStateChanger(iconCurrentState);
-        tutorialWalk = playerController.playerWalk;
-        tutorialJump = playerController.playerJump;
-        tutorialGrab = playerController.playerGrab;
-    }
+
     void IconStateChanger(iconState iconPassThrough)
     {
-        switch (iconCurrentState)
-        {
-            case iconState.Walk:
-                imageIcon.sprite = controllerIcon[0];
-                imageAction.sprite = contorllerAction[0];
-                if (tutorialWalk)
-                {
-                    imageTransition(iconState.Jump);
-                }
-                break;
-            case iconState.Jump:
-                imageIcon.sprite = controllerIcon[1];
-                imageAction.sprite = contorllerAction[1];
-                if (tutorialJump)
-                {
-                    imageTransition(iconState.Grab);
-                }
-                break;
-            case iconState.Grab:
-                imageIcon.sprite = controllerIcon[2];
-                imageAction.sprite = contorllerAction[2];
-                if (tutorialGrab)
-                {
-                    imageTransition(iconState.Complete);
-                }
-                break;
-            case iconState.Complete:
-                imageIcon.enabled = false;
-                imageAction.enabled = false;
-                break;
-        }
+        imageStrikeout.enabled = true;
+        StartCoroutine(resetTutorial(iconPassThrough));
     }
-    void imageTransition(iconState newState)
-    {
-        if (!imageStrikeout.enabled)
-        {
-            imageStrikeout.enabled = true;    
-        }
-        StartCoroutine(resetTutorial(newState));
-        
-    }
+
+
     IEnumerator resetTutorial(iconState newState)
     {
         yield return new WaitForSeconds(resetCountdown);
-        iconCurrentState = newState;
 
-        imageStrikeout.enabled = false;
+        if (newState == iconState.Complete) 
+        {
+            tutorialPanel.gameObject.SetActive(false);
+            yield return null;
+        }
+        else
+        {
+            imageIcon.sprite = controllerIcon[(int)newState];
+            imageAction.sprite = contorllerAction[(int)newState];
 
+            imageStrikeout.enabled = false;
+        }
     }
+
+    void UpdateTutorialState() 
+    {
+        if(iconCurrentState != iconState.Complete) 
+        {
+            iconCurrentState += 1;
+            IconStateChanger(iconCurrentState);
+        }
+    }
+
+    public void DoJumpAction(InputAction.CallbackContext ctx) 
+    {
+        if (iconCurrentState == iconState.Jump && !imageStrikeout.enabled) 
+        {
+            UpdateTutorialState();
+        }
+    }
+
+    public void DoWalkAction(InputAction.CallbackContext ctx) 
+    {
+        if (iconCurrentState == iconState.Walk && !imageStrikeout.enabled)
+        {
+            UpdateTutorialState();
+        }
+    }
+
+    public void DoGrabAction(InputAction.CallbackContext ctx) 
+    {
+        if (iconCurrentState == iconState.Grab && !imageStrikeout.enabled)
+        {
+            UpdateTutorialState();
+        }
+    }
+
 }

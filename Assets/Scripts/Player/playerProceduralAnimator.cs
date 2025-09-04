@@ -72,6 +72,9 @@ public class playerProceduralAnimator : MonoBehaviour
     private Vector3 leftFootTargetPosition;
     private Vector3 rightFootTargetPosition;
 
+    private Vector3 leftFootStandingPosition;
+    private Vector3 rightFootStandingPosition;
+
     private float leftFootLerp = 1f;
     private float rightFootLerp = 1f;
 
@@ -82,6 +85,7 @@ public class playerProceduralAnimator : MonoBehaviour
 
     private float stepWaitTimer = 0.0f;
 
+    private float velocityMagnitude;
 
     private void Awake()
     {
@@ -118,7 +122,6 @@ public class playerProceduralAnimator : MonoBehaviour
         {
             UpdateFootTargetPositions();
             Step();
-            
         }
         else
         {
@@ -154,7 +157,7 @@ public class playerProceduralAnimator : MonoBehaviour
     {
         Vector3 velocity = body.GetComponent<Rigidbody>().linearVelocity;
         Vector3 offset = velocity * velocityFactor;
-
+        velocityMagnitude = velocity.magnitude;
 
         // Step left foot
         if (stepLeftFoot && leftFootLerp >= 1f && stepWaitTimer >= stepWaitTime)
@@ -163,6 +166,7 @@ public class playerProceduralAnimator : MonoBehaviour
             {
                 if (TryGetFootTarget(leftLegRenderer.transform.position,offset, out Vector3 target))
                 {
+                    //stomp
                     leftFootPreviousPosition = leftFoot.position;
                     leftFootTargetPosition = target;
                     leftFootLerp = 0f;
@@ -172,6 +176,7 @@ public class playerProceduralAnimator : MonoBehaviour
                 }
                 else
                 {
+                    //in the air
                     leftFootPreviousPosition = leftFoot.position;
                     leftFootTargetPosition = leftLegRenderer.transform.position;
                     leftFootLerp = 0f;
@@ -187,6 +192,7 @@ public class playerProceduralAnimator : MonoBehaviour
             {
                 if (TryGetFootTarget(rightLegRenderer.transform.position,offset, out Vector3 target))
                 {
+                    //stomp
                     rightFootPreviousPosition = rightFoot.position;
                     rightFootTargetPosition = target;
                     rightFootLerp = 0f;
@@ -196,6 +202,7 @@ public class playerProceduralAnimator : MonoBehaviour
                 }
                 else
                 {
+                    //weeee we are in the air
                     rightFootPreviousPosition = rightFoot.position;
                     rightFootTargetPosition = rightLegRenderer.transform.position;
                     rightFootLerp = 0f;
@@ -308,8 +315,8 @@ public class playerProceduralAnimator : MonoBehaviour
             leftFootLerp += Time.deltaTime * stepSpeed;
             Vector3 mid = (leftFootPreviousPosition + leftFootTargetPosition) / 2 + Vector3.up * stepHeight;
             leftFoot.position = Vector3.Lerp(Vector3.Lerp(leftFootPreviousPosition, mid, leftFootLerp),
-                                             Vector3.Lerp(mid, leftFootTargetPosition, leftFootLerp),
-                                             leftFootLerp);
+                                                Vector3.Lerp(mid, leftFootTargetPosition, leftFootLerp),
+                                                leftFootLerp);
         }
 
         if (rightFootLerp < 1f)
@@ -317,12 +324,11 @@ public class playerProceduralAnimator : MonoBehaviour
             rightFootLerp += Time.deltaTime * stepSpeed;
             Vector3 mid = (rightFootPreviousPosition + rightFootTargetPosition) / 2 + Vector3.up * stepHeight;
             rightFoot.position = Vector3.Lerp(Vector3.Lerp(rightFootPreviousPosition, mid, rightFootLerp),
-                                              Vector3.Lerp(mid, rightFootTargetPosition, rightFootLerp),
-                                              rightFootLerp);
+                                                Vector3.Lerp(mid, rightFootTargetPosition, rightFootLerp),
+                                                rightFootLerp);
         }
+        
     }
-
-
 
 
     Vector3 SpringLerp(Vector3 current, Vector3 target, ref Vector3 velocity)

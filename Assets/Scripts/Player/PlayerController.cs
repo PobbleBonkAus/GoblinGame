@@ -66,11 +66,6 @@ public class PlayerController : MonoBehaviour
     Vector3 currentSlopeNormal = Vector3.zero;
     Transform orientation;
 
-    //Tutorial Things
-    [HideInInspector] public bool playerWalk;
-    [HideInInspector] public bool playerJump;
-    [HideInInspector] public bool playerGrab;
-
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -108,7 +103,6 @@ public class PlayerController : MonoBehaviour
 
     }
 
-
     void Move()
     {
         if (isRagdolled) return;
@@ -133,9 +127,13 @@ public class PlayerController : MonoBehaviour
         // Preserve vertical velocity (gravity, jumps, falling)
         float verticalVelocity = rb.linearVelocity.y;
 
-            rb.AddForce(velocity + currentYVelocity);
-        }
+        // Apply combined velocity
+        Vector3 finalVelocity = new Vector3(horizontalVelocity.x, verticalVelocity, horizontalVelocity.z);
+        rb.linearVelocity = finalVelocity;
+
+        //rb.AddForce(finalVelocity);
     }
+
     void TurnTowardsMoveDirection()
     {
         if(moveInput.magnitude > 0.1f)
@@ -213,8 +211,6 @@ public class PlayerController : MonoBehaviour
                 isJumpHeld = true;
                 rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z); // reset Y
                 rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-
-                playerJump = true;
             }
         }
         else if (ctx.canceled) // button released
@@ -268,7 +264,7 @@ public class PlayerController : MonoBehaviour
     public bool IsGrounded()
     {
 
-        if(Physics.Raycast(groundCheckOrigin.position, Vector3.down,out RaycastHit hit, 1.0f)) 
+        if(Physics.Raycast(groundCheckOrigin.position, Vector3.down, out RaycastHit hit, 1.0f)) 
         {
             groundPoint = hit.point;
             currentSlopeNormal = hit.normal;

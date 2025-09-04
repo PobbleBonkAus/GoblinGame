@@ -254,8 +254,6 @@ public class PhysicsGrabber : MonoBehaviour
     public void DoGrabObject(InputAction.CallbackContext obj)
     {
         grabPressed = true;
-
-        player.playerGrab = true;
     }
 
     public void DoReleaseObject(InputAction.CallbackContext obj)

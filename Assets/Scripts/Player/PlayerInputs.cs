@@ -11,6 +11,7 @@ public class PlayerInputs : MonoBehaviour
     public playerProceduralAnimator playerAnimator;
     public PlayerController playerController;
     public PlayerCameraController cameraController;
+    public TutorialIcons tutorial;
 
     void OnEnable() => inputActions.Enable();
     void OnDisable() => inputActions.Disable();
@@ -38,5 +39,12 @@ public class PlayerInputs : MonoBehaviour
         playerInputActions.FindAction("StoreItem").started += playerPhysicsGrabber.DoPickUp;
 
         playerInputActions.FindAction("Ragdoll").started += playerController.DoRagdoll;
+
+        //tutorial actions
+        playerInputActions.FindAction("Move").performed += tutorial.DoWalkAction;
+        playerInputActions.FindAction("Jump").performed += tutorial.DoJumpAction;
+        playerInputActions.FindAction("Grab").performed += tutorial.DoGrabAction;
     }
+
+
 }
