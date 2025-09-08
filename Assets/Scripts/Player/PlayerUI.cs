@@ -1,25 +1,59 @@
+using System.Collections;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
-using UnityEngine.UIElements;
+
 public class PlayerUI : MonoBehaviour
 {
-    [Header("Physics Grabber")]
-    public PhysicsGrabber physicsGrabber;
+    [SerializeField] private Image fadeToBlackImage;
+    [SerializeField] private float fadeInTime = 1f;
+    [SerializeField] private float holdTime = 1f;
+    [SerializeField] private float fadeOutTime = 1f;
 
-    [Header("UI Meter Elements")]
-    public UnityEngine.UI.Image meterImage;
-    public UnityEngine.UI.Image meterBase;
+    [SerializeField] private UnityEvent[] fadeOutEvents;
 
-    float meterScale;
-    private void Update()
+    bool isFading = false;
+
+
+    public void FadeToBlack()
     {
-        if (physicsGrabber.throwForceTimer <= 0)
-        {   meterBase.enabled = false;   }
-        else
-        {   meterBase.enabled = true;   }
+        if (isFading) return;
 
-        meterScale = physicsGrabber.throwForceTimer / physicsGrabber.maxThrowForceTime;
-        meterImage.rectTransform.localScale = new Vector3(1, meterScale, 1);
+        StopAllCoroutines(); // prevents overlapping fades
+        StartCoroutine(FadeInAndOut());
     }
-    
+
+    private IEnumerator FadeInAndOut()
+    {
+        isFading = true;
+        // fade in
+        yield return Fade(Color.clear, Color.black, fadeInTime);
+
+
+
+        // trigger events after fade
+        foreach (var e in fadeOutEvents)
+            e.Invoke();
+
+        // hold black
+        yield return new WaitForSeconds(holdTime);
+
+
+
+        // fade out
+        yield return Fade(Color.black, Color.clear, fadeOutTime);
+        isFading = false;
+    }
+
+    private IEnumerator Fade(Color from, Color to, float duration)
+    {
+        float timer = 0f;
+        while (timer < duration)
+        {
+            timer += Time.deltaTime;
+            fadeToBlackImage.color = Color.Lerp(from, to, timer / duration);
+            yield return null;
+        }
+        fadeToBlackImage.color = to; // snap to final color
+    }
 }

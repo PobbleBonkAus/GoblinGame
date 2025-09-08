@@ -70,7 +70,7 @@ public class ObjectDeposit : MonoBehaviour
     {
         yield return new WaitForSeconds(initialEjectDelay);
         player.GetComponent<PlayerController>().isRagdolled = true;
-        player.GetComponent<Rigidbody>().linearVelocity = coinSpawn.forward * ejectionForce;
+        player.GetComponent<Rigidbody>().linearVelocity = coinSpawn.forward * ejectionForce * 300.0f;
 
     }
 

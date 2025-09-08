@@ -44,7 +44,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float righteningForceLerp = 0.5f;
     [SerializeField] float righteningTrigger = 5.0f;
     [SerializeField] float minRighteningAngle = 3.0f;
-    float variedRighteningForce = 100.0f;
+    private float variedRighteningForce = 100.0f;
 
     [Header("Expressions")]
     [SerializeField] Renderer[] eyeRenderers;
@@ -56,20 +56,19 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private PhysicsGrabber physicsGrabber;
     [SerializeField] Transform playerVisuals;
     [SerializeField] Transform cam;
-
-    private Vector3 groundPoint;
-
+    [SerializeField] PlayerUI playerUI;
     [SerializeField] Transform groundCheckOrigin;
-    [SerializeField] float hoverFactor = 3.0f;
-    [SerializeField] float heavyObjectMulitplier;
-
-    Vector3 currentSlopeNormal = Vector3.zero;
-    Transform orientation;
+    
+    private GameManager gameManager;
+    private Vector3 groundPoint;
+    private Vector3 currentSlopeNormal = Vector3.zero;
+    private Transform orientation;
 
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
         orientation = new GameObject().transform;
+        gameManager = FindAnyObjectByType<GameManager>();
         orientation.position = transform.position;
     }
 
@@ -85,11 +84,9 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        if(transform.position.y < -0.0f) 
+        if(transform.position.y < -3.0f) 
         {
-            //WE ARE IN THE SEEEEAAAAA
-            //fade to black
-            //spawn at nearest beach?
+            playerUI.FadeToBlack();
         }
 
         if (!isRagdolled) 
@@ -196,6 +193,8 @@ public class PlayerController : MonoBehaviour
     {
         if (ctx.started) // button pressed
         {
+            if (rb == null) return;
+
             if (isRagdolled && rb.linearVelocity.magnitude < 3.0f && IsGrounded())
             {
                 EndRagdoll();
@@ -263,7 +262,6 @@ public class PlayerController : MonoBehaviour
 
     public bool IsGrounded()
     {
-
         if(Physics.Raycast(groundCheckOrigin.position, Vector3.down, out RaycastHit hit, 1.0f)) 
         {
             groundPoint = hit.point;
@@ -276,6 +274,11 @@ public class PlayerController : MonoBehaviour
             return false;
         }
 
+    }
+
+    public void WashUpOnBeach() 
+    {
+        rb.MovePosition(gameManager.GetNearestBeachSpawn(transform.position));
     }
 
     private void OnCollisionEnter(Collision collision)

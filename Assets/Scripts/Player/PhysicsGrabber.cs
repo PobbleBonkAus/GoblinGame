@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -31,13 +31,21 @@ public class PhysicsGrabber : MonoBehaviour
     [SerializeField] private SphereCollider grabCollider;
     [SerializeField] private Transform playerRoot; // Main pivot of player body
     [SerializeField] private Transform head;
-
+    [SerializeField] private PlayerCameraController cameraController;
+ 
     [Header("Throwing")]
     [SerializeField] public float maxThrowForceTime = 50.0f;
     [SerializeField] private float throwLockOutDuration = 1.0f;
+    [SerializeField] private float headColliderDeactivationTimeAfterThrow = 0.5f;
+    [SerializeField] private float throwZoomTimeMultiplier = 3.0f;
+    [SerializeField] private float throwZoomAmount = 3.0f;
+    private float initialCameraFOV;
+
     private float throwLockOutTime = 0.0f;
     [HideInInspector] public float throwForceTimer = 0.0f;
     private bool chargingThrow = false;
+
+
 
     [Header("Item Storing")]
     [SerializeField] private Transform storedItemTransform;
@@ -86,6 +94,7 @@ public class PhysicsGrabber : MonoBehaviour
                 {
                     initialGrabPointRelative = Vector3.Lerp(initialGrabPointRelative, transform.forward, throwForceTimer * 0.006f);
                     throwForceTimer += 1.0f;
+                    cameraController.SetZoom(-throwForceTimer);
                 }
             }
 
@@ -119,7 +128,7 @@ public class PhysicsGrabber : MonoBehaviour
         grabbedObjectOriginalLinearDrag = grabbedObject.linearDamping;
         grabbedObjectOriginalAngularDrag = grabbedObject.angularDamping;
 
-        grabbedObject.linearDamping = grabbedObjectLinearDrag;
+        //grabbedObject.linearDamping = grabbedObjectLinearDrag;
         grabbedObject.angularDamping = grabbedObjectAngularDrag;
 
         grabbedObject.gameObject.layer = LayerMask.NameToLayer("GrabbedObject");
@@ -144,51 +153,34 @@ public class PhysicsGrabber : MonoBehaviour
 
     private void MoveGrabbedObject()
     {
-        float currentForce = grabForce;
         if (grabbedObject != null)
         {
             raiseOffset = (raisingObject ? raiseOffset = raisedObjectTransform.position : Vector3.zero);
-
-            switch (objectType) 
-            {
-                case (ObjectType.SMALL):
-                    // Target position based on original offset to player root
-                    currentForce = smallObjectGrabForce;
-                    if (raisingObject)
-                    {
-                        grabOffsetFromPlayer = raisedObjectTransform.localPosition;
-                    }
-                    else
-                    {
-                        grabOffsetFromPlayer = transform.localPosition;
-                    }
-                    break;
-                
-                case (ObjectType.LARGE):
-                    currentForce = largeObjectGrabForce;
-                    float distanceToGrabbedObject = Vector3.Distance(player.transform.position, globalGrabPoint);
-                    if (distanceToGrabbedObject > maxGrabObjectRange)
-                    {
-                        playerRigidbody.AddForce((globalGrabPoint - player.transform.position) * heavyObjectMultiplier);
-                                               
-                    }
-                    break;       
-            }
+            grabOffsetFromPlayer = (raisingObject) ? raisedObjectTransform.localPosition : grabOffsetFromPlayer = transform.localPosition;
+            grabbedObject.linearDamping = (!player.IsGrounded()) ? 0.0f : grabbedObject.linearDamping = grabbedObjectLinearDrag;
 
 
             Vector3 desiredWorldPosition = playerRoot.TransformPoint(grabOffsetFromPlayer);
 
             // Maintain grab point on object
             targetPosition = desiredWorldPosition - grabbedObject.transform.TransformVector(initialGrabPointRelative);
-
             Vector3 direction = targetPosition - grabbedObject.transform.position;
-
             globalGrabPoint = grabbedObject.position - grabbedObject.transform.TransformVector(initialGrabPointRelative);
+
+
 
             if (direction.sqrMagnitude > minGrabMoveDistance * minGrabMoveDistance)
             {
-                grabbedObject.AddForce(direction * currentForce, ForceMode.Force);
+                // Force to move object
+                Vector3 pullForce = direction * grabForce;
+
+                grabbedObject.AddForce(pullForce, ForceMode.Force);
+
+                Vector3 oppositeForce = -pullForce * Mathf.Clamp01(grabbedObject.mass / 50f);
+                playerRigidbody.AddForce(oppositeForce, ForceMode.Force);
+                
             }
+
 
             RotateGrabObject();
         }
@@ -285,7 +277,9 @@ public class PhysicsGrabber : MonoBehaviour
             
             Rigidbody releasedObject = grabbedObject;
             ReleaseObject();
-            releasedObject.AddForce(transform.forward * throwForce * throwForceTimer);
+            releasedObject.AddForce(cameraController.transform.forward * throwForce * throwForceTimer);
+
+            cameraController.SetZoom(0.0f);
 
             throwLockOutTime = throwLockOutDuration;
             throwForceTimer = 0.0f;
@@ -314,7 +308,7 @@ public class PhysicsGrabber : MonoBehaviour
     {
         head.GetComponent<MeshCollider>().enabled = false;
        
-        yield return new WaitForSeconds(1.0f);
+        yield return new WaitForSeconds(headColliderDeactivationTimeAfterThrow);
 
         head.GetComponent<MeshCollider>().enabled = true;
     }

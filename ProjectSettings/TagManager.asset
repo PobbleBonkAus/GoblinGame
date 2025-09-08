@@ -11,6 +11,7 @@ TagManager:
   - Cosmetic
   - PlayerSpawn
   - Camera
+  - GameManager
   layers:
   - Default
   - TransparentFX

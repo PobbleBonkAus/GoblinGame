@@ -17,7 +17,8 @@ public class PlayerCameraController : MonoBehaviour
     [SerializeField] private float zoomLerp = 0.5f;
     [SerializeField] private float maxZoom = 10.0f;
     [SerializeField] private float minZoom = 0.01f;
-
+    private float targetZoom;
+    private float initialFieldOfView;
 
     [HideInInspector]
     public InputAction look;
@@ -33,19 +34,23 @@ public class PlayerCameraController : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
         currentDistance = targetDistance;
+        initialFieldOfView = cam.fieldOfView;
+        targetZoom = initialFieldOfView;
     }
 
     private void Update()
     {
+        if (cam == null) return;       
+        
         lookInput = look.ReadValue<Vector2>();
         Look();
 
-        if (cam != null)
-        {
-            Vector3 desiredCameraPos = transform.position - transform.forward * currentDistance;
-            cam.transform.position = Vector3.Lerp(cam.transform.position, desiredCameraPos, zoomLerp);
-            cam.transform.LookAt(target.position);
-        }
+
+        cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, targetZoom, Time.deltaTime * zoomLerp);
+
+        Vector3 desiredCameraPos = transform.position - transform.forward * currentDistance;
+        cam.transform.position = Vector3.Lerp(cam.transform.position, desiredCameraPos, zoomLerp);
+        cam.transform.LookAt(target.position);
     }
 
     private void Look()
@@ -66,5 +71,18 @@ public class PlayerCameraController : MonoBehaviour
             transform.rotation = targetRotation;
         }
     }
+
+    public void SetZoom(float newZoom) 
+    {
+        if(newZoom == 0) 
+        {
+            targetZoom = initialFieldOfView;
+        }
+        else
+        {
+            targetZoom = initialFieldOfView + newZoom;
+        }
+    }
+
 
 }

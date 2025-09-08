@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 6919052789755859384}
   m_Layer: 6
   m_Name: Flask
-  m_TagString: Sellable
+  m_TagString: Junk
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

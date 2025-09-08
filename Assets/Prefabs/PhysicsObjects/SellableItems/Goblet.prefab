@@ -12,6 +12,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Spark Particles
       objectReference: {fileID: 0}
+    - target: {fileID: 6803396813658721022, guid: 6cbb1e197f004684ea683e6d68de0825, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 7480349124917792536, guid: 6cbb1e197f004684ea683e6d68de0825, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.41107365

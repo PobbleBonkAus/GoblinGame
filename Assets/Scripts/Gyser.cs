@@ -5,33 +5,31 @@ public class Gyser : MonoBehaviour
 {
 
     [SerializeField]
-    private float timer = 10.0f;
+    private float timer = 1.0f;
     [SerializeField]
-    private float gyserForce = 10.0f;
+    private float gyserForce = 1000.0f;
     [SerializeField]
     private Transform gyserDirectionTransform;
 
-    List<Rigidbody> rigidbodies;
+    List<Rigidbody> rigidbodies = new List<Rigidbody>();
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        StartCoroutine("ShootWater");   
+        StartCoroutine(ShootWater());   
     }
 
 
     IEnumerator<WaitForSeconds> ShootWater() 
     {
-        
-        yield return new WaitForSeconds(timer); 
+        yield return new WaitForSeconds(timer);
 
         for (int i = 0; i < rigidbodies.Count; i++) 
         {
             rigidbodies[i].AddForce(gyserDirectionTransform.up * gyserForce, ForceMode.Impulse);
-            print(rigidbodies[i].name);
         }
 
-        StartCoroutine("ShootWater");
+        StartCoroutine(ShootWater());
     }
 
     private void OnTriggerEnter(Collider other)
@@ -42,7 +40,6 @@ public class Gyser : MonoBehaviour
             {
                 rigidbodies.Add(other.attachedRigidbody);
             }
- 
         }
     }
 
