@@ -33,7 +33,7 @@ public class PlayerInputs : MonoBehaviour
         playerInputActions.FindAction("Throw").started += playerPhysicsGrabber.DoChargeThrow;
         playerInputActions.FindAction("Throw").canceled += playerPhysicsGrabber.DoThrow;
 
-        playerInputActions.FindAction("RaiseObject").started += playerPhysicsGrabber.DoRaiseObject;
+        playerInputActions.FindAction("RaiseObject").performed += playerPhysicsGrabber.DoRaiseObject;
         playerInputActions.FindAction("RaiseObject").canceled += playerPhysicsGrabber.DoLowerObject;
 
         playerInputActions.FindAction("StoreItem").started += playerPhysicsGrabber.DoPickUp;

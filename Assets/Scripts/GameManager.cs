@@ -37,6 +37,23 @@ public class GameManager : MonoBehaviour
                 statuesRaised += 1;
             }
         }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Quit();
+        }
+
+
+    }
+
+    public void Quit()
+    {
+#if UNITY_STANDALONE
+        Application.Quit();
+#endif
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#endif
     }
 
     public void RaiseStatue() 

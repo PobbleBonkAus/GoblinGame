@@ -14,5 +14,12 @@ public class InteractableRigidbody : MonoBehaviour
         EQUIPABLE, //Cosmetics
     }
 
-
+    private void Update()
+    {
+        if(transform.position.y < -10.0f) 
+        {
+            transform.position = new Vector3(Random.Range(-30, 30), 100, Random.Range(-30, 30));
+            GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
+        }
+    }
 }

@@ -64,6 +64,9 @@ public class PlayerController : MonoBehaviour
     private Vector3 currentSlopeNormal = Vector3.zero;
     private Transform orientation;
 
+    [SerializeField] LayerMask wallCheckLayerMask;
+
+
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -100,11 +103,22 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    private void Update()
+    {
+
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            rb.Move(GameObject.FindGameObjectWithTag("PlayerSpawn").transform.position, Quaternion.identity);
+            rb.linearVelocity = Vector3.zero;
+        }
+    }
+
     void Move()
     {
         if (isRagdolled) return;
 
         moveInput = move.ReadValue<Vector2>();
+
 
         // Camera-relative movement (ignores camera tilt)
         Vector3 cameraRight = Vector3.ProjectOnPlane(cam.right, Vector3.up).normalized;
@@ -126,9 +140,14 @@ public class PlayerController : MonoBehaviour
 
         // Apply combined velocity
         Vector3 finalVelocity = new Vector3(horizontalVelocity.x, verticalVelocity, horizontalVelocity.z);
-        rb.linearVelocity = finalVelocity;
 
-        //rb.AddForce(finalVelocity);
+        if (Physics.Raycast(transform.position, horizontalVelocity.normalized, 1.0f, wallCheckLayerMask))
+        {
+            finalVelocity = new Vector3(0.0f, verticalVelocity, 0.0f);    
+        }
+
+        rb.linearVelocity = finalVelocity;
+        
     }
 
     void TurnTowardsMoveDirection()
@@ -185,7 +204,7 @@ public class PlayerController : MonoBehaviour
         }
         else if (rb.linearVelocity.y > 0f && !isJumpHeld) // early release
         {
-            rb.linearVelocity += Vector3.up * Physics.gravity.y * (lowJumpMultiplier - 1f) * Time.fixedDeltaTime;
+           // rb.linearVelocity += Vector3.up * Physics.gravity.y * (lowJumpMultiplier - 1f) * Time.fixedDeltaTime;
         }
     }
 
@@ -195,9 +214,10 @@ public class PlayerController : MonoBehaviour
         {
             if (rb == null) return;
 
-            if (isRagdolled && rb.linearVelocity.magnitude < 3.0f && IsGrounded())
+            if (isRagdolled)
             {
                 EndRagdoll();
+                return;
             }
             else if (IsGrounded())
             {
@@ -223,13 +243,9 @@ public class PlayerController : MonoBehaviour
         {
             StartRagdoll();
         }
-        else
+        else if(rb.linearVelocity.magnitude < 3.0f)
         {
-            if (!IsGrounded() || isInOcean) 
-            {
-                EndRagdoll();
-            }
-
+            EndRagdoll();
         }
     }
 
@@ -238,7 +254,7 @@ public class PlayerController : MonoBehaviour
     {
         isRagdolled = true;
         variedRighteningForce = 0.0f;
-        rb.AddForce(rb.linearVelocity * ragdollImpulse, ForceMode.Impulse);
+        rb.AddForce((rb.linearVelocity + Random.insideUnitSphere) * ragdollImpulse, ForceMode.Impulse);
         rb.AddForce(transform.up * ragdollImpulse, ForceMode.Impulse);
         rb.AddTorque(Random.rotation.eulerAngles * ragdollTorqueKick, ForceMode.Impulse);
         gameObject.layer = LayerMask.NameToLayer("Grabbable");
@@ -270,6 +286,7 @@ public class PlayerController : MonoBehaviour
         }
         else 
         {
+            currentSlopeNormal = Vector3.zero;
             groundPoint = transform.position;
             return false;
         }
@@ -279,6 +296,8 @@ public class PlayerController : MonoBehaviour
     public void WashUpOnBeach() 
     {
         rb.MovePosition(gameManager.GetNearestBeachSpawn(transform.position));
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
     }
 
     private void OnCollisionEnter(Collision collision)

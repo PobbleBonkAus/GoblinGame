@@ -1261,6 +1261,37 @@ LineRenderer:
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
+--- !u!1 &4229403102123672742
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7958509766898684776}
+  m_Layer: 3
+  m_Name: HatHolder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7958509766898684776
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4229403102123672742}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.936, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1853315821433438560}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4835987827963804364
 GameObject:
   m_ObjectHideFlags: 0
@@ -1796,6 +1827,7 @@ Transform:
   - {fileID: 8487091824733129529}
   - {fileID: 6995706435923843302}
   - {fileID: 893869638855486819}
+  - {fileID: 7958509766898684776}
   m_Father: {fileID: 8782199234064376268}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &6177313823285589185
@@ -2451,7 +2483,7 @@ MonoBehaviour:
   interactRange: 2
   largeObjectGrabForce: 10
   smallObjectGrabForce: 100
-  throwForce: 30
+  throwForce: 40
   useItemTimeoutDuration: 0.3
   minGrabMoveDistance: 0.2
   grabbedObjectLinearDrag: 10
@@ -2601,7 +2633,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92272c2c85c4a22438d22d6133e4ecd3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cosmeticTransform: {fileID: 2875734061182977641}
+  cosmeticTransform: {fileID: 7958509766898684776}
 --- !u!64 &2614516384934714371
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -3045,6 +3077,9 @@ MonoBehaviour:
   cam: {fileID: 3028761874667257503}
   playerUI: {fileID: 4431265629851340168}
   groundCheckOrigin: {fileID: 108663793620656103}
+  wallCheckLayerMask:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!114 &2910426281273310292
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -146,6 +146,9 @@ public class PhysicsGrabber : MonoBehaviour
 
             grabbedObject = null;
             grabbing = false;
+            raisingObject = false;
+            raisePressed = false;
+
             kinematicBody.SetActive(false);
         }
     }
@@ -277,9 +280,10 @@ public class PhysicsGrabber : MonoBehaviour
             
             Rigidbody releasedObject = grabbedObject;
             ReleaseObject();
-            releasedObject.AddForce(cameraController.transform.forward * throwForce * throwForceTimer);
+            releasedObject.AddForce(((transform.forward) + (Vector3.up/2.0f)) * throwForce * throwForceTimer);
 
             cameraController.SetZoom(0.0f);
+
 
             throwLockOutTime = throwLockOutDuration;
             throwForceTimer = 0.0f;

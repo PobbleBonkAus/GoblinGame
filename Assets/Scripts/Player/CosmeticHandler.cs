@@ -34,7 +34,7 @@ public class CosmeticHandler : MonoBehaviour
         currentCosmetic.GetComponent<Rigidbody>().isKinematic = true;
         currentCosmetic.gameObject.layer = LayerMask.NameToLayer("Cosmetic");
         currentCosmetic.GetComponent<Collider>().enabled = false;
-        currentCosmetic.transform.SetPositionAndRotation(cosmeticTransform.position, cosmeticTransform.rotation);
+        currentCosmetic.transform.SetPositionAndRotation(cosmeticTransform.position + Vector3.up, cosmeticTransform.rotation);
     }
 
 
