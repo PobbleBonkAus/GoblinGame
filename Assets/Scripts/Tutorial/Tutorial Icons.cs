@@ -73,6 +73,8 @@ public class TutorialIcons : MonoBehaviour
 
     public void DoWalkAction(InputAction.CallbackContext ctx) 
     {
+        if (iconCurrentState == iconState.Complete) return;
+
         if (iconCurrentState == iconState.Walk && !imageStrikeout.enabled)
         {
             UpdateTutorialState();
@@ -81,6 +83,8 @@ public class TutorialIcons : MonoBehaviour
 
     public void DoGrabAction(InputAction.CallbackContext ctx) 
     {
+        if (iconCurrentState == iconState.Complete) return;
+
         if (iconCurrentState == iconState.Grab && !imageStrikeout.enabled)
         {
             UpdateTutorialState();

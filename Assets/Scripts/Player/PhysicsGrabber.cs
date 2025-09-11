@@ -32,7 +32,7 @@ public class PhysicsGrabber : MonoBehaviour
     [SerializeField] private Transform playerRoot; // Main pivot of player body
     [SerializeField] private Transform head;
     [SerializeField] private PlayerCameraController cameraController;
- 
+
     [Header("Throwing")]
     [SerializeField] public float maxThrowForceTime = 50.0f;
     [SerializeField] private float throwLockOutDuration = 1.0f;
@@ -64,7 +64,7 @@ public class PhysicsGrabber : MonoBehaviour
     private Vector3 initialGrabPointRelative; // local point on object
     private Vector3 targetPosition;
     private Vector3 grabOffsetFromPlayer; // relative position from player root
-    
+
     [HideInInspector] public bool raisePressed = false;
     [HideInInspector] public bool grabPressed = false;
     [HideInInspector] public bool grabbing = false;
@@ -86,6 +86,8 @@ public class PhysicsGrabber : MonoBehaviour
 
         if (grabbing)
         {
+            if (grabbedObject == null) { grabbing = false; }
+
             MoveGrabbedObject();
 
             if (chargingThrow)
@@ -144,10 +146,13 @@ public class PhysicsGrabber : MonoBehaviour
             grabbedObject.linearDamping = grabbedObjectOriginalLinearDrag;
             grabbedObject.angularDamping = grabbedObjectOriginalAngularDrag;
 
+            if (grabbedObject != null) { grabbedObject.GetComponent<InteractableRigidbody>().DeactivateObject(); }
+
             grabbedObject = null;
             grabbing = false;
             raisingObject = false;
             raisePressed = false;
+
 
             kinematicBody.SetActive(false);
         }
@@ -159,6 +164,9 @@ public class PhysicsGrabber : MonoBehaviour
         if (grabbedObject != null)
         {
             raiseOffset = (raisingObject ? raiseOffset = raisedObjectTransform.position : Vector3.zero);
+
+
+
             grabOffsetFromPlayer = (raisingObject) ? raisedObjectTransform.localPosition : grabOffsetFromPlayer = transform.localPosition;
             grabbedObject.linearDamping = (!player.IsGrounded()) ? 0.0f : grabbedObject.linearDamping = grabbedObjectLinearDrag;
 
@@ -181,7 +189,7 @@ public class PhysicsGrabber : MonoBehaviour
 
                 Vector3 oppositeForce = -pullForce * Mathf.Clamp01(grabbedObject.mass / 50f);
                 playerRigidbody.AddForce(oppositeForce, ForceMode.Force);
-                
+
             }
 
 
@@ -258,15 +266,19 @@ public class PhysicsGrabber : MonoBehaviour
 
     }
 
-    public void DoRaiseObject(InputAction.CallbackContext obj) 
+    public void DoRaiseObject(InputAction.CallbackContext obj)
     {
         raisingObject = true;
+        if (grabbedObject != null){ grabbedObject.GetComponent<InteractableRigidbody>().ActivateObject(); }
+        
         raisePressed = true;
     }
 
     public void DoLowerObject(InputAction.CallbackContext obj) 
     {
         raisingObject = false;
+        if(grabbedObject != null) { grabbedObject.GetComponent<InteractableRigidbody>().DeactivateObject(); }
+        
         raisePressed = false;
     }
     

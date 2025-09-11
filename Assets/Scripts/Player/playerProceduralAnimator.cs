@@ -239,8 +239,8 @@ public class playerProceduralAnimator : MonoBehaviour
         else if(physicsGrabber.raisePressed)
         {
             //move hands in above of the player to show the player is trying to raise
-            leftHand.position = SpringLerp(leftHand.position, physicsGrabber.transform.position + (transform.up) + (transform.right * 0.4f), ref leftHandVel);
-            rightHand.position = SpringLerp(rightHand.position, physicsGrabber.transform.position + (transform.up) - (transform.right * 0.4f), ref rightHandVel);
+            leftHand.position = SpringLerp(leftHand.position, (transform.position + transform.up * 2.0f) + (transform.right * 0.75f) + (transform.forward * 0.1f), ref leftHandVel);
+            rightHand.position = SpringLerp(rightHand.position, (transform.position + transform.up * 2.0f) - (transform.right * 0.75f) + (transform.forward * 0.1f), ref rightHandVel);
         }
         else
         {
