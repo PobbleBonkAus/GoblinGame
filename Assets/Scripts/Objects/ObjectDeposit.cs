@@ -16,27 +16,28 @@ public class ObjectDeposit : MonoBehaviour
 
     [SerializeField] UnityEvent OnDeposit;
 
-    void RecieveObject(InteractableRigidbody interactableObject) 
+    void RecieveObject(Rigidbody body) 
     {
-        Debug.Log("Recieved Object");
-        string tag = interactableObject.tag;
-        switch (tag)
+        Debug.Log("recieved body" + body.name);
+        int value = 0;
+
+        if(body.TryGetComponent<InteractableRigidbody>(out InteractableRigidbody sellable)) 
         {
-            default:
-                Debug.Log("found default " + interactableObject.name);
-                StartCoroutine(SpitJunkBackOut(interactableObject));
-                break;
-            case "Sellable":
-                Debug.Log("found sellable" + interactableObject.name);
-                StartCoroutine(SpawnCoins(interactableObject.value));
-                Destroy(interactableObject.gameObject);
-                OnDeposit.Invoke();
-                break;
-            case "Junk":
-                Debug.Log("found junk " + interactableObject.name);
-                StartCoroutine(SpitJunkBackOut(interactableObject));
-                break;
+            value = sellable.value;
         }
+        
+        if(value != 0) 
+        {
+            StartCoroutine(SpawnCoins(value));
+            Destroy(body.gameObject);
+        }
+        else
+        {
+            Debug.Log("JUNK");
+            //body.linearVelocity = coinSpawn.forward * ejectionForce;
+            StartCoroutine(SpitJunkBackOut(body));
+        }
+
     }
     
     IEnumerator SpawnCoins(int itemValue) 
@@ -59,31 +60,20 @@ public class ObjectDeposit : MonoBehaviour
         coin.GetComponent<Rigidbody>().AddForce(coinSpawn.forward * ejectionForce,ForceMode.Impulse);
     }
 
-    IEnumerator SpitJunkBackOut(InteractableRigidbody interactableObject) 
+    IEnumerator SpitJunkBackOut(Rigidbody body) 
     {
         yield return new WaitForSeconds(initialEjectDelay);
+
         Debug.Log("Ejecting Junk");
-        interactableObject.GetComponent<Rigidbody>().linearVelocity = coinSpawn.forward * ejectionForce;
+        body.linearVelocity = coinSpawn.forward * ejectionForce;
     }
 
-    IEnumerator SpitPlayerBackOut(GameObject player) 
-    {
-        yield return new WaitForSeconds(initialEjectDelay);
-        player.GetComponent<PlayerController>().isRagdolled = true;
-        player.GetComponent<Rigidbody>().linearVelocity = coinSpawn.forward * ejectionForce * 300.0f;
-
-    }
 
     private void OnTriggerEnter(Collider other)
-    {
-        Debug.Log("Trigger entered");
-        if (other.TryGetComponent<InteractableRigidbody>(out InteractableRigidbody body)) 
+    {     
+        if (other.attachedRigidbody) 
         {
-            RecieveObject(body);
-        }
-        else if (other.gameObject.CompareTag("Player")) 
-        {
-            SpitPlayerBackOut(other.gameObject);
+            RecieveObject(other.attachedRigidbody);
         }
 
     }

@@ -116,6 +116,8 @@ public class PhysicsGrabber : MonoBehaviour
     {
         if (player.isRagdolled) return;
 
+        if (hitRigidbody == playerRigidbody) return;
+
         grabbedObject = hitRigidbody;
 
         // Store grab point relative to object
@@ -146,7 +148,13 @@ public class PhysicsGrabber : MonoBehaviour
             grabbedObject.linearDamping = grabbedObjectOriginalLinearDrag;
             grabbedObject.angularDamping = grabbedObjectOriginalAngularDrag;
 
-            if (grabbedObject != null) { grabbedObject.GetComponent<InteractableRigidbody>().DeactivateObject(); }
+            if (grabbedObject != null) 
+            {
+                if (grabbedObject.TryGetComponent<InteractableRigidbody>(out InteractableRigidbody body))
+                {
+                    body.DeactivateObject();
+                }
+            }
 
             grabbedObject = null;
             grabbing = false;
@@ -164,9 +172,6 @@ public class PhysicsGrabber : MonoBehaviour
         if (grabbedObject != null)
         {
             raiseOffset = (raisingObject ? raiseOffset = raisedObjectTransform.position : Vector3.zero);
-
-
-
             grabOffsetFromPlayer = (raisingObject) ? raisedObjectTransform.localPosition : grabOffsetFromPlayer = transform.localPosition;
             grabbedObject.linearDamping = (!player.IsGrounded()) ? 0.0f : grabbedObject.linearDamping = grabbedObjectLinearDrag;
 
@@ -179,19 +184,16 @@ public class PhysicsGrabber : MonoBehaviour
             globalGrabPoint = grabbedObject.position - grabbedObject.transform.TransformVector(initialGrabPointRelative);
 
 
-
             if (direction.sqrMagnitude > minGrabMoveDistance * minGrabMoveDistance)
             {
                 // Force to move object
                 Vector3 pullForce = direction * grabForce;
+                Vector3 oppositeForce = -pullForce * Mathf.Clamp01(grabbedObject.mass / 50f);
 
                 grabbedObject.AddForce(pullForce, ForceMode.Force);
-
-                Vector3 oppositeForce = -pullForce * Mathf.Clamp01(grabbedObject.mass / 50f);
                 playerRigidbody.AddForce(oppositeForce, ForceMode.Force);
-
+               
             }
-
 
             RotateGrabObject();
         }

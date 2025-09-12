@@ -87,7 +87,7 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        if(transform.position.y < -3.0f) 
+        if(transform.position.y < -4.0f) 
         {
             playerUI.FadeToBlack();
         }

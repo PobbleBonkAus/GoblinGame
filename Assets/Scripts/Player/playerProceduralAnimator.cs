@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class playerProceduralAnimator : MonoBehaviour
@@ -48,6 +49,7 @@ public class playerProceduralAnimator : MonoBehaviour
     [SerializeField] private LineRenderer leftArmRenderer;
     [SerializeField] private LineRenderer rightArmRenderer;
     [SerializeField] private float armLerpSpeed = 0.3f;
+    [SerializeField] private float armMaxStretch = 3.0f;
     [SerializeField] private Transform leftHandTarget;
     [SerializeField] private Transform rightHandTarget;
     [SerializeField] float damping = 5f;
@@ -92,28 +94,40 @@ public class playerProceduralAnimator : MonoBehaviour
         playerLayer = LayerMask.NameToLayer("Player");
         raycastMask = ~(1 << playerLayer); // Everything except the Player layer
 
-        // Detach feet so they stay in world space
-        leftFoot.SetParent(null);
-        rightFoot.SetParent(null);
-
-        leftHand.SetParent(null);
-        rightHand.SetParent(null);
-
     }
 
     private void Start()
     {
-        //leftHand.position = body.position;
-        //rightHand.position = body.position;
+
+
+
+        StartCoroutine(LateStart());
+    }
+
+    IEnumerator<WaitForSeconds> LateStart() 
+    {
+        yield return new WaitForSeconds(0.5f);
+
+        leftHand.SetParent(null);
+        rightHand.SetParent(null);
 
         leftHandTarget.position = leftHand.position;
         rightHandTarget.position = rightHand.position;
+
+        leftHand.position = body.position;
+        rightHand.position = body.position;
+
+
+        // Detach feet so they stay in world space
+        leftFoot.SetParent(null);
+        rightFoot.SetParent(null);
 
         leftFootPreviousPosition = leftFoot.position;
         rightFootPreviousPosition = rightFoot.position;
 
         leftFootTargetPosition = leftFoot.position;
         rightFootTargetPosition = rightFoot.position;
+
     }
 
     private void Update()
@@ -159,6 +173,24 @@ public class playerProceduralAnimator : MonoBehaviour
         Vector3 offset = velocity * velocityFactor;
         velocityMagnitude = velocity.magnitude;
 
+        if(playerRigidbody.linearVelocity.magnitude < 0.4f) 
+        {
+            if (TryGetFootTarget(leftLegRenderer.transform.position, offset, out Vector3 target))
+            {
+                //stomp
+                leftFootPreviousPosition = leftFoot.position;
+                leftFootTargetPosition = target;
+            }
+            if (TryGetFootTarget(rightLegRenderer.transform.position, offset, out Vector3 target2))
+            {
+                //stomp
+                rightFootPreviousPosition = rightFoot.position;
+                rightFootTargetPosition = target2;
+            }
+
+            return;
+        }
+
         // Step left foot
         if (stepLeftFoot && leftFootLerp >= 1f && stepWaitTimer >= stepWaitTime)
         {
@@ -172,7 +204,7 @@ public class playerProceduralAnimator : MonoBehaviour
                     leftFootLerp = 0f;
                     stepLeftFoot = false;
                     stepWaitTimer = 0f;
-                    leftFootDust.Play();
+                    leftFootDust.Play();                    
                 }
                 else
                 {
@@ -183,6 +215,7 @@ public class playerProceduralAnimator : MonoBehaviour
                     stepLeftFoot = false;
                     stepWaitTimer = 0f;
                 }
+
             }
         }
         // Step right foot
@@ -216,6 +249,7 @@ public class playerProceduralAnimator : MonoBehaviour
     //updates the hand positions for the arm renderers
     private void UpdateArmTargetPositions() 
     {
+
         //If the player is holding down the grab button and is not ragdolled, move the hands according to the physics grabber
         if (player.isRagdolled)
         {
@@ -250,6 +284,7 @@ public class playerProceduralAnimator : MonoBehaviour
 
         }
     }
+
     /* Doesn't work :((
     private void RotateHeadWithCamera()
     {
@@ -310,9 +345,28 @@ public class playerProceduralAnimator : MonoBehaviour
 
     private void Step()
     {
+        if(playerRigidbody.linearVelocity.magnitude < 0.5f) 
+        {
+            leftFootLerp += Time.deltaTime * stepSpeed;
+
+            Vector3 mid = (leftFootPreviousPosition + leftFootTargetPosition) / 2 + Vector3.up * stepHeight;
+            leftFoot.position = Vector3.Lerp(Vector3.Lerp(leftFootPreviousPosition, mid, leftFootLerp),
+                                                Vector3.Lerp(mid, leftFootTargetPosition, leftFootLerp),
+                                                leftFootLerp);
+
+            rightFootLerp += Time.deltaTime * stepSpeed;
+
+            Vector3 Rmid = (rightFootPreviousPosition + rightFootTargetPosition) / 2 + Vector3.up * stepHeight;
+            rightFoot.position = Vector3.Lerp(Vector3.Lerp(rightFootPreviousPosition, Rmid, rightFootLerp),
+                                                Vector3.Lerp(Rmid, rightFootTargetPosition, rightFootLerp),
+                                                rightFootLerp);
+            return;
+        }
+
         if (leftFootLerp < 1f)
         {
             leftFootLerp += Time.deltaTime * stepSpeed;
+
             Vector3 mid = (leftFootPreviousPosition + leftFootTargetPosition) / 2 + Vector3.up * stepHeight;
             leftFoot.position = Vector3.Lerp(Vector3.Lerp(leftFootPreviousPosition, mid, leftFootLerp),
                                                 Vector3.Lerp(mid, leftFootTargetPosition, leftFootLerp),
@@ -322,6 +376,7 @@ public class playerProceduralAnimator : MonoBehaviour
         if (rightFootLerp < 1f)
         {
             rightFootLerp += Time.deltaTime * stepSpeed;
+
             Vector3 mid = (rightFootPreviousPosition + rightFootTargetPosition) / 2 + Vector3.up * stepHeight;
             rightFoot.position = Vector3.Lerp(Vector3.Lerp(rightFootPreviousPosition, mid, rightFootLerp),
                                                 Vector3.Lerp(mid, rightFootTargetPosition, rightFootLerp),
@@ -357,6 +412,8 @@ public class playerProceduralAnimator : MonoBehaviour
         rightFootPreviousPosition = rightFoot.position;
         rightFootTargetPosition = rightFoot.position;
     }
+
+
 
     private void DrawLegs()
     {
