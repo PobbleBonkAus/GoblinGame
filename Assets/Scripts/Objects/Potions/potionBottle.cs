@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEditor.Rendering.Universal;
 using UnityEngine;
 
 public class potionBottle : InteractableRigidbody
@@ -6,12 +7,13 @@ public class potionBottle : InteractableRigidbody
     [Header("Liquid Settings")]
     [SerializeField] float liquidAmount = 4.0f;          // how much liquid total
     [SerializeField] float liquidPourSpeed = 0.3f;       // how fast it drains per second
-    [SerializeField] float potionDuration = 5.0f;        // how long effect lasts
+    [SerializeField] float potionDuration = 5.0f;        // how long effect 
 
     [Header("References")]
     [SerializeField] Transform liquid;                   // mesh/transform inside bottle
     [SerializeField] ParticleSystem pouringParticle;
     [SerializeField] GameObject affectParticle;
+    [SerializeField] Renderer liquidMaterial;
     bool pouring = false;
 
     Dictionary<Rigidbody, float> affectedBodies = new Dictionary<Rigidbody, float>();
@@ -47,7 +49,9 @@ public class potionBottle : InteractableRigidbody
             if (liquid != null)
             {
                 float t = liquidAmount / 5f; // assumes 5 is max
-                liquid.localScale = Vector3.one * t;
+                //liquid.localScale = Vector3.one * t;
+                liquidMaterial.material.SetFloat("_Fill_Amount", t * 1f);
+                print(t);
             }
 
         }
@@ -76,6 +80,7 @@ public class potionBottle : InteractableRigidbody
 
     private void OnParticleCollision(GameObject other)
     {
+
         if (other.GetComponent<Rigidbody>() && other != gameObject)
         {
             if (!affectedBodies.ContainsKey(other.GetComponent<Rigidbody>()))

@@ -1,7 +1,7 @@
 ﻿// Toony Colors Pro+Mobile 2
 // (c) 2014-2025 Jean Moreno
 
-Shader "Emission_GGTCP2 Copy"
+Shader "Glass_GGTCP2 "
 {
 	Properties
 	{
@@ -13,7 +13,7 @@ Shader "Emission_GGTCP2 Copy"
 		[TCP2Separator]
 
 		[TCP2HeaderHelp(Base)]
-		_Color ("Color", Color) = (1,1,1,1)
+		_BaseColor ("Color", Color) = (1,1,1,1)
 		[TCP2ColorNoAlpha] _HColor ("Highlight Color", Color) = (0.75,0.75,0.75,1)
 		[TCP2ColorNoAlpha] _SColor ("Shadow Color", Color) = (0.2,0.2,0.2,1)
 		[MainTexture] _BaseMap ("Albedo", 2D) = "white" {}
@@ -21,12 +21,27 @@ Shader "Emission_GGTCP2 Copy"
 
 		[TCP2Header(Ramp Shading)]
 		
-		_RampThreshold ("Threshold", Range(0.01,1)) = 0.5
+		_RampThreshold ("Threshold", Range(0.01,1)) = 0.01
 		_RampSmoothing ("Smoothing", Range(0.001,1)) = 0.5
+		[IntRange] _BandsCount ("Bands Count", Range(1,20)) = 4
+		[TCP2Separator]
+		
+		[TCP2HeaderHelp(Specular)]
+		[Toggle(TCP2_SPECULAR)] _UseSpecular ("Enable Specular", Float) = 0
+		[TCP2ColorNoAlpha] _SpecularColor ("Specular Color", Color) = (0.5,0.5,0.5,1)
+		_SpecularSmoothness ("Smoothness", Float) = 0.2
+		_SpecularToonBands ("Specular Bands", Float) = 3
 		[TCP2Separator]
 
 		[TCP2HeaderHelp(Emission)]
 		[TCP2ColorNoAlpha] [HDR] _Emission ("Emission Color", Color) = (0,0,0,1)
+		[TCP2Separator]
+		
+		[TCP2HeaderHelp(Rim Lighting)]
+		[Toggle(TCP2_RIM_LIGHTING)] _UseRim ("Enable Rim Lighting", Float) = 0
+		[TCP2ColorNoAlpha] _RimColor ("Rim Color", Color) = (0.8,0.8,0.8,0.5)
+		_RimMin ("Rim Min", Range(0,2)) = 0.5
+		_RimMax ("Rim Max", Range(0,2)) = 1
 		[TCP2Separator]
 
 		[TCP2HeaderHelp(Reflections)]
@@ -35,7 +50,11 @@ Shader "Emission_GGTCP2 Copy"
 		_ReflectionSmoothness ("Smoothness", Range(0,1)) = 0.5
 		[TCP2Separator]
 		
+		[Toggle(TCP2_TEXTURED_THRESHOLD)] _UseTexturedThreshold ("Enable Textured Threshold", Float) = 0
 		_StylizedThreshold ("Stylized Threshold", 2D) = "gray" {}
+		[TCP2Separator]
+		
+		[TCP2ColorNoAlpha] _DiffuseTint ("Diffuse Tint", Color) = (1,0.5,0,1)
 		[TCP2Separator]
 		
 		[TCP2HeaderHelp(Sketch)]
@@ -94,11 +113,19 @@ Shader "Emission_GGTCP2 Copy"
 			
 			// Shader Properties
 			float4 _BaseMap_ST;
-			fixed4 _Color;
+			fixed4 _BaseColor;
 			half4 _Emission;
 			float4 _StylizedThreshold_ST;
 			float _RampThreshold;
 			float _RampSmoothing;
+			float _BandsCount;
+			fixed4 _DiffuseTint;
+			float _RimMin;
+			float _RimMax;
+			fixed4 _RimColor;
+			float _SpecularSmoothness;
+			float _SpecularToonBands;
+			fixed4 _SpecularColor;
 			float4 _SketchTexture_ST;
 			half _SketchTexture_OffsetSpeed;
 			fixed4 _SColor;
@@ -114,6 +141,13 @@ Shader "Emission_GGTCP2 Copy"
 			float3 p3 = frac(p.xyx * float3(443.897, 441.423, 437.195));
 			p3 += dot(p3, p3.yzx + 19.19);
 			return frac((p3.xx+p3.yz)*p3.zy);
+		}
+		
+		//Specular help functions (from UnityStandardBRDF.cginc)
+		inline float3 SpecSafeNormalize(float3 inVec)
+		{
+			half dp3 = max(0.001f, dot(inVec, inVec));
+			return inVec * rsqrt(dp3);
 		}
 		
 		// Built-in renderer (CG) to SRP (HLSL) bindings
@@ -165,9 +199,12 @@ Shader "Emission_GGTCP2 Copy"
 
 			//--------------------------------------
 			// Toony Colors Pro 2 keywords
+			#pragma shader_feature_local_fragment TCP2_SPECULAR
+			#pragma shader_feature_local_fragment TCP2_RIM_LIGHTING
 			#pragma shader_feature_local_fragment TCP2_REFLECTIONS
 		#pragma shader_feature_local _ _ALPHAPREMULTIPLY_ON
 			#pragma shader_feature_local_fragment TCP2_SKETCH
+			#pragma shader_feature_local_fragment TCP2_TEXTURED_THRESHOLD
 
 			// vertex input
 			struct Attributes
@@ -259,7 +296,7 @@ Shader "Emission_GGTCP2 Copy"
 				
 				// Shader Properties Sampling
 				float4 __albedo = ( TCP2_TEX2D_SAMPLE(_BaseMap, _BaseMap, input.pack1.xy).rgba );
-				float4 __mainColor = ( _Color.rgba );
+				float4 __mainColor = ( _BaseColor.rgba );
 				float __alpha = ( __albedo.a * __mainColor.a );
 				float __ambientIntensity = ( 1.0 );
 				float3 __emission = ( _Emission.rgb );
@@ -267,6 +304,15 @@ Shader "Emission_GGTCP2 Copy"
 				float __stylizedThresholdScale = ( 1.0 );
 				float __rampThreshold = ( _RampThreshold );
 				float __rampSmoothing = ( _RampSmoothing );
+				float __bandsCount = ( _BandsCount );
+				float3 __diffuseTint = ( _DiffuseTint.rgb );
+				float __rimMin = ( _RimMin );
+				float __rimMax = ( _RimMax );
+				float3 __rimColor = ( _RimColor.rgb );
+				float __rimStrength = ( 1.0 );
+				float __specularSmoothness = ( _SpecularSmoothness );
+				float __specularToonBands = ( _SpecularToonBands );
+				float3 __specularColor = ( _SpecularColor.rgb );
 				float3 __sketchColor = ( float3(0,0,0) );
 				float3 __sketchTexture = ( TCP2_TEX2D_SAMPLE(_SketchTexture, _SketchTexture, screenUV * _ScreenParams.zw * _SketchTexture_ST.xy + _SketchTexture_ST.zw + hash22(floor(_Time.xx * _SketchTexture_OffsetSpeed.xx) / _SketchTexture_OffsetSpeed.xx)).aaa );
 				float __sketchThresholdScale = ( 1.0 );
@@ -274,6 +320,9 @@ Shader "Emission_GGTCP2 Copy"
 				float3 __highlightColor = ( _HColor.rgb );
 				float __reflectionSmoothness = ( _ReflectionSmoothness );
 				float3 __reflectionColor = ( _ReflectionColor.rgb );
+
+				half ndv = abs(dot(viewDirWS, normalWS));
+				half ndvRaw = ndv;
 
 				// main texture
 				half3 albedo = __albedo.rgb;
@@ -326,23 +375,56 @@ Shader "Emission_GGTCP2 Copy"
 				half atten = mainLight.shadowAttenuation * mainLight.distanceAttenuation;
 
 				half ndl = dot(normalWS, lightDir);
+				#if defined(TCP2_TEXTURED_THRESHOLD)
 				float stylizedThreshold = __stylizedThreshold;
 				stylizedThreshold -= 0.5;
 				stylizedThreshold *= __stylizedThresholdScale;
 				ndl += stylizedThreshold;
+				#endif
 				half3 ramp;
 				
 				half rampThreshold = __rampThreshold;
 				half rampSmooth = __rampSmoothing * 0.5;
+				half bandsCount = __bandsCount;
 				ndl = saturate(ndl);
 				ramp = smoothstep(rampThreshold - rampSmooth, rampThreshold + rampSmooth, ndl);
+				ramp = (round(ramp * bandsCount) / bandsCount) * step(ndl, 1);
 
 				// apply attenuation
 				ramp *= atten;
 
+				// Diffuse Tint
+				half3 diffuseTint = saturate(__diffuseTint + ndl);
+				ramp *= diffuseTint;
+				
 				half3 color = half3(0,0,0);
+				// Rim Lighting
+				#if defined(TCP2_RIM_LIGHTING)
+				half rim = 1 - ndvRaw;
+				rim = ( rim );
+				half rimMin = __rimMin;
+				half rimMax = __rimMax;
+				rim = smoothstep(rimMin, rimMax, rim);
+				half3 rimColor = __rimColor;
+				half rimStrength = __rimStrength;
+				emission.rgb += rim * rimColor * rimStrength;
+				#endif
 				half3 accumulatedRamp = ramp * max(lightColor.r, max(lightColor.g, lightColor.b));
 				half3 accumulatedColors = ramp * lightColor.rgb;
+
+				half3 halfDir = SpecSafeNormalize(float3(lightDir) + float3(viewDirWS));
+				
+				#if defined(TCP2_SPECULAR)
+				//Blinn-Phong Specular
+				float ndh = max(0, dot (normalWS, halfDir));
+				float spec = pow(ndh, 1e-4h + __specularSmoothness * 128.0);
+				spec = floor(spec * __specularToonBands) / __specularToonBands;
+				spec *= ndl;
+				spec *= atten;
+				
+				//Apply specular
+				emission.rgb += spec * lightColor.rgb * __specularColor;
+				#endif
 
 				// Additional lights loop
 			#ifdef _ADDITIONAL_LIGHTS
@@ -376,21 +458,41 @@ Shader "Emission_GGTCP2 Copy"
 							#endif
 
 							half ndl = dot(normalWS, lightDir);
+							#if defined(TCP2_TEXTURED_THRESHOLD)
 							float stylizedThreshold = __stylizedThreshold;
 							stylizedThreshold -= 0.5;
 							stylizedThreshold *= __stylizedThresholdScale;
 							ndl += stylizedThreshold;
+							#endif
 							half3 ramp;
 							
 							ndl = saturate(ndl);
 							ramp = smoothstep(rampThreshold - rampSmooth, rampThreshold + rampSmooth, ndl);
+							ramp = (round(ramp * bandsCount) / bandsCount) * step(ndl, 1);
 
 							// apply attenuation (shadowmaps & point/spot lights attenuation)
 							ramp *= atten;
 
+							// Diffuse Tint
+							half3 diffuseTint = saturate(__diffuseTint + ndl);
+							ramp *= diffuseTint;
+							
 							accumulatedRamp += ramp * max(lightColor.r, max(lightColor.g, lightColor.b));
 							accumulatedColors += ramp * lightColor.rgb;
 
+							half3 halfDir = SpecSafeNormalize(float3(lightDir) + float3(viewDirWS));
+							
+							#if defined(TCP2_SPECULAR)
+							//Blinn-Phong Specular
+							float ndh = max(0, dot (normalWS, halfDir));
+							float spec = pow(ndh, 1e-4h + __specularSmoothness * 128.0);
+							spec = floor(spec * __specularToonBands) / __specularToonBands;
+							spec *= ndl;
+							spec *= atten;
+							
+							//Apply specular
+							emission.rgb += spec * lightColor.rgb * __specularColor;
+							#endif
 						}
 					}
 
@@ -423,21 +525,41 @@ Shader "Emission_GGTCP2 Copy"
 					#endif
 
 					half ndl = dot(normalWS, lightDir);
+					#if defined(TCP2_TEXTURED_THRESHOLD)
 					float stylizedThreshold = __stylizedThreshold;
 					stylizedThreshold -= 0.5;
 					stylizedThreshold *= __stylizedThresholdScale;
 					ndl += stylizedThreshold;
+					#endif
 					half3 ramp;
 					
 					ndl = saturate(ndl);
 					ramp = smoothstep(rampThreshold - rampSmooth, rampThreshold + rampSmooth, ndl);
+					ramp = (round(ramp * bandsCount) / bandsCount) * step(ndl, 1);
 
 					// apply attenuation (shadowmaps & point/spot lights attenuation)
 					ramp *= atten;
 
+					// Diffuse Tint
+					half3 diffuseTint = saturate(__diffuseTint + ndl);
+					ramp *= diffuseTint;
+					
 					accumulatedRamp += ramp * max(lightColor.r, max(lightColor.g, lightColor.b));
 					accumulatedColors += ramp * lightColor.rgb;
 
+					half3 halfDir = SpecSafeNormalize(float3(lightDir) + float3(viewDirWS));
+					
+					#if defined(TCP2_SPECULAR)
+					//Blinn-Phong Specular
+					float ndh = max(0, dot (normalWS, halfDir));
+					float spec = pow(ndh, 1e-4h + __specularSmoothness * 128.0);
+					spec = floor(spec * __specularToonBands) / __specularToonBands;
+					spec *= ndl;
+					spec *= atten;
+					
+					//Apply specular
+					emission.rgb += spec * lightColor.rgb * __specularColor;
+					#endif
 				}
 				LIGHT_LOOP_END
 			#endif
@@ -518,6 +640,7 @@ Shader "Emission_GGTCP2 Copy"
 			struct Varyings
 			{
 				float4 positionCS     : SV_POSITION;
+				float3 normal         : NORMAL;
 			#if defined(DEPTH_NORMALS_PASS)
 				float3 normalWS : TEXCOORD0;
 			#endif
@@ -558,11 +681,14 @@ Shader "Emission_GGTCP2 Copy"
 					UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
 				#endif
 
+				float3 worldNormalUv = mul(UNITY_MATRIX_M, float4(input.normal, 1.0)).xyz;
+
 				// Texture Coordinates
 				output.pack1.xy.xy = input.texcoord0.xy * _BaseMap_ST.xy + _BaseMap_ST.zw;
 
 				float3 worldPos = mul(UNITY_MATRIX_M, input.vertex).xyz;
 				VertexPositionInputs vertexInput = GetVertexPositionInputs(input.vertex.xyz);
+				output.normal = normalize(worldNormalUv);
 				output.pack0.xyz = vertexInput.positionWS;
 
 				#if defined(DEPTH_ONLY_PASS)
@@ -592,13 +718,17 @@ Shader "Emission_GGTCP2 Copy"
 				#endif
 
 				float3 positionWS = input.pack0.xyz;
+				float3 normalWS = normalize(input.normal);
 
 				// Shader Properties Sampling
 				float4 __albedo = ( TCP2_TEX2D_SAMPLE(_BaseMap, _BaseMap, input.pack1.xy).rgba );
-				float4 __mainColor = ( _Color.rgba );
+				float4 __mainColor = ( _BaseColor.rgba );
 				float __alpha = ( __albedo.a * __mainColor.a );
 
 				half3 viewDirWS = GetWorldSpaceNormalizeViewDir(positionWS);
+				half ndv = abs(dot(viewDirWS, normalWS));
+				half ndvRaw = ndv;
+
 				half3 albedo = half3(1,1,1);
 				half alpha = __alpha;
 				half3 emission = half3(0,0,0);
@@ -720,5 +850,5 @@ Shader "Emission_GGTCP2 Copy"
 	CustomEditor "ToonyColorsPro.ShaderGenerator.MaterialInspector_SG2"
 }
 
-/* TCP_DATA u config(ver:"2.9.18";unity:"6000.0.40f1";tmplt:"SG2_Template_URP";features:list["UNITY_5_4","UNITY_5_5","UNITY_5_6","UNITY_2017_1","UNITY_2018_1","UNITY_2018_2","UNITY_2018_3","UNITY_2019_1","UNITY_2019_2","UNITY_2019_3","UNITY_2019_4","UNITY_2020_1","UNITY_2021_1","UNITY_2021_2","UNITY_2022_2","ENABLE_DEPTH_NORMALS_PASS","ENABLE_FORWARD_PLUS","EMISSION","TEXTURED_THRESHOLD","SKETCH","SKETCH_SHADER_FEATURE","SKETCH_AMBIENT","GLOSSY_REFLECTIONS","REFLECTION_SHADER_FEATURE","TEMPLATE_LWRP","AUTO_TRANSPARENT_BLENDING"];flags:list[];flags_extra:dict[];keywords:dict[RENDER_TYPE="Opaque",RampTextureDrawer="[TCP2Gradient]",RampTextureLabel="Ramp Texture",SHADER_TARGET="3.0"];shaderProperties:list[,sp(name:"Main Color";imps:list[imp_mp_color(def:RGBA(1, 1, 1, 1);hdr:False;cc:4;chan:"RGBA";prop:"_Color";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"45fe211f-cb08-47c3-b490-0a5b8b47c0ab";op:Multiply;lbl:"Color";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False)];customTextures:list[];codeInjection:codeInjection(injectedFiles:list[];mark:False);matLayers:list[]) */
-/* TCP_HASH b800498fb2dfaccce8763477e2643fd5 */
+/* TCP_DATA u config(ver:"2.9.18";unity:"6000.0.40f1";tmplt:"SG2_Template_URP";features:list["UNITY_5_4","UNITY_5_5","UNITY_5_6","UNITY_2017_1","UNITY_2018_1","UNITY_2018_2","UNITY_2018_3","UNITY_2019_1","UNITY_2019_2","UNITY_2019_3","UNITY_2019_4","UNITY_2020_1","UNITY_2021_1","UNITY_2021_2","UNITY_2022_2","ENABLE_DEPTH_NORMALS_PASS","ENABLE_FORWARD_PLUS","SPEC_LEGACY","SPECULAR","SPECULAR_TOON_BAND","SPECULAR_SHADER_FEATURE","EMISSION","SS_MULTIPLICATIVE","TEXTURED_THRESHOLD","TT_SHADER_FEATURE","DIFFUSE_TINT","SKETCH","SKETCH_SHADER_FEATURE","SKETCH_AMBIENT","AUTO_TRANSPARENT_BLENDING","SS_SHADER_FEATURE","RIM_SHADER_FEATURE","RIM","RAMP_BANDS_CRISP_NO_AA","WIND_SHADER_FEATURE","ALPHA_TO_COVERAGE","TEMPLATE_LWRP","GLOSSY_REFLECTIONS","REFLECTION_SHADER_FEATURE"];flags:list[];flags_extra:dict[];keywords:dict[RENDER_TYPE="Opaque",RampTextureDrawer="[TCP2Gradient]",RampTextureLabel="Ramp Texture",SHADER_TARGET="3.0",RIM_LABEL="Rim Lighting"];shaderProperties:list[,,,,sp(name:"Ramp Threshold";imps:list[imp_mp_range(def:0.01;min:0.01;max:1;prop:"_RampThreshold";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"d0d52c54-5eb0-463d-8984-1a54580991d6";op:Multiply;lbl:"Threshold";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False)];customTextures:list[];codeInjection:codeInjection(injectedFiles:list[];mark:False);matLayers:list[]) */
+/* TCP_HASH 34d666ce81bd61cbe13d90a994d7ddc1 */
