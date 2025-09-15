@@ -5,7 +5,9 @@ public class InteractableRigidbody : MonoBehaviour
 {
     public int value = 0;
     public ObjectType type;
-    
+
+    public bool isActivated;
+
     public enum ObjectType 
     {
         SMALL, //Can be lifted above head, doesnt apply force on player
@@ -22,4 +24,15 @@ public class InteractableRigidbody : MonoBehaviour
             GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
         }
     }
+
+    public virtual void ActivateObject() 
+    {
+        isActivated = true;
+    }
+
+    public virtual void DeactivateObject() 
+    {
+        isActivated = false;
+    }
+
 }

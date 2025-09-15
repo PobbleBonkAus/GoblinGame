@@ -94,12 +94,18 @@ public class PlayerController : MonoBehaviour
 
         if (!isRagdolled) 
         {
-            Move();
-            TurnTowardsMoveDirection();
-            RightenPlayer();
+            if (rb.useGravity)
+            {
+                Move();
+                TurnTowardsMoveDirection();
+                RightenPlayer();
+            }
+        }
+        if (rb.useGravity)
+        {
+            ApplyBetterJump();
         }
 
-        ApplyBetterJump();
 
     }
 
@@ -252,6 +258,9 @@ public class PlayerController : MonoBehaviour
 
     public void StartRagdoll() 
     {
+        if (rb == null) return;
+
+
         isRagdolled = true;
         variedRighteningForce = 0.0f;
         rb.AddForce((rb.linearVelocity + Random.insideUnitSphere) * ragdollImpulse, ForceMode.Impulse);
