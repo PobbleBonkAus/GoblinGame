@@ -12,6 +12,7 @@ public class PlayerInputs : MonoBehaviour
     public PlayerController playerController;
     public PlayerCameraController cameraController;
     public TutorialIcons tutorial;
+    public OptionsMenu optionsMenu;
 
     void OnEnable() => inputActions.Enable();
     void OnDisable() => inputActions.Disable();
@@ -44,6 +45,7 @@ public class PlayerInputs : MonoBehaviour
         playerInputActions.FindAction("Move").performed += tutorial.DoWalkAction;
         playerInputActions.FindAction("Jump").performed += tutorial.DoJumpAction;
         playerInputActions.FindAction("Grab").performed += tutorial.DoGrabAction;
+
     }
 
 

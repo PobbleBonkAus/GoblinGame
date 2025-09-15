@@ -103,6 +103,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "ToggleOptionsMenu",
+                    "type": "Button",
+                    "id": "091355b1-4526-4291-bb77-278052bb6979",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -493,8 +502,8 @@
                 },
                 {
                     "name": "",
-                    "id": "e3ce2f03-9db9-4159-9d8d-2fa9d73f7ba2",
-                    "path": "<Keyboard>/escape",
+                    "id": "0131395f-7a8f-4955-b799-ad81570977aa",
+                    "path": "",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -504,12 +513,23 @@
                 },
                 {
                     "name": "",
-                    "id": "0131395f-7a8f-4955-b799-ad81570977aa",
-                    "path": "",
+                    "id": "6e5c3e88-4cb7-4838-8975-ebd9193c76ff",
+                    "path": "<Keyboard>/escape",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Quit",
+                    "action": "ToggleOptionsMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4d0b92d6-17c6-4264-9d12-bd0545bb65ab",
+                    "path": "<Gamepad>/start",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ToggleOptionsMenu",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
@@ -532,7 +552,7 @@
                     "name": "Submit",
                     "type": "Button",
                     "id": "8a1f570c-1ff3-46be-8e96-d070622210da",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -541,7 +561,7 @@
                     "name": "Cancel",
                     "type": "Button",
                     "id": "3251b58d-599f-4840-ac66-1e504c4e44df",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false

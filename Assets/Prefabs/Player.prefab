@@ -802,6 +802,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 2946067421182195168}
+  target: {fileID: 2722708969919576874}
   lookSensitivity: 100
   smoothCamera: 0
   smoothCameraLerp: 0.15
@@ -820,7 +821,6 @@ MonoBehaviour:
     m_Interactions: 
     m_SingletonActionBindings: []
     m_Flags: 1
-  target: {fileID: 2722708969919576874}
 --- !u!1 &1461637083489432056
 GameObject:
   m_ObjectHideFlags: 0
@@ -2530,7 +2530,7 @@ MonoBehaviour:
   globalGrabPoint: {x: 0, y: 0, z: 0}
   interactRange: 2
   largeObjectGrabForce: 10
-  smallObjectGrabForce: 100
+  smallObjectGrabForce: 110
   throwForce: 40
   useItemTimeoutDuration: 0.3
   minGrabMoveDistance: 0.2

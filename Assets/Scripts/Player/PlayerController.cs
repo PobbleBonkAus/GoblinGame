@@ -66,7 +66,6 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] LayerMask wallCheckLayerMask;
 
-
     void Awake()
     {
         rb = GetComponent<Rigidbody>();

@@ -1,18 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class GameManager : MonoBehaviour
 {
 
-    //Track cosmetics
-    //Track statues
-    //Track Sellables
-    //Track world borders
-
     private int statuesRaised = 0;
     private List<Rigidbody> sellables;
-    
 
+    [SerializeField] PlayerInputManager playerInputManager;
     [SerializeField] GameObject[] statues;
     [SerializeField] float statueRaiseSpeed = 0.5f;
     [SerializeField] Transform[] beachSpawns; 
@@ -23,8 +19,15 @@ public class GameManager : MonoBehaviour
 
     public static GameManager gameManager;
 
+    int players = 0;
 
 
+    private void Start()
+    {
+        playerInputManager.JoinPlayer(0,0);
+        players += 1;
+        playerInputManager.joinBehavior = PlayerJoinBehavior.JoinPlayersWhenButtonIsPressed;
+    }
 
     private void Update()
     {
@@ -36,11 +39,6 @@ public class GameManager : MonoBehaviour
                 raisingStatue = false;
                 statuesRaised += 1;
             }
-        }
-
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            Quit();
         }
 
 
@@ -80,6 +78,14 @@ public class GameManager : MonoBehaviour
 
         return nearestBeach;
 
+    }
+
+    public GameObject GetPlayerParent() 
+    {
+        GameObject parent = transform.GetChild(players).gameObject;
+        players += 1;
+
+        return parent;
     }
 
 }

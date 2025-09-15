@@ -189,6 +189,15 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ToggleOptionsMenu"",
+                    ""type"": ""Button"",
+                    ""id"": ""091355b1-4526-4291-bb77-278052bb6979"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -579,8 +588,8 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""e3ce2f03-9db9-4159-9d8d-2fa9d73f7ba2"",
-                    ""path"": ""<Keyboard>/escape"",
+                    ""id"": ""0131395f-7a8f-4955-b799-ad81570977aa"",
+                    ""path"": """",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -590,12 +599,23 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""0131395f-7a8f-4955-b799-ad81570977aa"",
-                    ""path"": """",
+                    ""id"": ""6e5c3e88-4cb7-4838-8975-ebd9193c76ff"",
+                    ""path"": ""<Keyboard>/escape"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""Quit"",
+                    ""action"": ""ToggleOptionsMenu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4d0b92d6-17c6-4264-9d12-bd0545bb65ab"",
+                    ""path"": ""<Gamepad>/start"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ToggleOptionsMenu"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -618,7 +638,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""name"": ""Submit"",
                     ""type"": ""Button"",
                     ""id"": ""8a1f570c-1ff3-46be-8e96-d070622210da"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -627,7 +647,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""name"": ""Cancel"",
                     ""type"": ""Button"",
                     ""id"": ""3251b58d-599f-4840-ac66-1e504c4e44df"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -1194,6 +1214,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Player_RaiseObject = m_Player.FindAction("RaiseObject", throwIfNotFound: true);
         m_Player_Reset = m_Player.FindAction("Reset", throwIfNotFound: true);
         m_Player_Quit = m_Player.FindAction("Quit", throwIfNotFound: true);
+        m_Player_ToggleOptionsMenu = m_Player.FindAction("ToggleOptionsMenu", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1298,6 +1319,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_RaiseObject;
     private readonly InputAction m_Player_Reset;
     private readonly InputAction m_Player_Quit;
+    private readonly InputAction m_Player_ToggleOptionsMenu;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1353,6 +1375,10 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Quit".
         /// </summary>
         public InputAction @Quit => m_Wrapper.m_Player_Quit;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/ToggleOptionsMenu".
+        /// </summary>
+        public InputAction @ToggleOptionsMenu => m_Wrapper.m_Player_ToggleOptionsMenu;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1412,6 +1438,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Quit.started += instance.OnQuit;
             @Quit.performed += instance.OnQuit;
             @Quit.canceled += instance.OnQuit;
+            @ToggleOptionsMenu.started += instance.OnToggleOptionsMenu;
+            @ToggleOptionsMenu.performed += instance.OnToggleOptionsMenu;
+            @ToggleOptionsMenu.canceled += instance.OnToggleOptionsMenu;
         }
 
         /// <summary>
@@ -1456,6 +1485,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Quit.started -= instance.OnQuit;
             @Quit.performed -= instance.OnQuit;
             @Quit.canceled -= instance.OnQuit;
+            @ToggleOptionsMenu.started -= instance.OnToggleOptionsMenu;
+            @ToggleOptionsMenu.performed -= instance.OnToggleOptionsMenu;
+            @ToggleOptionsMenu.canceled -= instance.OnToggleOptionsMenu;
         }
 
         /// <summary>
@@ -1833,6 +1865,13 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnQuit(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "ToggleOptionsMenu" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnToggleOptionsMenu(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.
