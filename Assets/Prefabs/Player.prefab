@@ -317,6 +317,7 @@ MonoBehaviour:
   playerController: {fileID: 4395257486556739307}
   cameraController: {fileID: 6915619187968391567}
   tutorial: {fileID: 1964386934899323725}
+  optionsMenu: {fileID: 0}
 --- !u!1 &862767390361792617
 GameObject:
   m_ObjectHideFlags: 0
@@ -803,13 +804,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cam: {fileID: 2946067421182195168}
   target: {fileID: 2722708969919576874}
-  lookSensitivity: 100
-  smoothCamera: 0
-  smoothCameraLerp: 0.15
+  lookSensitivity: 266.2
+  smoothCamera: 1
+  smoothCameraLerp: 0.06
   maxLookAngle: 80
   minLookAngle: -35
   zoomSpeed: 1
-  zoomLerp: 0.5
+  zoomLerp: 0.45
   maxZoom: 10
   minZoom: 0.01
   look:
@@ -1170,7 +1171,7 @@ Transform:
   m_GameObject: {fileID: 2714812525045582950}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.3, y: -0.49, z: 0}
+  m_LocalPosition: {x: 0.3, y: -0.334, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1200,7 +1201,7 @@ LineRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 448ddaf2e5007194ab0db11fd126dd29, type: 2}
+  - {fileID: 2100000, guid: 7c67087527f20544ab922d9f08366fa7, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1341,7 +1342,7 @@ Transform:
   m_GameObject: {fileID: 4835987827963804364}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.3, y: -0.49, z: 0}
+  m_LocalPosition: {x: -0.3, y: -0.334, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1371,7 +1372,7 @@ LineRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 448ddaf2e5007194ab0db11fd126dd29, type: 2}
+  - {fileID: 2100000, guid: 7c67087527f20544ab922d9f08366fa7, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2241,6 +2242,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8782199234064376268}
   - component: {fileID: 5469216572922779766}
+  - component: {fileID: 4979119103046316047}
   m_Layer: 3
   m_Name: PlayerVisuals
   m_TagString: Player
@@ -2300,6 +2302,7 @@ MonoBehaviour:
     m_Bits: 8
   player: {fileID: 4395257486556739307}
   playerBody: {fileID: 2875734061182977641}
+  stretchAndSquish: 1
   headBobTransform: {fileID: 1853315821433438560}
   bodyBobTransform: {fileID: 2875734061182977641}
   playerBobOffset: 0
@@ -2320,6 +2323,19 @@ MonoBehaviour:
   physicsGrabber: {fileID: 6208202181723915416}
   leftFootDust: {fileID: 5822926008086345850}
   rightFootDust: {fileID: 3385002379520747456}
+--- !u!114 &4979119103046316047
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7562934901390371752}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92272c2c85c4a22438d22d6133e4ecd3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cosmeticTransform: {fileID: 7958509766898684776}
 --- !u!1 &7724413338628849395
 GameObject:
   m_ObjectHideFlags: 0
@@ -2540,7 +2556,7 @@ MonoBehaviour:
   heavyObjectMultiplier: 80
   springSnapBackForce: -0.4
   kinematicBody: {fileID: 7899023277092317841}
-  cosmeticHandler: {fileID: 3980494218557812091}
+  cosmeticHandler: {fileID: 0}
   player: {fileID: 4395257486556739307}
   grabCollider: {fileID: 865081390670594358}
   playerRoot: {fileID: 2722708969919576874}
@@ -2618,7 +2634,6 @@ GameObject:
   - component: {fileID: 2875734061182977641}
   - component: {fileID: 5624377197854774776}
   - component: {fileID: 4809271053423369850}
-  - component: {fileID: 3980494218557812091}
   - component: {fileID: 2614516384934714371}
   m_Layer: 3
   m_Name: Body
@@ -2696,19 +2711,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &3980494218557812091
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7812182646489895528}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 92272c2c85c4a22438d22d6133e4ecd3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cosmeticTransform: {fileID: 7958509766898684776}
 --- !u!64 &2614516384934714371
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -3132,12 +3134,12 @@ MonoBehaviour:
   ragdollImpulse: 0.3
   colliionRagdollLimit: 30
   isInOcean: 0
-  jumpForce: 13.2
-  downwardsImpulse: 3
-  fallMultiplier: 4
+  jumpForce: 10.8
+  downwardsImpulse: 12.99
+  fallMultiplier: 3
   lowJumpMultiplier: 6
   ragdollWhenJump: 0
-  fallingTrigger: 79.5
+  fallingTrigger: 15.6
   righteningForce: 21.6
   righteningForceLerp: 15.22
   righteningTrigger: 6.66

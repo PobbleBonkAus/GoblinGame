@@ -308,11 +308,14 @@ public class PlayerController : MonoBehaviour
         rb.angularVelocity = Vector3.zero;
     }
 
+    public Vector3 collisionVelocity = Vector3.zero;
+
     private void OnCollisionEnter(Collision collision)
     {
 
         if (collision.impulse.magnitude > colliionRagdollLimit)
         {
+            collisionVelocity = collision.relativeVelocity;
             StartRagdoll();
         }
     }

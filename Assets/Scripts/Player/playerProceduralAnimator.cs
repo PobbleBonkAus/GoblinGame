@@ -30,7 +30,7 @@ public class playerProceduralAnimator : MonoBehaviour
     [SerializeField] private LayerMask playerMask; // Only used to exclude self
     [SerializeField] private PlayerController player;
     [SerializeField] private Transform playerBody;
-
+    [SerializeField] private float stretchAndSquish = 1.0f;
 
     [Header("Bob")]
     [SerializeField] private Transform headBobTransform;
@@ -150,6 +150,10 @@ public class playerProceduralAnimator : MonoBehaviour
         DrawLegs();
         DrawArms();
         stepWaitTimer += Time.deltaTime;
+
+       // Vector3 collisionVector = player.collisionVelocity;
+        ////transform.localScale = Vector3.Lerp(transform.localScale, collisionVector, 1.0f / collisionVector.magnitude);
+
     }
 
     private void BobPlayerWithLegs()
