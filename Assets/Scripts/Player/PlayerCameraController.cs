@@ -13,6 +13,8 @@ public class PlayerCameraController : MonoBehaviour
     [SerializeField] private float maxLookAngle = 80.0f;
     [SerializeField] private float minLookAngle = 5.0f;
 
+    [SerializeField] private float lookOffset = 3.0f;
+
     [Header("Zooming")]
     [SerializeField] private float zoomSpeed = 1.0f;
     [SerializeField] private float zoomLerp = 0.5f;
@@ -50,7 +52,7 @@ public class PlayerCameraController : MonoBehaviour
         cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, targetZoom, Time.deltaTime * zoomLerp);
 
         Vector3 desiredCameraPos = target.transform.position - transform.forward * currentDistance;
-        cam.transform.position = Vector3.Lerp(cam.transform.position, desiredCameraPos, zoomLerp);
+        cam.transform.position = Vector3.Lerp(cam.transform.position, desiredCameraPos + Vector3.up * lookOffset, zoomLerp);
         cam.transform.LookAt(target.position);
     }
 
