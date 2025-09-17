@@ -66,6 +66,10 @@ public class playerProceduralAnimator : MonoBehaviour
     [SerializeField] ParticleSystem rightFootDust;
 
 
+    [Header("Audio")]
+    [SerializeField] AudioClip footstep;
+
+
     private Vector3 grabbedPoint;
 
     private Vector3 leftFootPreviousPosition;
@@ -208,6 +212,8 @@ public class playerProceduralAnimator : MonoBehaviour
                     leftFootLerp = 0f;
                     stepLeftFoot = false;
                     stepWaitTimer = 0f;
+
+                    AudioController.instance.PlayAudioClip(footstep, transform);
                     leftFootDust.Play();                    
                 }
                 else
@@ -235,6 +241,8 @@ public class playerProceduralAnimator : MonoBehaviour
                     rightFootLerp = 0f;
                     stepLeftFoot = true;
                     stepWaitTimer = 0f;
+
+                    AudioController.instance.PlayAudioClip(footstep,transform);
                     rightFootDust.Play();
                 }
                 else

@@ -59,18 +59,21 @@ public class PlayerController : MonoBehaviour
     [SerializeField] PlayerUI playerUI;
     [SerializeField] Transform groundCheckOrigin;
     
-    private GameManager gameManager;
     private Vector3 groundPoint;
     private Vector3 currentSlopeNormal = Vector3.zero;
     private Transform orientation;
 
     [SerializeField] LayerMask wallCheckLayerMask;
 
+    [Header("Audio")]
+    [SerializeField] AudioClip jumpAudio;
+    [SerializeField] AudioClip landAudio;
+    [SerializeField] AudioClip ragdollAudio;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
         orientation = new GameObject().transform;
-        gameManager = FindAnyObjectByType<GameManager>();
         orientation.position = transform.position;
     }
 
@@ -170,20 +173,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void TurnAwayFromCamera() 
-    {
-        // Camera direction
-        Vector3 cameraDir = cam.forward;
-
-        // Calculate horizontal (Y axis) angle
-        Vector3 flatCameraForward = cameraDir;
-        flatCameraForward.y = 0;
-        flatCameraForward.Normalize();
-
-        Quaternion targetRotation = Quaternion.LookRotation(flatCameraForward);
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSmoothTime);
-        
-    }
     void RightenPlayer()
     {
         if(variedRighteningForce < righteningForce) 
@@ -207,10 +196,6 @@ public class PlayerController : MonoBehaviour
         {
             rb.linearVelocity += Vector3.up * Physics.gravity.y * (fallMultiplier - 1f) * Time.fixedDeltaTime;
         }
-        else if (rb.linearVelocity.y > 0f && !isJumpHeld) // early release
-        {
-           // rb.linearVelocity += Vector3.up * Physics.gravity.y * (lowJumpMultiplier - 1f) * Time.fixedDeltaTime;
-        }
     }
 
     public void DoJump(InputAction.CallbackContext ctx)
@@ -226,15 +211,13 @@ public class PlayerController : MonoBehaviour
             }
             else if (IsGrounded())
             {
-                if (ragdollWhenJump) 
-                {
-                    isRagdolled = true;
-                    rb.AddRelativeTorque(Random.rotation.eulerAngles * ragdollJumpKick, ForceMode.Impulse);
-                }
-                jumpPressed = true;
+                StartCoroutine(LandNoiseDelay());
+
                 isJumpHeld = true;
                 rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z); // reset Y
                 rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+
+                AudioController.instance.PlayAudioClip(jumpAudio, transform);
             }
         }
         else if (ctx.canceled) // button released
@@ -242,6 +225,15 @@ public class PlayerController : MonoBehaviour
             isJumpHeld = false;
         }
     }
+
+    IEnumerator LandNoiseDelay() 
+    {
+        yield return new WaitForSeconds(0.5f);
+
+        jumpPressed = true;
+        
+    }
+
     public void DoRagdoll(InputAction.CallbackContext obj)
     {
         if (!isRagdolled)
@@ -270,6 +262,8 @@ public class PlayerController : MonoBehaviour
         eyeDazeGameObject.SetActive(true);
         eyeRenderers[0].material.SetFloat("_EyePlacement", eyeDazed);
         eyeRenderers[1].material.SetFloat("_EyePlacement", eyeDazed);
+
+        AudioController.instance.PlayAudioClip(ragdollAudio, transform);
     }
 
     private void EndRagdoll() 
@@ -290,6 +284,12 @@ public class PlayerController : MonoBehaviour
         {
             groundPoint = hit.point;
             currentSlopeNormal = hit.normal;
+            if (jumpPressed) 
+            {
+                AudioController.instance.PlayAudioClip(landAudio, transform);
+                jumpPressed = false;
+            }
+
             return true;
         }
         else 
@@ -303,7 +303,7 @@ public class PlayerController : MonoBehaviour
 
     public void WashUpOnBeach() 
     {
-        rb.MovePosition(gameManager.GetNearestBeachSpawn(transform.position));
+        rb.MovePosition(GameManager.instance.GetNearestBeachSpawn(transform.position));
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
     }

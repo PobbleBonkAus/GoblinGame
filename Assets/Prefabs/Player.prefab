@@ -809,6 +809,7 @@ MonoBehaviour:
   smoothCameraLerp: 0.06
   maxLookAngle: 80
   minLookAngle: -35
+  lookOffset: 3
   zoomSpeed: 1
   zoomLerp: 0.45
   maxZoom: 10
@@ -2323,6 +2324,7 @@ MonoBehaviour:
   physicsGrabber: {fileID: 6208202181723915416}
   leftFootDust: {fileID: 5822926008086345850}
   rightFootDust: {fileID: 3385002379520747456}
+  footstep: {fileID: 8300000, guid: 3e7ece91ad15b41469ce81e8189f64ad, type: 3}
 --- !u!114 &4979119103046316047
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3158,6 +3160,9 @@ MonoBehaviour:
   wallCheckLayerMask:
     serializedVersion: 2
     m_Bits: 128
+  jumpAudio: {fileID: 8300000, guid: 70fdaf4c51142cb4dadf8bea76c34f0a, type: 3}
+  landAudio: {fileID: 8300000, guid: 497274a46d302ef4ebf35013051a3f69, type: 3}
+  ragdollAudio: {fileID: 8300000, guid: 97f42a05df250504eb27ca5d37cd31ba, type: 3}
   collisionVelocity: {x: 0, y: 0, z: 0}
 --- !u!114 &2910426281273310292
 MonoBehaviour:

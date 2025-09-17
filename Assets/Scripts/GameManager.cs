@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] PlayerInputManager playerInputManager;
     [SerializeField] GameObject[] statues;
     [SerializeField] float statueRaiseSpeed = 0.5f;
-    [SerializeField] Transform[] beachSpawns; 
+    [SerializeField] Transform[] beachSpawns;
 
 
     bool raisingStatue;
@@ -19,13 +19,27 @@ public class GameManager : MonoBehaviour
 
     public static GameManager gameManager;
 
-    int players = 0;
+    public GameObject[] players = new GameObject[3];
 
+    int playerIndex = 0;
+
+    public static GameManager instance { get; private set; }
+
+    private void Awake()
+    {
+        if (instance != null && instance != this)
+        {
+            Destroy(this);
+        }
+        else
+        {
+            instance = this;
+        }
+
+    }
 
     private void Start()
     {
-        playerInputManager.JoinPlayer(0,0);
-        players += 1;
         playerInputManager.joinBehavior = PlayerJoinBehavior.JoinPlayersWhenButtonIsPressed;
     }
 
@@ -40,8 +54,6 @@ public class GameManager : MonoBehaviour
                 statuesRaised += 1;
             }
         }
-
-
     }
 
     public void Quit()
@@ -80,12 +92,16 @@ public class GameManager : MonoBehaviour
 
     }
 
-    public GameObject GetPlayerParent() 
-    {
-        GameObject parent = transform.GetChild(players).gameObject;
-        players += 1;
 
-        return parent;
+    public void OnPlayerJoined(PlayerInput playerInput) 
+    {
+        Debug.Log("Player " + playerInput.playerIndex + " joined!");
+        players[playerInput.playerIndex] = playerInput.gameObject;
     }
 
+    public void OnPlayerLeft(PlayerInput playerInput)
+    {
+        Debug.Log("Player " + playerInput.playerIndex + " left!");
+        players[playerInput.playerIndex] = null;
+    }
 }

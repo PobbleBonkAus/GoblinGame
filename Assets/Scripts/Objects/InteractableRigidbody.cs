@@ -35,4 +35,6 @@ public class InteractableRigidbody : MonoBehaviour
         isActivated = false;
     }
 
+
+
 }
