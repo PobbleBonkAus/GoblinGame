@@ -37,7 +37,7 @@ public class bomb : InteractableRigidbody
 
     void Countdown() 
     {
-        Vector3 targetScale = new Vector3(wick.transform.localScale.x, 0.0f, wick.transform.localScale.z);
+        Vector3 targetScale = new Vector3(wick.transform.localScale.x, 0.01f, wick.transform.localScale.z);
 
         wick.transform.localScale = Vector3.MoveTowards(wick.transform.localScale, targetScale, currentBombTime);
 
