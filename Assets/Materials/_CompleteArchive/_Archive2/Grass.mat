@@ -8,10 +8,11 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Grass
-  m_Shader: {fileID: 4800000, guid: 4d37be8684e25a44ab4953355b190366, type: 3}
+  m_Shader: {fileID: 4800000, guid: 5381baa1f0b4b8540ba239f5aee1c203, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
+  - TCP2_WIND
   - _ALPHAPREMULTIPLY_ON
   - _RECEIVE_SHADOWS_OFF
   m_InvalidKeywords: []
@@ -66,6 +67,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _SketchTexture:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _SpecGlossMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -91,14 +96,14 @@ Material:
     - _AddPrecomputedVelocity: 0
     - _AlphaClip: 0
     - _AlphaToMask: 0
-    - _BandsCount: 2
+    - _BandsCount: 4
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 0
-    - _Cutoff: 0.5
+    - _Cutoff: 0
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
     - _DstBlend: 10
@@ -111,11 +116,14 @@ Material:
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueOffset: 0
-    - _RampSmoothing: 1
-    - _RampThreshold: 0.2
+    - _RampSmoothing: 0.5
+    - _RampThreshold: 0.01
     - _ReceiveShadows: 1
     - _ReceiveShadowsOff: 0
     - _RenderingMode: 2
+    - _RimMax: 1
+    - _RimMin: 0.5
+    - _SketchTexture_OffsetSpeed: 120
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
@@ -124,24 +132,31 @@ Material:
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
     - _Surface: 0
+    - _UseRim: 0
+    - _UseSketch: 0
     - _UseSpecular: 0
+    - _UseTexturedThreshold: 0
+    - _UseWind: 1
     - _WindSpeed: 2.5
-    - _WindStrength: 0.025
+    - _WindStrength: 0.08
     - _WorkflowMode: 1
     - _ZWrite: 0
     - __dummy__: 0
     m_Colors:
-    - _BaseColor: {r: 0.20000002, g: 0.6627451, b: 0.6, a: 1}
+    - _BaseColor: {r: 0.058823533, g: 0.6901961, b: 0.83921576, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _DiffuseTint: {r: 1, g: 1, b: 1, a: 1}
+    - _Emission: {r: 0, g: 0, b: 0, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _HColor: {r: 0.75, g: 0.75, b: 0.75, a: 1}
-    - _SColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
+    - _HColor: {r: 0.10196079, g: 0.81568635, b: 0.90196085, a: 1}
+    - _RimColor: {r: 0.8, g: 0.8, b: 0.8, a: 0.5}
+    - _SColor: {r: 0.20000002, g: 0.24705884, b: 0.29411766, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
-    - _SpecularColor: {r: 0.7450981, g: 0.7529413, b: 0.7803922, a: 1}
-    - _WindDirection: {r: 1, g: 0, b: 0, a: 0}
+    - _SpecularColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    - _WindDirection: {r: 1, g: 0, b: 1, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
---- !u!114 &713732693529492618
+--- !u!114 &5782614789560025214
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}

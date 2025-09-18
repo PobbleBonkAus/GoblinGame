@@ -1,7 +1,7 @@
 ﻿// Toony Colors Pro+Mobile 2
 // (c) 2014-2025 Jean Moreno
 
-Shader "Base_GGTCP2"
+Shader "Metal_GGTCP2 "
 {
 	Properties
 	{
@@ -27,14 +27,14 @@ Shader "Base_GGTCP2"
 		[TCP2Separator]
 		
 		[TCP2HeaderHelp(Specular)]
-		[Toggle(TCP2_SPECULAR)] _UseSpecular ("Enable Specular", Float) = 0
 		[TCP2ColorNoAlpha] _SpecularColor ("Specular Color", Color) = (0.7450981,0.7529413,0.7803922,1)
 		_SpecularSmoothness ("Smoothness", Float) = 0.2
 		_SpecularToonBands ("Specular Bands", Float) = 3
 		[TCP2Separator]
 
-		[TCP2HeaderHelp(Emission)]
-		[TCP2ColorNoAlpha] [HDR] _Emission ("Emission Color", Color) = (0,0,0,1)
+		[TCP2HeaderHelp(Reflections)]
+		[TCP2ColorNoAlpha] _ReflectionColor ("Color", Color) = (1,1,1,1)
+		_ReflectionSmoothness ("Smoothness", Range(0,1)) = 0.5
 		[TCP2Separator]
 		
 		_StylizedThreshold ("Stylized Threshold", 2D) = "gray" {}
@@ -90,7 +90,6 @@ Shader "Base_GGTCP2"
 			// Shader Properties
 			float4 _BaseMap_ST;
 			fixed4 _BaseColor;
-			half4 _Emission;
 			float4 _StylizedThreshold_ST;
 			float _RampThreshold;
 			float _RampSmoothing;
@@ -100,6 +99,8 @@ Shader "Base_GGTCP2"
 			fixed4 _SpecularColor;
 			fixed4 _SColor;
 			fixed4 _HColor;
+			float _ReflectionSmoothness;
+			fixed4 _ReflectionColor;
 		CBUFFER_END
 
 		//Specular help functions (from UnityStandardBRDF.cginc)
@@ -158,7 +159,6 @@ Shader "Base_GGTCP2"
 
 			//--------------------------------------
 			// Toony Colors Pro 2 keywords
-			#pragma shader_feature_local_fragment TCP2_SPECULAR
 		#pragma shader_feature_local _ _ALPHAPREMULTIPLY_ON
 
 			// vertex input
@@ -246,7 +246,6 @@ Shader "Base_GGTCP2"
 				float4 __mainColor = ( _BaseColor.rgba );
 				float __alpha = ( __albedo.a * __mainColor.a );
 				float __ambientIntensity = ( 1.0 );
-				float3 __emission = ( _Emission.rgb );
 				float __stylizedThreshold = ( TCP2_TEX2D_SAMPLE(_StylizedThreshold, _StylizedThreshold, input.pack0.xy * _StylizedThreshold_ST.xy + _StylizedThreshold_ST.zw).a );
 				float __stylizedThresholdScale = ( 1.0 );
 				float __rampThreshold = ( _RampThreshold );
@@ -257,6 +256,8 @@ Shader "Base_GGTCP2"
 				float3 __specularColor = ( _SpecularColor.rgb );
 				float3 __shadowColor = ( _SColor.rgb );
 				float3 __highlightColor = ( _HColor.rgb );
+				float __reflectionSmoothness = ( _ReflectionSmoothness );
+				float3 __reflectionColor = ( _ReflectionColor.rgb );
 
 				// main texture
 				half3 albedo = __albedo.rgb;
@@ -301,7 +302,6 @@ Shader "Base_GGTCP2"
 
 				half3 indirectDiffuse = bakedGI;
 				indirectDiffuse *= occlusion * albedo * __ambientIntensity;
-				emission += __emission;
 
 				half3 lightDir = mainLight.direction;
 				half3 lightColor = mainLight.color.rgb;
@@ -331,7 +331,6 @@ Shader "Base_GGTCP2"
 
 				half3 halfDir = SpecSafeNormalize(float3(lightDir) + float3(viewDirWS));
 				
-				#if defined(TCP2_SPECULAR)
 				//Blinn-Phong Specular
 				float ndh = max(0, dot (normalWS, halfDir));
 				float spec = pow(ndh, 1e-4h + __specularSmoothness * 128.0);
@@ -341,7 +340,6 @@ Shader "Base_GGTCP2"
 				
 				//Apply specular
 				emission.rgb += spec * lightColor.rgb * __specularColor;
-				#endif
 
 				// Additional lights loop
 			#ifdef _ADDITIONAL_LIGHTS
@@ -393,7 +391,6 @@ Shader "Base_GGTCP2"
 
 							half3 halfDir = SpecSafeNormalize(float3(lightDir) + float3(viewDirWS));
 							
-							#if defined(TCP2_SPECULAR)
 							//Blinn-Phong Specular
 							float ndh = max(0, dot (normalWS, halfDir));
 							float spec = pow(ndh, 1e-4h + __specularSmoothness * 128.0);
@@ -403,7 +400,6 @@ Shader "Base_GGTCP2"
 							
 							//Apply specular
 							emission.rgb += spec * lightColor.rgb * __specularColor;
-							#endif
 						}
 					}
 
@@ -454,7 +450,6 @@ Shader "Base_GGTCP2"
 
 					half3 halfDir = SpecSafeNormalize(float3(lightDir) + float3(viewDirWS));
 					
-					#if defined(TCP2_SPECULAR)
 					//Blinn-Phong Specular
 					float ndh = max(0, dot (normalWS, halfDir));
 					float spec = pow(ndh, 1e-4h + __specularSmoothness * 128.0);
@@ -464,7 +459,6 @@ Shader "Base_GGTCP2"
 					
 					//Apply specular
 					emission.rgb += spec * lightColor.rgb * __specularColor;
-					#endif
 				}
 				LIGHT_LOOP_END
 			#endif
@@ -484,6 +478,24 @@ Shader "Base_GGTCP2"
 				#if defined(_ALPHAPREMULTIPLY_ON)
 					color.rgb *= alpha;
 				#endif
+
+				half3 reflections = half3(0, 0, 0);
+
+				// World reflection
+				half reflectionRoughness = 1 - __reflectionSmoothness;
+				half3 reflectVector = reflect(-viewDirWS, normalWS);
+				
+				#if USE_FORWARD_PLUS
+					half3 indirectSpecular = GlossyEnvironmentReflection(reflectVector, positionWS, reflectionRoughness, occlusion, normalizedScreenSpaceUV);
+				#else
+					half3 indirectSpecular = GlossyEnvironmentReflection(reflectVector, reflectionRoughness, occlusion);
+				#endif
+				half reflectionRoughness4 = max(pow(reflectionRoughness, 4), 6.103515625e-5);
+				float surfaceReductionRefl = 1.0 / (reflectionRoughness4 + 1.0);
+				reflections += indirectSpecular * surfaceReductionRefl;
+
+				reflections *= __reflectionColor;
+				color.rgb += reflections;
 
 				color += emission;
 
@@ -718,5 +730,5 @@ Shader "Base_GGTCP2"
 	CustomEditor "ToonyColorsPro.ShaderGenerator.MaterialInspector_SG2"
 }
 
-/* TCP_DATA u config(ver:"2.9.18";unity:"6000.0.40f1";tmplt:"SG2_Template_URP";features:list["UNITY_5_4","UNITY_5_5","UNITY_5_6","UNITY_2017_1","UNITY_2018_1","UNITY_2018_2","UNITY_2018_3","UNITY_2019_1","UNITY_2019_2","UNITY_2019_3","UNITY_2019_4","UNITY_2020_1","UNITY_2021_1","UNITY_2021_2","UNITY_2022_2","ENABLE_DEPTH_NORMALS_PASS","ENABLE_FORWARD_PLUS","SPEC_LEGACY","SPECULAR","SPECULAR_TOON_BAND","SS_MULTIPLICATIVE","TEXTURED_THRESHOLD","SKETCH_SHADER_FEATURE","SKETCH_AMBIENT","AUTO_TRANSPARENT_BLENDING","SS_SHADER_FEATURE","RIM_SHADER_FEATURE","RAMP_BANDS_CRISP_NO_AA","WIND_SHADER_FEATURE","ALPHA_TO_COVERAGE","EMISSION","SPECULAR_SHADER_FEATURE","TEMPLATE_LWRP"];flags:list[];flags_extra:dict[];keywords:dict[RENDER_TYPE="Opaque",RampTextureDrawer="[TCP2Gradient]",RampTextureLabel="Ramp Texture",SHADER_TARGET="3.0",RIM_LABEL="Rim Lighting"];shaderProperties:list[,,,,sp(name:"Ramp Threshold";imps:list[imp_mp_range(def:0.2;min:0.01;max:1;prop:"_RampThreshold";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"d0d52c54-5eb0-463d-8984-1a54580991d6";op:Multiply;lbl:"Threshold";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),sp(name:"Ramp Smoothing";imps:list[imp_mp_range(def:1;min:0.001;max:1;prop:"_RampSmoothing";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"50a6cf14-4633-40c7-8910-272cfa5e5d5b";op:Multiply;lbl:"Smoothing";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),sp(name:"Bands Count";imps:list[imp_mp_range(def:2;min:1;max:20;prop:"_BandsCount";md:"[IntRange]";gbv:False;custom:False;refs:"";pnlock:False;guid:"29b76750-c6e7-439d-8e0d-fe8ce7a6c0a0";op:Multiply;lbl:"Bands Count";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),,,sp(name:"Specular Color";imps:list[imp_mp_color(def:RGBA(0.7450981, 0.7529413, 0.7803922, 1);hdr:False;cc:3;chan:"RGB";prop:"_SpecularColor";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"b858d15b-46fe-45d0-8583-714dbe89c351";op:Multiply;lbl:"Specular Color";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),,,,,,,,,,,,,,,,,,,,sp(name:"Diffuse Tint";imps:list[imp_mp_color(def:RGBA(1, 1, 1, 1);hdr:False;cc:3;chan:"RGB";prop:"_DiffuseTint";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"cbe2dd48-17d5-4b84-ba21-07bef40222f2";op:Multiply;lbl:"Diffuse Tint";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False)];customTextures:list[];codeInjection:codeInjection(injectedFiles:list[];mark:False);matLayers:list[]) */
-/* TCP_HASH 8431b0c90dcf3fd58471777993cb05ab */
+/* TCP_DATA u config(ver:"2.9.18";unity:"6000.0.40f1";tmplt:"SG2_Template_URP";features:list["UNITY_5_4","UNITY_5_5","UNITY_5_6","UNITY_2017_1","UNITY_2018_1","UNITY_2018_2","UNITY_2018_3","UNITY_2019_1","UNITY_2019_2","UNITY_2019_3","UNITY_2019_4","UNITY_2020_1","UNITY_2021_1","UNITY_2021_2","UNITY_2022_2","ENABLE_DEPTH_NORMALS_PASS","ENABLE_FORWARD_PLUS","SPEC_LEGACY","SPECULAR","SPECULAR_TOON_BAND","TEXTURED_THRESHOLD","SKETCH_SHADER_FEATURE","SKETCH_AMBIENT","AUTO_TRANSPARENT_BLENDING","SS_SHADER_FEATURE","RIM_SHADER_FEATURE","RAMP_BANDS_CRISP_NO_AA","WIND_SHADER_FEATURE","ALPHA_TO_COVERAGE","GLOSSY_REFLECTIONS","TEMPLATE_LWRP"];flags:list[];flags_extra:dict[];keywords:dict[RENDER_TYPE="Opaque",RampTextureDrawer="[TCP2Gradient]",RampTextureLabel="Ramp Texture",SHADER_TARGET="3.0",RIM_LABEL="Rim Lighting"];shaderProperties:list[,,,,sp(name:"Ramp Threshold";imps:list[imp_mp_range(def:0.2;min:0.01;max:1;prop:"_RampThreshold";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"d0d52c54-5eb0-463d-8984-1a54580991d6";op:Multiply;lbl:"Threshold";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),sp(name:"Ramp Smoothing";imps:list[imp_mp_range(def:1;min:0.001;max:1;prop:"_RampSmoothing";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"50a6cf14-4633-40c7-8910-272cfa5e5d5b";op:Multiply;lbl:"Smoothing";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),sp(name:"Bands Count";imps:list[imp_mp_range(def:2;min:1;max:20;prop:"_BandsCount";md:"[IntRange]";gbv:False;custom:False;refs:"";pnlock:False;guid:"29b76750-c6e7-439d-8e0d-fe8ce7a6c0a0";op:Multiply;lbl:"Bands Count";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),,,sp(name:"Specular Color";imps:list[imp_mp_color(def:RGBA(0.7450981, 0.7529413, 0.7803922, 1);hdr:False;cc:3;chan:"RGB";prop:"_SpecularColor";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"b858d15b-46fe-45d0-8583-714dbe89c351";op:Multiply;lbl:"Specular Color";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),,,,,,,,,,,,,,,,,,,,,sp(name:"Diffuse Tint";imps:list[imp_mp_color(def:RGBA(1, 1, 1, 1);hdr:False;cc:3;chan:"RGB";prop:"_DiffuseTint";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"cbe2dd48-17d5-4b84-ba21-07bef40222f2";op:Multiply;lbl:"Diffuse Tint";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False)];customTextures:list[];codeInjection:codeInjection(injectedFiles:list[];mark:False);matLayers:list[]) */
+/* TCP_HASH 6ab913091520779de86df27f72201447 */

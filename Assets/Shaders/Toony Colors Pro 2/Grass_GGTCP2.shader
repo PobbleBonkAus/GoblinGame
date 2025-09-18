@@ -1,7 +1,7 @@
 ﻿// Toony Colors Pro+Mobile 2
 // (c) 2014-2025 Jean Moreno
 
-Shader "Base_GGTCP2"
+Shader "Grass_GGTCP2"
 {
 	Properties
 	{
@@ -19,26 +19,20 @@ Shader "Base_GGTCP2"
 		[MainTexture] _BaseMap ("Albedo", 2D) = "white" {}
 		[TCP2Separator]
 
-		[TCP2Header(Ramp Shading)]
-		
-		_RampThreshold ("Threshold", Range(0.01,1)) = 0.2
-		_RampSmoothing ("Smoothing", Range(0.001,1)) = 1
-		[IntRange] _BandsCount ("Bands Count", Range(1,20)) = 2
-		[TCP2Separator]
-		
 		[TCP2HeaderHelp(Specular)]
 		[Toggle(TCP2_SPECULAR)] _UseSpecular ("Enable Specular", Float) = 0
 		[TCP2ColorNoAlpha] _SpecularColor ("Specular Color", Color) = (0.7450981,0.7529413,0.7803922,1)
 		_SpecularSmoothness ("Smoothness", Float) = 0.2
 		_SpecularToonBands ("Specular Bands", Float) = 3
 		[TCP2Separator]
-
-		[TCP2HeaderHelp(Emission)]
-		[TCP2ColorNoAlpha] [HDR] _Emission ("Emission Color", Color) = (0,0,0,1)
-		[TCP2Separator]
 		
 		_StylizedThreshold ("Stylized Threshold", 2D) = "gray" {}
 		[TCP2Separator]
+		
+		[TCP2HeaderHelp(Wind)]
+		_WindDirection ("Direction", Vector) = (1,0,0,0)
+		_WindStrength ("Strength", Range(0,0.2)) = 0.025
+		_WindSpeed ("Speed", Range(0,10)) = 2.5
 		
 		[ToggleOff(_RECEIVE_SHADOWS_OFF)] _ReceiveShadowsOff ("Receive Shadows", Float) = 1
 
@@ -88,13 +82,12 @@ Shader "Base_GGTCP2"
 		CBUFFER_START(UnityPerMaterial)
 			
 			// Shader Properties
+			float _WindSpeed;
+			float4 _WindDirection;
+			float _WindStrength;
 			float4 _BaseMap_ST;
 			fixed4 _BaseColor;
-			half4 _Emission;
 			float4 _StylizedThreshold_ST;
-			float _RampThreshold;
-			float _RampSmoothing;
-			float _BandsCount;
 			float _SpecularSmoothness;
 			float _SpecularToonBands;
 			fixed4 _SpecularColor;
@@ -166,6 +159,7 @@ Shader "Base_GGTCP2"
 			{
 				float4 vertex       : POSITION;
 				float3 normal       : NORMAL;
+				half4 vertexColor   : COLOR;
 				float4 texcoord0 : TEXCOORD0;
 				UNITY_VERTEX_INPUT_INSTANCE_ID
 			};
@@ -206,8 +200,26 @@ Shader "Base_GGTCP2"
 
 				// Texture Coordinates
 				output.pack0.xy.xy = input.texcoord0.xy * _BaseMap_ST.xy + _BaseMap_ST.zw;
+				// Shader Properties Sampling
+				float __windTimeOffset = ( input.vertexColor.g );
+				float __windSpeed = ( _WindSpeed );
+				float __windFrequency = ( 1.0 );
+				float3 __windDirection = ( _WindDirection.xyz );
+				float3 __windMask = ( input.vertexColor.rrr );
+				float __windStrength = ( _WindStrength );
 
 				float3 worldPos = mul(UNITY_MATRIX_M, input.vertex).xyz;
+				// Wind Animation
+				float windTimeOffset = __windTimeOffset;
+				float windSpeed = __windSpeed;
+				float3 windFrequency = worldPos.xyz * __windFrequency;
+				float windPhase = (_Time.y + windTimeOffset) * windSpeed;
+				float3 windFactor = sin(windPhase + windFrequency);
+				float3 windDir = normalize(__windDirection);
+				float3 windMask = __windMask;
+				float windStrength = __windStrength;
+				worldPos.xyz += windDir * windFactor * windMask * windStrength;
+				input.vertex.xyz = mul(UNITY_MATRIX_I_M, float4(worldPos, 1)).xyz;
 				VertexPositionInputs vertexInput = GetVertexPositionInputs(input.vertex.xyz);
 			#if defined(REQUIRES_VERTEX_SHADOW_COORD_INTERPOLATOR)
 				output.shadowCoord = GetShadowCoord(vertexInput);
@@ -246,12 +258,8 @@ Shader "Base_GGTCP2"
 				float4 __mainColor = ( _BaseColor.rgba );
 				float __alpha = ( __albedo.a * __mainColor.a );
 				float __ambientIntensity = ( 1.0 );
-				float3 __emission = ( _Emission.rgb );
 				float __stylizedThreshold = ( TCP2_TEX2D_SAMPLE(_StylizedThreshold, _StylizedThreshold, input.pack0.xy * _StylizedThreshold_ST.xy + _StylizedThreshold_ST.zw).a );
 				float __stylizedThresholdScale = ( 1.0 );
-				float __rampThreshold = ( _RampThreshold );
-				float __rampSmoothing = ( _RampSmoothing );
-				float __bandsCount = ( _BandsCount );
 				float __specularSmoothness = ( _SpecularSmoothness );
 				float __specularToonBands = ( _SpecularToonBands );
 				float3 __specularColor = ( _SpecularColor.rgb );
@@ -301,12 +309,11 @@ Shader "Base_GGTCP2"
 
 				half3 indirectDiffuse = bakedGI;
 				indirectDiffuse *= occlusion * albedo * __ambientIntensity;
-				emission += __emission;
 
 				half3 lightDir = mainLight.direction;
 				half3 lightColor = mainLight.color.rgb;
 
-				half atten = mainLight.shadowAttenuation * mainLight.distanceAttenuation;
+				half atten = mainLight.shadowAttenuation;
 
 				half ndl = dot(normalWS, lightDir);
 				float stylizedThreshold = __stylizedThreshold;
@@ -315,12 +322,8 @@ Shader "Base_GGTCP2"
 				ndl += stylizedThreshold;
 				half3 ramp;
 				
-				half rampThreshold = __rampThreshold;
-				half rampSmooth = __rampSmoothing * 0.5;
-				half bandsCount = __bandsCount;
 				ndl = saturate(ndl);
-				ramp = smoothstep(rampThreshold - rampSmooth, rampThreshold + rampSmooth, ndl);
-				ramp = (round(ramp * bandsCount) / bandsCount) * step(ndl, 1);
+				ramp = float3(1, 1, 1);
 
 				// apply attenuation
 				ramp *= atten;
@@ -382,8 +385,7 @@ Shader "Base_GGTCP2"
 							half3 ramp;
 							
 							ndl = saturate(ndl);
-							ramp = smoothstep(rampThreshold - rampSmooth, rampThreshold + rampSmooth, ndl);
-							ramp = (round(ramp * bandsCount) / bandsCount) * step(ndl, 1);
+							ramp = float3(1, 1, 1);
 
 							// apply attenuation (shadowmaps & point/spot lights attenuation)
 							ramp *= atten;
@@ -443,8 +445,7 @@ Shader "Base_GGTCP2"
 					half3 ramp;
 					
 					ndl = saturate(ndl);
-					ramp = smoothstep(rampThreshold - rampSmooth, rampThreshold + rampSmooth, ndl);
-					ramp = (round(ramp * bandsCount) / bandsCount) * step(ndl, 1);
+					ramp = float3(1, 1, 1);
 
 					// apply attenuation (shadowmaps & point/spot lights attenuation)
 					ramp *= atten;
@@ -510,6 +511,7 @@ Shader "Base_GGTCP2"
 				float4 vertex   : POSITION;
 				float3 normal   : NORMAL;
 				float4 texcoord0 : TEXCOORD0;
+				half4 vertexColor : COLOR;
 				UNITY_VERTEX_INPUT_INSTANCE_ID
 			};
 
@@ -558,8 +560,26 @@ Shader "Base_GGTCP2"
 
 				// Texture Coordinates
 				output.pack1.xy.xy = input.texcoord0.xy * _BaseMap_ST.xy + _BaseMap_ST.zw;
+				// Shader Properties Sampling
+				float __windTimeOffset = ( input.vertexColor.g );
+				float __windSpeed = ( _WindSpeed );
+				float __windFrequency = ( 1.0 );
+				float3 __windDirection = ( _WindDirection.xyz );
+				float3 __windMask = ( input.vertexColor.rrr );
+				float __windStrength = ( _WindStrength );
 
 				float3 worldPos = mul(UNITY_MATRIX_M, input.vertex).xyz;
+				// Wind Animation
+				float windTimeOffset = __windTimeOffset;
+				float windSpeed = __windSpeed;
+				float3 windFrequency = worldPos.xyz * __windFrequency;
+				float windPhase = (_Time.y + windTimeOffset) * windSpeed;
+				float3 windFactor = sin(windPhase + windFrequency);
+				float3 windDir = normalize(__windDirection);
+				float3 windMask = __windMask;
+				float windStrength = __windStrength;
+				worldPos.xyz += windDir * windFactor * windMask * windStrength;
+				input.vertex.xyz = mul(UNITY_MATRIX_I_M, float4(worldPos, 1)).xyz;
 				VertexPositionInputs vertexInput = GetVertexPositionInputs(input.vertex.xyz);
 				output.pack0.xyz = vertexInput.positionWS;
 
@@ -718,5 +738,5 @@ Shader "Base_GGTCP2"
 	CustomEditor "ToonyColorsPro.ShaderGenerator.MaterialInspector_SG2"
 }
 
-/* TCP_DATA u config(ver:"2.9.18";unity:"6000.0.40f1";tmplt:"SG2_Template_URP";features:list["UNITY_5_4","UNITY_5_5","UNITY_5_6","UNITY_2017_1","UNITY_2018_1","UNITY_2018_2","UNITY_2018_3","UNITY_2019_1","UNITY_2019_2","UNITY_2019_3","UNITY_2019_4","UNITY_2020_1","UNITY_2021_1","UNITY_2021_2","UNITY_2022_2","ENABLE_DEPTH_NORMALS_PASS","ENABLE_FORWARD_PLUS","SPEC_LEGACY","SPECULAR","SPECULAR_TOON_BAND","SS_MULTIPLICATIVE","TEXTURED_THRESHOLD","SKETCH_SHADER_FEATURE","SKETCH_AMBIENT","AUTO_TRANSPARENT_BLENDING","SS_SHADER_FEATURE","RIM_SHADER_FEATURE","RAMP_BANDS_CRISP_NO_AA","WIND_SHADER_FEATURE","ALPHA_TO_COVERAGE","EMISSION","SPECULAR_SHADER_FEATURE","TEMPLATE_LWRP"];flags:list[];flags_extra:dict[];keywords:dict[RENDER_TYPE="Opaque",RampTextureDrawer="[TCP2Gradient]",RampTextureLabel="Ramp Texture",SHADER_TARGET="3.0",RIM_LABEL="Rim Lighting"];shaderProperties:list[,,,,sp(name:"Ramp Threshold";imps:list[imp_mp_range(def:0.2;min:0.01;max:1;prop:"_RampThreshold";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"d0d52c54-5eb0-463d-8984-1a54580991d6";op:Multiply;lbl:"Threshold";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),sp(name:"Ramp Smoothing";imps:list[imp_mp_range(def:1;min:0.001;max:1;prop:"_RampSmoothing";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"50a6cf14-4633-40c7-8910-272cfa5e5d5b";op:Multiply;lbl:"Smoothing";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),sp(name:"Bands Count";imps:list[imp_mp_range(def:2;min:1;max:20;prop:"_BandsCount";md:"[IntRange]";gbv:False;custom:False;refs:"";pnlock:False;guid:"29b76750-c6e7-439d-8e0d-fe8ce7a6c0a0";op:Multiply;lbl:"Bands Count";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),,,sp(name:"Specular Color";imps:list[imp_mp_color(def:RGBA(0.7450981, 0.7529413, 0.7803922, 1);hdr:False;cc:3;chan:"RGB";prop:"_SpecularColor";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"b858d15b-46fe-45d0-8583-714dbe89c351";op:Multiply;lbl:"Specular Color";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),,,,,,,,,,,,,,,,,,,,sp(name:"Diffuse Tint";imps:list[imp_mp_color(def:RGBA(1, 1, 1, 1);hdr:False;cc:3;chan:"RGB";prop:"_DiffuseTint";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"cbe2dd48-17d5-4b84-ba21-07bef40222f2";op:Multiply;lbl:"Diffuse Tint";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False)];customTextures:list[];codeInjection:codeInjection(injectedFiles:list[];mark:False);matLayers:list[]) */
-/* TCP_HASH 8431b0c90dcf3fd58471777993cb05ab */
+/* TCP_DATA u config(ver:"2.9.18";unity:"6000.0.40f1";tmplt:"SG2_Template_URP";features:list["UNITY_5_4","UNITY_5_5","UNITY_5_6","UNITY_2017_1","UNITY_2018_1","UNITY_2018_2","UNITY_2018_3","UNITY_2019_1","UNITY_2019_2","UNITY_2019_3","UNITY_2019_4","UNITY_2020_1","UNITY_2021_1","UNITY_2021_2","UNITY_2022_2","ENABLE_DEPTH_NORMALS_PASS","ENABLE_FORWARD_PLUS","SPEC_LEGACY","SPECULAR","SPECULAR_TOON_BAND","SS_MULTIPLICATIVE","TEXTURED_THRESHOLD","SKETCH_SHADER_FEATURE","SKETCH_AMBIENT","AUTO_TRANSPARENT_BLENDING","SS_SHADER_FEATURE","RIM_SHADER_FEATURE","ALPHA_TO_COVERAGE","SPECULAR_SHADER_FEATURE","WIND_ANIM_SIN","WIND_ANIM","NO_RAMP_UNLIT","TEMPLATE_LWRP"];flags:list[];flags_extra:dict[];keywords:dict[RENDER_TYPE="Opaque",RampTextureDrawer="[TCP2Gradient]",RampTextureLabel="Ramp Texture",SHADER_TARGET="3.0",RIM_LABEL="Rim Lighting"];shaderProperties:list[,,,,,,sp(name:"Specular Color";imps:list[imp_mp_color(def:RGBA(0.7450981, 0.7529413, 0.7803922, 1);hdr:False;cc:3;chan:"RGB";prop:"_SpecularColor";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"b858d15b-46fe-45d0-8583-714dbe89c351";op:Multiply;lbl:"Specular Color";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),,,,,,,,,,,,,,,,,,,,,,,,,,,sp(name:"Ramp Threshold";imps:list[imp_mp_range(def:0.2;min:0.01;max:1;prop:"_RampThreshold";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"d0d52c54-5eb0-463d-8984-1a54580991d6";op:Multiply;lbl:"Threshold";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),sp(name:"Ramp Smoothing";imps:list[imp_mp_range(def:1;min:0.001;max:1;prop:"_RampSmoothing";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"50a6cf14-4633-40c7-8910-272cfa5e5d5b";op:Multiply;lbl:"Smoothing";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),sp(name:"Bands Count";imps:list[imp_mp_range(def:2;min:1;max:20;prop:"_BandsCount";md:"[IntRange]";gbv:False;custom:False;refs:"";pnlock:False;guid:"29b76750-c6e7-439d-8e0d-fe8ce7a6c0a0";op:Multiply;lbl:"Bands Count";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),sp(name:"Diffuse Tint";imps:list[imp_mp_color(def:RGBA(1, 1, 1, 1);hdr:False;cc:3;chan:"RGB";prop:"_DiffuseTint";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"cbe2dd48-17d5-4b84-ba21-07bef40222f2";op:Multiply;lbl:"Diffuse Tint";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False)];customTextures:list[];codeInjection:codeInjection(injectedFiles:list[];mark:False);matLayers:list[]) */
+/* TCP_HASH 28f648b91c7dd3b9262f6b357a658355 */
