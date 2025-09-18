@@ -7,6 +7,7 @@ public class bomb : InteractableRigidbody
     [SerializeField] float bombExplosionRadius = 30.0f;
 
     [SerializeField] Transform wick;
+    [SerializeField] Transform fusePoint;
     [SerializeField] ParticleSystem fuseParticle;
     [SerializeField] GameObject explosion;
     private float currentBombTime = 0.0f;
@@ -32,7 +33,7 @@ public class bomb : InteractableRigidbody
             currentBombTime -= Time.deltaTime;
             Countdown();
         }
-
+        fuseParticle.transform.position = fusePoint.position;
     }
 
     void Countdown() 
