@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 4618998691042603035}
   - component: {fileID: 2168457516392393522}
   - component: {fileID: 8488715270665971691}
+  - component: {fileID: 1022269242026801534}
   m_Layer: 6
   m_Name: Crate
   m_TagString: Grabbable
@@ -151,3 +152,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   value: 1
   type: 0
+  isActivated: 0
+--- !u!114 &1022269242026801534
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2943522181916608074}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98e680c4e5ef19a46b7930f1c292c559, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetRb: {fileID: 2168457516392393522}
+  model: {fileID: 2039373947399873977}
+  impactSquashFactor: 0.3
+  spring: 8
+  minImpactSpeed: 1
+  maxScale: 3.5

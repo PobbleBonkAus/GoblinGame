@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
@@ -56,6 +55,10 @@ public class PhysicsGrabber : MonoBehaviour
     [SerializeField] Transform raisedObjectTransform;
     [SerializeField] float raiseSpeed;
 
+    [Header("Events")]
+    [SerializeField] UnityEvent OnGrabObject;
+    [SerializeField] UnityEvent OnDropObject;
+
     private bool raisingObject;
     Vector3 raiseOffset = Vector3.zero;
 
@@ -92,12 +95,7 @@ public class PhysicsGrabber : MonoBehaviour
 
             if (chargingThrow)
             {
-                if (throwForceTimer < maxThrowForceTime)
-                {
-                    initialGrabPointRelative = Vector3.Lerp(initialGrabPointRelative, transform.forward, throwForceTimer * 0.006f);
-                    throwForceTimer += 1.0f;
-                    cameraController.SetZoom(-throwForceTimer);
-                }
+                ChargeThrow();
             }
 
             if (player.isRagdolled)
@@ -111,6 +109,7 @@ public class PhysicsGrabber : MonoBehaviour
             storedItem.transform.SetPositionAndRotation(storedItemTransform.position, storedItemTransform.rotation);
         }
     }
+
 
     private void GrabObject(Rigidbody hitRigidbody, Vector3 hitPoint)
     {
@@ -138,6 +137,9 @@ public class PhysicsGrabber : MonoBehaviour
         grabbedObject.gameObject.layer = LayerMask.NameToLayer("GrabbedObject");
         objectType = grabbedObject.GetComponent<InteractableRigidbody>().type;
         kinematicBody.SetActive(true);
+
+        OnGrabObject.Invoke();
+
     }
 
     private void ReleaseObject()
@@ -161,20 +163,47 @@ public class PhysicsGrabber : MonoBehaviour
             raisingObject = false;
             raisePressed = false;
 
-
+            
             kinematicBody.SetActive(false);
+            OnDropObject.Invoke();
         }
     }
 
-
+    Vector3 chargeOffset = Vector3.zero;
     private void MoveGrabbedObject()
     {
         if (grabbedObject != null)
         {
-            raiseOffset = (raisingObject ? raiseOffset = raisedObjectTransform.position : Vector3.zero);
-            grabOffsetFromPlayer = (raisingObject) ? raisedObjectTransform.localPosition : grabOffsetFromPlayer = transform.localPosition;
-            grabbedObject.linearDamping = (!player.IsGrounded()) ? 0.0f : grabbedObject.linearDamping = grabbedObjectLinearDrag;
+            // updates the raise offset 
+            raiseOffset = (raisingObject ? raisedObjectTransform.position : Vector3.zero);
 
+            // sets the graboffset 
+            grabOffsetFromPlayer = (raisingObject) ? raisedObjectTransform.localPosition : transform.localPosition;
+
+            // sets the linear damp of the object to 0.0 if the player is in the air
+            grabbedObject.linearDamping = (!player.IsGrounded()) ? 0.0f : grabbedObjectLinearDrag;
+
+            // --- Overhead throw offset ---
+            Vector3 baseOffset = grabOffsetFromPlayer;
+            if (chargingThrow)
+            {
+                float chargeProgress = Mathf.Clamp01(throwForceTimer / maxThrowForceTime);
+
+                Vector3 front = player.transform.forward * 1.0f + player.transform.up * 3.0f;
+                Vector3 overhead = player.transform.up * 3.0f;
+                Vector3 behind = -player.transform.forward * 1.0f + player.transform.up * 1.5f;
+
+                if (chargeProgress < 0.5f)
+                    chargeOffset = Vector3.Lerp(front, overhead, chargeProgress * 2f);   // front → overhead
+                else
+                    chargeOffset = Vector3.Lerp(overhead, behind, (chargeProgress - 0.5f) * 2f); // overhead → behind
+            }
+            else
+            {
+                chargeOffset = Vector3.zero;
+            }
+
+            grabOffsetFromPlayer = baseOffset + chargeOffset;
 
             Vector3 desiredWorldPosition = playerRoot.TransformPoint(grabOffsetFromPlayer);
 
@@ -183,16 +212,17 @@ public class PhysicsGrabber : MonoBehaviour
             Vector3 direction = targetPosition - grabbedObject.transform.position;
             globalGrabPoint = grabbedObject.position - grabbedObject.transform.TransformVector(initialGrabPointRelative);
 
-
             if (direction.sqrMagnitude > minGrabMoveDistance * minGrabMoveDistance)
             {
-                // Force to move object
+                // Position pull force
                 Vector3 pullForce = direction * grabForce;
-                Vector3 oppositeForce = -pullForce * Mathf.Clamp01(grabbedObject.mass / 50f);
 
+                // Apply combined forces
                 grabbedObject.AddForce(pullForce, ForceMode.Force);
+
+                // Counterforce on player
+                Vector3 oppositeForce = -(pullForce) * Mathf.Clamp01(grabbedObject.mass / 50f);
                 playerRigidbody.AddForce(oppositeForce, ForceMode.Force);
-               
             }
 
             RotateGrabObject();
@@ -224,6 +254,15 @@ public class PhysicsGrabber : MonoBehaviour
 
         // Update global grab point for visuals
         globalGrabPoint = currentGrabPoint;
+    }
+
+    private void ChargeThrow() 
+    {
+        if (throwForceTimer < maxThrowForceTime)
+        {
+            throwForceTimer += 1.0f;
+            cameraController.SetZoom(-throwForceTimer);
+        }
     }
 
     public void StoreGrabbedItem()

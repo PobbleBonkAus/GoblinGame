@@ -9,7 +9,9 @@ public class playerProceduralAnimator : MonoBehaviour
     [SerializeField] Transform headTransform;
     [SerializeField] private float headLerpSpeed;
     [SerializeField] Rigidbody playerRigidbody;
-
+    [SerializeField] private float maxHeadTurnAngle = 60f; // degrees from forward
+    [SerializeField] private float behindThreshold = 120f; // when camera is too far back
+    public Transform headLookTarget;
 
     [Header("Leg params")]
     [SerializeField] float stepDistance = 3.0f;
@@ -52,11 +54,13 @@ public class playerProceduralAnimator : MonoBehaviour
     [SerializeField] private float armMaxStretch = 3.0f;
     [SerializeField] private Transform leftHandTarget;
     [SerializeField] private Transform rightHandTarget;
+
     [SerializeField] float damping = 5f;
     [SerializeField] float stiffness = 50f;
 
     private Vector3 leftHandVel;
     private Vector3 rightHandVel;
+    private Vector3 headVel;
 
     [Header("Grabbing params")]
     [SerializeField] PhysicsGrabber physicsGrabber;
@@ -64,11 +68,11 @@ public class playerProceduralAnimator : MonoBehaviour
     [Header("Particle Effects")]
     [SerializeField] ParticleSystem leftFootDust;
     [SerializeField] ParticleSystem rightFootDust;
-
+    [SerializeField] ParticleSystem clapEffect;
 
     [Header("Audio")]
     [SerializeField] AudioClip footstep;
-
+    [SerializeField] AudioClip clap;
 
     private Vector3 grabbedPoint;
 
@@ -103,8 +107,6 @@ public class playerProceduralAnimator : MonoBehaviour
     private void Start()
     {
 
-
-
         StartCoroutine(LateStart());
     }
 
@@ -120,7 +122,6 @@ public class playerProceduralAnimator : MonoBehaviour
 
         leftHand.position = body.position;
         rightHand.position = body.position;
-
 
         // Detach feet so they stay in world space
         leftFoot.SetParent(null);
@@ -147,17 +148,47 @@ public class playerProceduralAnimator : MonoBehaviour
         }
 
         BobPlayerWithLegs();
-        
+        BobbleHead();
         UpdateArmTargetPositions();
-        //RotateHeadWithCamera();
+
+        if (!player.isRagdolled) 
+        {
+            RotateHead();
+        }
+
 
         DrawLegs();
         DrawArms();
         stepWaitTimer += Time.deltaTime;
 
-       // Vector3 collisionVector = player.collisionVelocity;
-        ////transform.localScale = Vector3.Lerp(transform.localScale, collisionVector, 1.0f / collisionVector.magnitude);
+    }
+    private void RotateHead()
+    {
+        Vector3 targetDir = camera.forward;
 
+        if (headLookTarget)
+        {
+            targetDir = (headLookTarget.position - headTransform.position).normalized;
+        }
+
+        if (physicsGrabber.grabbing)
+        {
+            targetDir = (physicsGrabber.globalGrabPoint - headTransform.position).normalized;
+        }
+
+
+        Quaternion toRotation = Quaternion.LookRotation(targetDir, body.transform.up);
+        headTransform.rotation = Quaternion.Slerp(headTransform.rotation, toRotation, headLerpSpeed * Time.time);
+
+        headTransform.transform.localEulerAngles = new Vector3(Mathf.Clamp(-Mathf.DeltaAngle(headTransform.transform.localEulerAngles.x, 0), -30, 30), headTransform.transform.localEulerAngles.y, 0); // clamp angle x -30 to 30
+        headTransform.transform.localEulerAngles = new Vector3(headTransform.transform.localEulerAngles.x, Mathf.Clamp(-Mathf.DeltaAngle(headTransform.transform.localEulerAngles.y, 0), -50, 50), 0);  // clamp angle y -50 to 50
+
+    }
+
+    IEnumerator<WaitForSeconds> LooseInterestInHeadLookTarget() 
+    {
+        yield return new WaitForSeconds(3.0f);
+        headLookTarget = null;
     }
 
     private void BobPlayerWithLegs()
@@ -296,51 +327,12 @@ public class playerProceduralAnimator : MonoBehaviour
 
         }
     }
-
-    /* Doesn't work :((
-    private void RotateHeadWithCamera()
+    
+    private void BobbleHead() 
     {
-        // Camera direction
-        Vector3 cameraDir = camera.forward;
-
-        // Calculate horizontal (Y axis) angle
-        Vector3 flatCameraForward = cameraDir;
-        flatCameraForward.y = 0;
-        flatCameraForward.Normalize();
-
-        Vector3 flatHeadForward = headTransform.forward;
-        flatHeadForward.y = 0;
-        flatHeadForward.Normalize();
-
-        float yawAngle = Vector3.SignedAngle(flatHeadForward, flatCameraForward, Vector3.up);
-
-
-        // Calculate vertical (X axis) angle with pitch offset
-        Vector3 headLocalForward = headTransform.InverseTransformDirection(cameraDir);
-        float pitchAngle = Mathf.Atan2(headLocalForward.y, headLocalForward.z) * Mathf.Rad2Deg;
-
-        // Apply user-defined offset
-        pitchAngle += pitchInput * pitchStrength;
-
-
-        if (Vector3.Angle(flatHeadForward, flatCameraForward) > pitchCutoff)
-        {
-            pitchAngle = 0;
-            yawAngle = 0;
-        }
-
-        // Clamp pitch
-        float clampedPitch = Mathf.Clamp(pitchAngle, pitchLimit.x, pitchLimit.y);
-        float clampedYaw = Mathf.Clamp(yawAngle, yawLimit.x, yawLimit.y);
-
-
-        // Final head rotation in local space (pitch X, yaw Y, no roll)
-        Quaternion targetRotation = Quaternion.Euler(-clampedPitch + initialPitchOffset, clampedYaw, 0f);
-        Quaternion finalRotation = Quaternion.Lerp(headTransform.localRotation, targetRotation, Time.deltaTime * headLerpSpeed);
-
-        headTransform.localRotation = finalRotation;
+        headTransform.position = SpringLerp(headTransform.position, headBobTransform.position, ref headVel);
     }
-    */
+    
     private bool TryGetFootTarget(Vector3 origin, Vector3 velocityOffset,out Vector3 hitPoint)
     {
         Vector3 rayStart = origin + velocityOffset;
@@ -426,7 +418,6 @@ public class playerProceduralAnimator : MonoBehaviour
     }
 
 
-
     private void DrawLegs()
     {
         leftLegRenderer.SetPosition(0, leftLegRenderer.transform.position);
@@ -447,6 +438,24 @@ public class playerProceduralAnimator : MonoBehaviour
 
         leftArmRenderer.SetPosition(0, leftArmRenderer.transform.position);
         leftArmRenderer.SetPosition(1, leftHand.position);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (!other.attachedRigidbody) return;
+        if(other.attachedRigidbody.linearVelocity.magnitude > 1.0f || other.CompareTag("Player")) 
+        {
+            if (other.transform.IsChildOf(transform.parent)) return;
+            headLookTarget = other.transform;
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if(other.transform == headLookTarget) 
+        {
+            headLookTarget = null;
+        }
     }
 
 }
