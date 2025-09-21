@@ -9957,7 +9957,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3563445205334023835, guid: a3aa84c6c7d76f84d8dc89b7fbc2648f, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3656816315597192154, guid: a3aa84c6c7d76f84d8dc89b7fbc2648f, type: 3}
       propertyPath: looping
@@ -10352,6 +10352,10 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Grabbable
       objectReference: {fileID: 0}
+    - target: {fileID: 6317578925029434746, guid: 272300993641436499331136d7ee54ed, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 871870f641b31ab4094f11c5eab1973e, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: -5568371526223589888, guid: 272300993641436499331136d7ee54ed, type: 3}

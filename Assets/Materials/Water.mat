@@ -120,8 +120,8 @@ Material:
     - _ClearCoatSmoothness: 0
     - _Cull: 2
     - _Cutoff: 0.5
-    - _DepthAlphaDistance: 0.15
-    - _DepthAlphaMin: 0.6
+    - _DepthAlphaDistance: 1
+    - _DepthAlphaMin: 0.25
     - _DepthColorDistance: 0.01
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
