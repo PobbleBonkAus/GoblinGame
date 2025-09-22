@@ -64,7 +64,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d7048b05d97652648a6f123a89c6c691, type: 2}
+  - {fileID: 2100000, guid: 5acb62124bcd7cf4d8049409862bed2c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -540,9 +540,9 @@ ParticleSystem:
         m_NumAlphaKeys: 2
     startSize:
       serializedVersion: 2
-      minMaxState: 3
-      scalar: 0.2
-      minScalar: 0.01
+      minMaxState: 0
+      scalar: 0.1
+      minScalar: 0.1
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -593,7 +593,7 @@ ParticleSystem:
         m_RotationOrder: 4
     startSizeY:
       serializedVersion: 2
-      minMaxState: 3
+      minMaxState: 0
       scalar: 1
       minScalar: 1
       maxCurve:
@@ -646,7 +646,7 @@ ParticleSystem:
         m_RotationOrder: 4
     startSizeZ:
       serializedVersion: 2
-      minMaxState: 3
+      minMaxState: 0
       scalar: 1
       minScalar: 1
       maxCurve:
@@ -5078,7 +5078,7 @@ ParticleSystemRenderer:
   m_VertexStreams: 00010304
   m_UseCustomTrailVertexStreams: 0
   m_TrailVertexStreams: 00010304
-  m_Mesh: {fileID: 4711208715938537054, guid: 272300993641436499331136d7ee54ed, type: 3}
+  m_Mesh: {fileID: 4711208715938537054, guid: 62b8fa17fe63e6c45b6a12cde49ffec5, type: 3}
   m_Mesh1: {fileID: 0}
   m_Mesh2: {fileID: 0}
   m_Mesh3: {fileID: 0}
@@ -5108,3 +5108,4 @@ MonoBehaviour:
   liquid: {fileID: 3551640522907387137}
   pouringParticle: {fileID: 7787433777987438705}
   affectParticle: {fileID: 5994341468072791595, guid: b7e1ce1fb2cd83142ada0ac566d52fda, type: 3}
+  liquidMaterial: {fileID: 0}

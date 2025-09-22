@@ -12,6 +12,7 @@ TagManager:
   - PlayerSpawn
   - Camera
   - GameManager
+  - Terrain
   layers:
   - Default
   - TransparentFX

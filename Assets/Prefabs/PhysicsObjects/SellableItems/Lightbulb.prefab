@@ -22,15 +22,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 0f129eb1fcb77924b83029ca2dc4072b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.000000015426
+      value: -55.16
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 0f129eb1fcb77924b83029ca2dc4072b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.11811
+      value: 4.94
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 0f129eb1fcb77924b83029ca2dc4072b, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.0034926
+      value: 5.04
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 0f129eb1fcb77924b83029ca2dc4072b, type: 3}
       propertyPath: m_LocalRotation.w
@@ -87,7 +87,7 @@ PrefabInstance:
     - target: {fileID: 8029106800918022278, guid: 0f129eb1fcb77924b83029ca2dc4072b, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 6c9c0e23fb579b94cb84eb1d4b09cbe8, type: 2}
+      objectReference: {fileID: 2100000, guid: 72f8ba1960f271a44ac1128954f3b0e1, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -152,8 +152,8 @@ MonoBehaviour:
   value: 1
   type: 0
   isActivated: 0
-  litMat: {fileID: 2100000, guid: 6c9c0e23fb579b94cb84eb1d4b09cbe8, type: 2}
-  unlitMat: {fileID: 2100000, guid: c1ec02849f3b09247a983c0994657c71, type: 2}
+  litMat: {fileID: 2100000, guid: ea699a88c13637444b0b98d7cf703ef2, type: 2}
+  unlitMat: {fileID: 2100000, guid: 72f8ba1960f271a44ac1128954f3b0e1, type: 2}
   bulb: {fileID: 5888492425019273791}
 --- !u!1 &4789302610761626894 stripped
 GameObject:
