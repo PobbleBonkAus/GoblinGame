@@ -45,6 +45,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _Cube:
+        m_Texture: {fileID: 8900000, guid: bde58d6a035c50f4dbf539f0ccf4b444, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -145,6 +149,7 @@ Material:
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _HColor: {r: 0.34117648, g: 0.3921569, b: 0.427451, a: 1}
     - _ReflectionColor: {r: 1, g: 1, b: 1, a: 1}
+    - _ReflectionCubemapColor: {r: 1, g: 1, b: 1, a: 1}
     - _SColor: {r: 0.098039225, g: 0.12941177, b: 0.1764706, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _SpecularColor: {r: 0.7450981, g: 0.7529413, b: 0.7803922, a: 1}

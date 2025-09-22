@@ -20,12 +20,11 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: _Test
+  m_Name: Player_Goblin
   m_Shader: {fileID: 4800000, guid: 5381baa1f0b4b8540ba239f5aee1c203, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords:
-  - TCP2_TEXTURED_THRESHOLD
+  m_ValidKeywords: []
   m_InvalidKeywords:
   - TCP2_DISABLE_WRAPPED_LIGHT
   - TCP2_OUTLINE_CONST_SIZE
@@ -34,6 +33,7 @@ Material:
   - TCP2_SHADOW_LIGHT_COLOR
   - TCP2_SPECULAR_CRISP
   - TCP2_SUBSURFACE
+  - TCP2_TEXTURED_THRESHOLD
   - TCP2_UV_NORMALS_FULL
   - _GLOSSYREFLECTIONS_OFF
   - _SPECULARHIGHLIGHTS_OFF
@@ -137,12 +137,13 @@ Material:
     - _AddPrecomputedVelocity: 0
     - _AlphaClip: 0
     - _AlphaToMask: 0
+    - _BandsCount: 2
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
-    - _Cull: 2
+    - _Cull: 0
     - _Cutoff: 0.5
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
@@ -239,6 +240,9 @@ Material:
     - _UseSpecular: 0
     - _UseSubsurface: 1
     - _UseTexturedThreshold: 1
+    - _UseWind: 0
+    - _WindSpeed: 2.5
+    - _WindStrength: 0.025
     - _WorkflowMode: 1
     - _ZWrite: 1
     - __dummy__: 0
@@ -257,5 +261,6 @@ Material:
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _SpecularColor: {r: 0.75, g: 0.75, b: 0.75, a: 1}
     - _SubsurfaceColor: {r: 1, g: 1, b: 1, a: 1}
+    - _WindDirection: {r: 1, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
