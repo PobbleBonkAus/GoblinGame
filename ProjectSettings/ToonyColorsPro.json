@@ -8,11 +8,11 @@
     "OpenedFoldouts": [
         "LIGHTING",
         "STYLIZATION",
-        "SPECIAL EFFECTS",
         "TRANSPARENCY/BLENDING",
         "SHADER STATES",
         "SURFACE",
-        "TERRAIN"
+        "TERRAIN",
+        "SPECIAL EFFECTS"
     ],
     "UseCustomFont": true,
     "CustomFont": {

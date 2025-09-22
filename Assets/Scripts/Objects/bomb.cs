@@ -7,6 +7,7 @@ public class bomb : InteractableRigidbody
     [SerializeField] float bombExplosionRadius = 30.0f;
 
     [SerializeField] Transform wick;
+    [SerializeField] Transform fusePoint;
     [SerializeField] ParticleSystem fuseParticle;
     [SerializeField] GameObject explosion;
     private float currentBombTime = 0.0f;
@@ -32,12 +33,12 @@ public class bomb : InteractableRigidbody
             currentBombTime -= Time.deltaTime;
             Countdown();
         }
-
+        fuseParticle.transform.position = fusePoint.position;
     }
 
     void Countdown() 
     {
-        Vector3 targetScale = new Vector3(wick.transform.localScale.x, 0.0f, wick.transform.localScale.z);
+        Vector3 targetScale = new Vector3(wick.transform.localScale.x, 0.01f, wick.transform.localScale.z);
 
         wick.transform.localScale = Vector3.MoveTowards(wick.transform.localScale, targetScale, currentBombTime);
 
