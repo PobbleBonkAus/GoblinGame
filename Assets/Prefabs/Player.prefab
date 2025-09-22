@@ -5220,7 +5220,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 862767390361792617}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -5800,7 +5800,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1479007786230113445}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -11602,6 +11602,7 @@ GameObject:
   - component: {fileID: 6177313823285589185}
   - component: {fileID: 6667842991308806383}
   - component: {fileID: 8996525532069409010}
+  - component: {fileID: 7653524968314350467}
   m_Layer: 3
   m_Name: HeadMesh
   m_TagString: Player
@@ -11623,11 +11624,11 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1079368744399314872}
-  - {fileID: 6898888618201529576}
-  - {fileID: 8487091824733129529}
   - {fileID: 6995706435923843302}
   - {fileID: 893869638855486819}
   - {fileID: 7958509766898684776}
+  - {fileID: 6898888618201529576}
+  - {fileID: 8487091824733129529}
   m_Father: {fileID: 8782199234064376268}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &6177313823285589185
@@ -11705,6 +11706,33 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -1423862223392508781, guid: 86d2273ad25f7e140a7f0ec4aa9fe4a0, type: 3}
+--- !u!54 &7653524968314350467
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6796583080785168567}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &7056697314652490295
 GameObject:
   m_ObjectHideFlags: 0
@@ -12066,6 +12094,12 @@ MonoBehaviour:
   playerBobAmplitude: 0.2
   playerHeadOffset: 0
   playerHeadAmplitude: 0.1
+  leftEar: {fileID: 6898888618201529576}
+  rightEar: {fileID: 8487091824733129529}
+  ear_maxZRotation: 30
+  ear_minZRotation: -20
+  ear_maxYRotation: 30
+  ear_minYRotation: -20
   grabbedBody: {fileID: 0}
   leftHand: {fileID: 6519706412754721883}
   rightHand: {fileID: 6298949021254815219}

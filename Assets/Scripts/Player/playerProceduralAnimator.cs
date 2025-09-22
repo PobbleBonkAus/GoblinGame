@@ -43,6 +43,15 @@ public class playerProceduralAnimator : MonoBehaviour
     [SerializeField] private float playerHeadOffset = 0.9f;
     [SerializeField] private float playerHeadAmplitude = 0.05f;
 
+    [Header("Ears")]
+    [SerializeField] Transform leftEar;
+    [SerializeField] Transform rightEar;
+    [SerializeField] float ear_maxZRotation = 30.0f;
+    [SerializeField] float ear_minZRotation = -20.0f;
+    [SerializeField] float ear_maxYRotation = 30.0f;
+    [SerializeField] float ear_minYRotation = -20.0f;
+    private Vector3 leftEarVelocity;
+    private Vector3 rightEarVelocity;
 
     [Header("Arm params")]
     [SerializeField] private Transform grabbedBody;
@@ -151,15 +160,15 @@ public class playerProceduralAnimator : MonoBehaviour
         BobbleHead();
         UpdateArmTargetPositions();
 
-        if (!player.isRagdolled) 
-        {
-            RotateHead();
-        }
+        RotateHead();
+        
 
 
         DrawLegs();
         DrawArms();
         stepWaitTimer += Time.deltaTime;
+
+        WobbleEars();
 
     }
     private void RotateHead()
@@ -176,6 +185,10 @@ public class playerProceduralAnimator : MonoBehaviour
             targetDir = (physicsGrabber.globalGrabPoint - headTransform.position).normalized;
         }
 
+        if (player.isRagdolled) 
+        {
+            targetDir = body.forward;
+        }
 
         Quaternion toRotation = Quaternion.LookRotation(targetDir, body.transform.up);
         headTransform.rotation = Quaternion.Slerp(headTransform.rotation, toRotation, headLerpSpeed * Time.time);
@@ -191,6 +204,22 @@ public class playerProceduralAnimator : MonoBehaviour
         headLookTarget = null;
     }
 
+    private void WobbleEars() 
+    {
+        //based on head velocity, wobble the ears with just rotation
+        Vector3 headVelocity = playerRigidbody.linearVelocity;
+        float velocitySlerp = headVelocity.magnitude;
+
+        Vector3 leftEarRotationTarget = Quaternion.Euler(0.0f, headVelocity.z, -headVelocity.y).eulerAngles;
+        Vector3 rightEarRotationTarget = Quaternion.Euler(0.0f, headVelocity.z, headVelocity.y).eulerAngles;
+
+        leftEar.transform.localRotation = Quaternion.Slerp(leftEar.transform.localRotation, 
+            Quaternion.Euler(leftEarRotationTarget.x, leftEarRotationTarget.y, leftEarRotationTarget.z),
+            1.0f / velocitySlerp);
+        rightEar.transform.localRotation = Quaternion.Slerp(rightEar.transform.localRotation,
+        Quaternion.Euler(rightEarRotationTarget.x, rightEarRotationTarget.y, rightEarRotationTarget.z),
+        1.0f / velocitySlerp);
+    }
     private void BobPlayerWithLegs()
     {
         float footDistance = Vector3.Distance(leftFoot.position, rightFoot.position);
