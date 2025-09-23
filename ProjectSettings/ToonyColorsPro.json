@@ -12,7 +12,8 @@
         "SHADER STATES",
         "SURFACE",
         "TERRAIN",
-        "SPECIAL EFFECTS"
+        "SPECIAL EFFECTS",
+        "OPTIONS"
     ],
     "UseCustomFont": true,
     "CustomFont": {

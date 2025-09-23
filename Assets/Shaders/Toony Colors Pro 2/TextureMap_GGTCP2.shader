@@ -42,6 +42,9 @@ Shader "Dragon_GGTCP2"
 		_StylizedThreshold ("Stylized Threshold", 2D) = "gray" {}
 		[TCP2Separator]
 		
+		[TCP2ColorNoAlpha] _DiffuseTint ("Diffuse Tint", Color) = (1,1,1,1)
+		[TCP2Separator]
+		
 		[ToggleOff(_RECEIVE_SHADOWS_OFF)] _ReceiveShadowsOff ("Receive Shadows", Float) = 1
 
 		// Avoid compile error if the properties are ending with a drawer
@@ -99,6 +102,7 @@ Shader "Dragon_GGTCP2"
 			float _RampThreshold;
 			float _RampSmoothing;
 			float _BandsCount;
+			fixed4 _DiffuseTint;
 			float _SpecularSmoothness;
 			float _SpecularToonBands;
 			fixed4 _SpecularColor;
@@ -256,6 +260,7 @@ Shader "Dragon_GGTCP2"
 				float __rampThreshold = ( _RampThreshold );
 				float __rampSmoothing = ( _RampSmoothing );
 				float __bandsCount = ( _BandsCount );
+				float3 __diffuseTint = ( _DiffuseTint.rgb );
 				float __specularSmoothness = ( _SpecularSmoothness );
 				float __specularToonBands = ( _SpecularToonBands );
 				float3 __specularColor = ( _SpecularColor.rgb );
@@ -329,6 +334,10 @@ Shader "Dragon_GGTCP2"
 				// apply attenuation
 				ramp *= atten;
 
+				// Diffuse Tint
+				half3 diffuseTint = saturate(__diffuseTint + ndl);
+				ramp *= diffuseTint;
+				
 				half3 color = half3(0,0,0);
 				half3 accumulatedRamp = ramp * max(lightColor.r, max(lightColor.g, lightColor.b));
 				half3 accumulatedColors = ramp * lightColor.rgb;
@@ -392,6 +401,10 @@ Shader "Dragon_GGTCP2"
 							// apply attenuation (shadowmaps & point/spot lights attenuation)
 							ramp *= atten;
 
+							// Diffuse Tint
+							half3 diffuseTint = saturate(__diffuseTint + ndl);
+							ramp *= diffuseTint;
+							
 							accumulatedRamp += ramp * max(lightColor.r, max(lightColor.g, lightColor.b));
 							accumulatedColors += ramp * lightColor.rgb;
 
@@ -453,6 +466,10 @@ Shader "Dragon_GGTCP2"
 					// apply attenuation (shadowmaps & point/spot lights attenuation)
 					ramp *= atten;
 
+					// Diffuse Tint
+					half3 diffuseTint = saturate(__diffuseTint + ndl);
+					ramp *= diffuseTint;
+					
 					accumulatedRamp += ramp * max(lightColor.r, max(lightColor.g, lightColor.b));
 					accumulatedColors += ramp * lightColor.rgb;
 
@@ -722,5 +739,5 @@ Shader "Dragon_GGTCP2"
 	CustomEditor "ToonyColorsPro.ShaderGenerator.MaterialInspector_SG2"
 }
 
-/* TCP_DATA u config(ver:"2.9.18";unity:"6000.0.42f1";tmplt:"SG2_Template_URP";features:list["UNITY_5_4","UNITY_5_5","UNITY_5_6","UNITY_2017_1","UNITY_2018_1","UNITY_2018_2","UNITY_2018_3","UNITY_2019_1","UNITY_2019_2","UNITY_2019_3","UNITY_2019_4","UNITY_2020_1","UNITY_2021_1","UNITY_2021_2","UNITY_2022_2","ENABLE_DEPTH_NORMALS_PASS","ENABLE_FORWARD_PLUS","SPEC_LEGACY","SPECULAR","SPECULAR_TOON_BAND","SS_MULTIPLICATIVE","TEXTURED_THRESHOLD","SKETCH_SHADER_FEATURE","SKETCH_AMBIENT","AUTO_TRANSPARENT_BLENDING","SS_SHADER_FEATURE","RIM_SHADER_FEATURE","RAMP_BANDS_CRISP_NO_AA","WIND_SHADER_FEATURE","ALPHA_TO_COVERAGE","SPECULAR_SHADER_FEATURE","EMISSION","TEMPLATE_LWRP"];flags:list[];flags_extra:dict[];keywords:dict[RENDER_TYPE="Opaque",RampTextureDrawer="[TCP2Gradient]",RampTextureLabel="Ramp Texture",SHADER_TARGET="3.0",RIM_LABEL="Rim Lighting"];shaderProperties:list[,,,,sp(name:"Ramp Threshold";imps:list[imp_mp_range(def:0.2;min:0.01;max:1;prop:"_RampThreshold";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"d0d52c54-5eb0-463d-8984-1a54580991d6";op:Multiply;lbl:"Threshold";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),sp(name:"Ramp Smoothing";imps:list[imp_mp_range(def:1;min:0.001;max:1;prop:"_RampSmoothing";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"50a6cf14-4633-40c7-8910-272cfa5e5d5b";op:Multiply;lbl:"Smoothing";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),sp(name:"Bands Count";imps:list[imp_mp_range(def:2;min:1;max:20;prop:"_BandsCount";md:"[IntRange]";gbv:False;custom:False;refs:"";pnlock:False;guid:"29b76750-c6e7-439d-8e0d-fe8ce7a6c0a0";op:Multiply;lbl:"Bands Count";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),,,sp(name:"Specular Color";imps:list[imp_mp_color(def:RGBA(0.7450981, 0.7529413, 0.7803922, 1);hdr:False;cc:3;chan:"RGB";prop:"_SpecularColor";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"b858d15b-46fe-45d0-8583-714dbe89c351";op:Multiply;lbl:"Specular Color";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),,,sp(name:"Emission";imps:list[imp_mp_texture(uto:False;tov:"";tov_lbl:"";gto:False;sbt:False;scr:False;scv:"";scv_lbl:"";gsc:False;roff:False;goff:False;sin_anm:False;sin_anmv:"";sin_anmv_lbl:"";gsin:False;notile:False;triplanar_local:False;def:"white";locked_uv:False;uv:0;cc:3;chan:"RGB";mip:-1;mipprop:False;ssuv_vert:False;ssuv_obj:False;uv_type:Texcoord;uv_chan:"XZ";tpln_scale:1;uv_shaderproperty:__NULL__;uv_cmp:__NULL__;sep_sampler:__NULL__;prop:"_EmissionTexture";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"6cfc9003-b9b5-480b-a013-b7566dc36a55";op:Multiply;lbl:"EmissionTexture";gpu_inst:False;dots_inst:False;locked:False;impl_index:-1),imp_mp_color(def:RGBA(0, 0, 0, 1);hdr:True;cc:3;chan:"RGB";prop:"_Emission";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"06bd5a01-3f8f-4420-8360-d2efb24ebf15";op:Multiply;lbl:"Emission Color";gpu_inst:False;dots_inst:False;locked:False;impl_index:0),imp_mp_texture(uto:False;tov:"";tov_lbl:"";gto:False;sbt:False;scr:False;scv:"";scv_lbl:"";gsc:False;roff:False;goff:False;sin_anm:False;sin_anmv:"";sin_anmv_lbl:"";gsin:False;notile:False;triplanar_local:False;def:"white";locked_uv:False;uv:0;cc:3;chan:"GGG";mip:-1;mipprop:False;ssuv_vert:False;ssuv_obj:False;uv_type:Texcoord;uv_chan:"XZ";tpln_scale:1;uv_shaderproperty:__NULL__;uv_cmp:__NULL__;sep_sampler:__NULL__;prop:"_EmissionMask";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"f0728d43-ddcb-4078-a450-15112463bbcd";op:Multiply;lbl:"EmissionMask";gpu_inst:False;dots_inst:False;locked:False;impl_index:-1)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),,,,,,,,,,,,,,,,,sp(name:"Diffuse Tint";imps:list[imp_mp_color(def:RGBA(1, 1, 1, 1);hdr:False;cc:3;chan:"RGB";prop:"_DiffuseTint";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"cbe2dd48-17d5-4b84-ba21-07bef40222f2";op:Multiply;lbl:"Diffuse Tint";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False)];customTextures:list[];codeInjection:codeInjection(injectedFiles:list[];mark:False);matLayers:list[]) */
-/* TCP_HASH 77795dc4f3cabef4983335ab2c9aaa19 */
+/* TCP_DATA u config(ver:"2.9.18";unity:"6000.0.42f1";tmplt:"SG2_Template_URP";features:list["UNITY_5_4","UNITY_5_5","UNITY_5_6","UNITY_2017_1","UNITY_2018_1","UNITY_2018_2","UNITY_2018_3","UNITY_2019_1","UNITY_2019_2","UNITY_2019_3","UNITY_2019_4","UNITY_2020_1","UNITY_2021_1","UNITY_2021_2","UNITY_2022_2","ENABLE_DEPTH_NORMALS_PASS","ENABLE_FORWARD_PLUS","SPEC_LEGACY","SPECULAR","SPECULAR_TOON_BAND","SS_MULTIPLICATIVE","TEXTURED_THRESHOLD","SKETCH_SHADER_FEATURE","SKETCH_AMBIENT","AUTO_TRANSPARENT_BLENDING","SS_SHADER_FEATURE","RIM_SHADER_FEATURE","RAMP_BANDS_CRISP_NO_AA","WIND_SHADER_FEATURE","ALPHA_TO_COVERAGE","SPECULAR_SHADER_FEATURE","EMISSION","TEMPLATE_LWRP","DIFFUSE_TINT"];flags:list[];flags_extra:dict[];keywords:dict[RENDER_TYPE="Opaque",RampTextureDrawer="[TCP2Gradient]",RampTextureLabel="Ramp Texture",SHADER_TARGET="3.0",RIM_LABEL="Rim Lighting"];shaderProperties:list[,,,,sp(name:"Ramp Threshold";imps:list[imp_mp_range(def:0.2;min:0.01;max:1;prop:"_RampThreshold";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"d0d52c54-5eb0-463d-8984-1a54580991d6";op:Multiply;lbl:"Threshold";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),sp(name:"Ramp Smoothing";imps:list[imp_mp_range(def:1;min:0.001;max:1;prop:"_RampSmoothing";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"50a6cf14-4633-40c7-8910-272cfa5e5d5b";op:Multiply;lbl:"Smoothing";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),sp(name:"Bands Count";imps:list[imp_mp_range(def:2;min:1;max:20;prop:"_BandsCount";md:"[IntRange]";gbv:False;custom:False;refs:"";pnlock:False;guid:"29b76750-c6e7-439d-8e0d-fe8ce7a6c0a0";op:Multiply;lbl:"Bands Count";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),,,sp(name:"Specular Color";imps:list[imp_mp_color(def:RGBA(0.7450981, 0.7529413, 0.7803922, 1);hdr:False;cc:3;chan:"RGB";prop:"_SpecularColor";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"b858d15b-46fe-45d0-8583-714dbe89c351";op:Multiply;lbl:"Specular Color";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),,,sp(name:"Emission";imps:list[imp_mp_texture(uto:False;tov:"";tov_lbl:"";gto:False;sbt:False;scr:False;scv:"";scv_lbl:"";gsc:False;roff:False;goff:False;sin_anm:False;sin_anmv:"";sin_anmv_lbl:"";gsin:False;notile:False;triplanar_local:False;def:"white";locked_uv:False;uv:0;cc:3;chan:"RGB";mip:-1;mipprop:False;ssuv_vert:False;ssuv_obj:False;uv_type:Texcoord;uv_chan:"XZ";tpln_scale:1;uv_shaderproperty:__NULL__;uv_cmp:__NULL__;sep_sampler:__NULL__;prop:"_EmissionTexture";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"6cfc9003-b9b5-480b-a013-b7566dc36a55";op:Multiply;lbl:"EmissionTexture";gpu_inst:False;dots_inst:False;locked:False;impl_index:-1),imp_mp_color(def:RGBA(0, 0, 0, 1);hdr:True;cc:3;chan:"RGB";prop:"_Emission";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"06bd5a01-3f8f-4420-8360-d2efb24ebf15";op:Multiply;lbl:"Emission Color";gpu_inst:False;dots_inst:False;locked:False;impl_index:0),imp_mp_texture(uto:False;tov:"";tov_lbl:"";gto:False;sbt:False;scr:False;scv:"";scv_lbl:"";gsc:False;roff:False;goff:False;sin_anm:False;sin_anmv:"";sin_anmv_lbl:"";gsin:False;notile:False;triplanar_local:False;def:"white";locked_uv:False;uv:0;cc:3;chan:"GGG";mip:-1;mipprop:False;ssuv_vert:False;ssuv_obj:False;uv_type:Texcoord;uv_chan:"XZ";tpln_scale:1;uv_shaderproperty:__NULL__;uv_cmp:__NULL__;sep_sampler:__NULL__;prop:"_EmissionMask";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"f0728d43-ddcb-4078-a450-15112463bbcd";op:Multiply;lbl:"EmissionMask";gpu_inst:False;dots_inst:False;locked:False;impl_index:-1)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),,,,,,,,,,,,,,,,,sp(name:"Diffuse Tint";imps:list[imp_mp_color(def:RGBA(1, 1, 1, 1);hdr:False;cc:3;chan:"RGB";prop:"_DiffuseTint";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"cbe2dd48-17d5-4b84-ba21-07bef40222f2";op:Multiply;lbl:"Diffuse Tint";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False)];customTextures:list[];codeInjection:codeInjection(injectedFiles:list[];mark:False);matLayers:list[]) */
+/* TCP_HASH f50f80cfd49a66335a94d509ff4300f0 */

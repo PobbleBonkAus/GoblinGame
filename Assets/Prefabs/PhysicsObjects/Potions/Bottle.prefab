@@ -286,7 +286,6 @@ MonoBehaviour:
   pouringParticle: {fileID: 3116818164357986020}
   affectParticle: {fileID: 0}
   liquidMaterial: {fileID: 6217340611934142964}
-  liquidColor: {r: 0.6156863, g: 0.4784314, b: 0.9215687, a: 0}
 --- !u!198 &3116818164357986020
 ParticleSystem:
   m_ObjectHideFlags: 0
