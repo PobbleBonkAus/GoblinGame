@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 3199549677280458298}
   - component: {fileID: 6423310710388154058}
   - component: {fileID: 179534451433817714}
+  - component: {fileID: 2175130943878171076}
   m_Layer: 6
   m_Name: Junk_Excalibur
   m_TagString: Sellable
@@ -153,6 +154,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   value: 100
   type: 1
+  isActivated: 0
+--- !u!114 &2175130943878171076
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8965322688192644432}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98e680c4e5ef19a46b7930f1c292c559, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetRb: {fileID: 6423310710388154058}
+  model: {fileID: 9196091846739751270}
+  impactSquashFactor: 0.3
+  spring: 8
+  minImpactSpeed: 1
+  maxScale: 3.5
 --- !u!1001 &7772458057519579933
 PrefabInstance:
   m_ObjectHideFlags: 0

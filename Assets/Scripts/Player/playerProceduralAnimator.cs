@@ -115,13 +115,12 @@ public class playerProceduralAnimator : MonoBehaviour
 
     private void Start()
     {
-
         StartCoroutine(LateStart());
     }
 
     IEnumerator<WaitForSeconds> LateStart() 
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.1f);
 
         leftHand.SetParent(null);
         rightHand.SetParent(null);

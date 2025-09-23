@@ -189,21 +189,24 @@ public class PhysicsGrabber : MonoBehaviour
             {
                 float chargeProgress = Mathf.Clamp01(throwForceTimer / maxThrowForceTime);
 
-                Vector3 front = player.transform.forward * 1.0f + player.transform.up * 3.0f;
-                Vector3 overhead = player.transform.up * 3.0f;
-                Vector3 behind = -player.transform.forward * 1.0f + player.transform.up * 1.5f;
+                Vector3 front = (player.transform.forward * 1.5f) + player.transform.up * 1.5f;
+                Vector3 overhead = player.transform.up * 2.0f;
+                Vector3 behind = (-player.transform.forward * 1.5f) + player.transform.up * 1.5f;
 
                 if (chargeProgress < 0.5f)
-                    chargeOffset = Vector3.Lerp(front, overhead, chargeProgress * 2f);   // front → overhead
+                    chargeOffset = Vector3.Lerp(front, overhead, chargeProgress * 2f);
                 else
-                    chargeOffset = Vector3.Lerp(overhead, behind, (chargeProgress - 0.5f) * 2f); // overhead → behind
+                    chargeOffset = Vector3.Lerp(overhead, behind, (chargeProgress - 0.5f) * 2f);
+
+                grabOffsetFromPlayer = chargeOffset;
             }
             else
             {
                 chargeOffset = Vector3.zero;
+                grabOffsetFromPlayer = baseOffset;
             }
 
-            grabOffsetFromPlayer = baseOffset + chargeOffset;
+            
 
             Vector3 desiredWorldPosition = playerRoot.TransformPoint(grabOffsetFromPlayer);
 
@@ -363,11 +366,11 @@ public class PhysicsGrabber : MonoBehaviour
 
     IEnumerator<WaitForSeconds> EnableHeadCollider() 
     {
-        head.GetComponent<MeshCollider>().enabled = false;
+        //head.GetComponent<MeshCollider>().enabled = false;
        
         yield return new WaitForSeconds(headColliderDeactivationTimeAfterThrow);
 
-        head.GetComponent<MeshCollider>().enabled = true;
+        //head.GetComponent<MeshCollider>().enabled = true;
     }
 
 
