@@ -110,6 +110,30 @@ public class PhysicsGrabber : MonoBehaviour
         }
     }
 
+    public void ForceGrabObject(Rigidbody body) 
+    {
+        Vector3 hitPoint = body.transform.position;
+        // Store grab point relative to object
+        initialGrabPointRelative = grabbedObject.transform.InverseTransformPoint(hitPoint);
+        // Store object offset relative to player root this is important for when we rotate the player around, the object
+        // should orbit around the player, not the physics grab origin.
+        grabOffsetFromPlayer = playerRoot.InverseTransformPoint(transform.position);
+
+        grabPoint = hitPoint;
+        grabbing = true;
+
+        grabbedObjectOriginalLinearDrag = grabbedObject.linearDamping;
+        grabbedObjectOriginalAngularDrag = grabbedObject.angularDamping;
+
+        //grabbedObject.linearDamping = grabbedObjectLinearDrag;
+        grabbedObject.angularDamping = grabbedObjectAngularDrag;
+
+        grabbedObject.gameObject.layer = LayerMask.NameToLayer("GrabbedObject");
+        objectType = grabbedObject.GetComponent<InteractableRigidbody>().type;
+        kinematicBody.SetActive(true);
+
+        OnGrabObject.Invoke();
+    }
 
     private void GrabObject(Rigidbody hitRigidbody, Vector3 hitPoint)
     {

@@ -7,7 +7,7 @@ public class InteractableRigidbody : MonoBehaviour
     public ObjectType type;
 
     public bool isActivated;
-
+    public bool isGrabbed;
     public enum ObjectType 
     {
         SMALL, //Can be lifted above head, doesnt apply force on player
@@ -35,6 +35,10 @@ public class InteractableRigidbody : MonoBehaviour
         isActivated = false;
     }
 
+    public virtual void OnGrab(PhysicsGrabber grabber) 
+    {
+        isGrabbed = true;
+    }
 
 
 }

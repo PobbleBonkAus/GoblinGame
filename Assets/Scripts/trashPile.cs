@@ -36,6 +36,17 @@ public class trashPile : MonoBehaviour
     public void SpawnTrashPile(PhysicsGrabber playerGrabber) 
     {
         GameObject instance = Instantiate(trashBall);
+        instance.transform.position = playerGrabber.transform.position;
+
+        playerGrabber.ForceGrabObject(instance.GetComponent<Rigidbody>());
     }
 
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player")) 
+        {
+            SpawnTrashPile(other.GetComponentInChildren<PhysicsGrabber>());
+        }
+    }
 }
