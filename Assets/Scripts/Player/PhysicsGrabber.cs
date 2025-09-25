@@ -91,6 +91,12 @@ public class PhysicsGrabber : MonoBehaviour
         {
             if (grabbedObject == null) { grabbing = false; }
 
+            if (Vector3.Distance(grabbedObject.position, transform.position) > maxGrabObjectRange) 
+            {
+                ReleaseObject();
+                grabPressed = false;
+            }
+
             MoveGrabbedObject();
 
             if (chargingThrow)
@@ -113,6 +119,7 @@ public class PhysicsGrabber : MonoBehaviour
     public void ForceGrabObject(Rigidbody body) 
     {
         Vector3 hitPoint = body.transform.position;
+        grabbedObject = body;
         // Store grab point relative to object
         initialGrabPointRelative = grabbedObject.transform.InverseTransformPoint(hitPoint);
         // Store object offset relative to player root this is important for when we rotate the player around, the object

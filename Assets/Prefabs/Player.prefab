@@ -12087,6 +12087,7 @@ MonoBehaviour:
   stepWaitTime: 0.2
   velocityFactor: 0.22
   kneeExtension: 0.2
+  tuckedLegsOffset: -0.65
   leftFoot: {fileID: 6988478946430746789}
   rightFoot: {fileID: 6327090710235738944}
   leftLegRenderer: {fileID: 2460179303410313677}
@@ -12946,7 +12947,7 @@ Rigidbody:
   serializedVersion: 4
   m_Mass: 1
   m_Drag: 0
-  m_AngularDrag: 4
+  m_AngularDrag: 8.06
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -13002,7 +13003,7 @@ MonoBehaviour:
   ragdollWhenJump: 0
   fallingTrigger: 15.6
   righteningForce: 21.6
-  righteningForceLerp: 15.22
+  righteningForceLerp: 6.4
   righteningTrigger: 6.66
   minRighteningAngle: 2.86
   eyeRenderers:
@@ -13073,6 +13074,7 @@ MonoBehaviour:
   value: 0
   type: 0
   isActivated: 0
+  isGrabbed: 0
 --- !u!1 &9013674627826794646
 GameObject:
   m_ObjectHideFlags: 0

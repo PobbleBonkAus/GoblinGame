@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Timeline;
 
 public class playerProceduralAnimator : MonoBehaviour
 {
@@ -22,6 +23,7 @@ public class playerProceduralAnimator : MonoBehaviour
     [SerializeField] float stepWaitTime = 0.5f;
     [SerializeField] float velocityFactor = 0.4f;
     [SerializeField] float kneeExtension = 0.2f;
+    [SerializeField] float tuckedLegsOffset = 3.0f;
     [SerializeField] Transform leftFoot;
     [SerializeField] Transform rightFoot;
     [SerializeField] LineRenderer leftLegRenderer;
@@ -120,7 +122,7 @@ public class playerProceduralAnimator : MonoBehaviour
 
     IEnumerator<WaitForSeconds> LateStart() 
     {
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(3.0f);
 
         leftHand.SetParent(null);
         rightHand.SetParent(null);
@@ -279,7 +281,7 @@ public class playerProceduralAnimator : MonoBehaviour
                 {
                     //in the air
                     leftFootPreviousPosition = leftFoot.position;
-                    leftFootTargetPosition = leftLegRenderer.transform.position;
+                    leftFootTargetPosition = leftLegRenderer.transform.position + (transform.up * tuckedLegsOffset * 2.0f);
                     leftFootLerp = 0f;
                     stepLeftFoot = false;
                     stepWaitTimer = 0f;
@@ -308,7 +310,7 @@ public class playerProceduralAnimator : MonoBehaviour
                 {
                     //weeee we are in the air
                     rightFootPreviousPosition = rightFoot.position;
-                    rightFootTargetPosition = rightLegRenderer.transform.position;
+                    rightFootTargetPosition = rightLegRenderer.transform.position + (transform.up * tuckedLegsOffset); 
                     rightFootLerp = 0f;
                     stepLeftFoot = true;
                     stepWaitTimer = 0f;
@@ -435,7 +437,7 @@ public class playerProceduralAnimator : MonoBehaviour
         leftFootLerp = 0;
         rightFootLerp = 0;
 
-        Vector3 tuckOffset = transform.up * -0.25f;
+        Vector3 tuckOffset = transform.up * tuckedLegsOffset;
 
         leftFoot.position = Vector3.Lerp(leftFoot.position, leftLegRenderer.transform.position + tuckOffset, 0.6f);
         leftFootPreviousPosition = leftFoot.position;
