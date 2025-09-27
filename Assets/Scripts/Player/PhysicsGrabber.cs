@@ -41,6 +41,7 @@ public class PhysicsGrabber : MonoBehaviour
     private float initialCameraFOV;
 
     private float throwLockOutTime = 0.0f;
+    Vector3 chargeOffset = Vector3.zero;
     [HideInInspector] public float throwForceTimer = 0.0f;
     private bool chargingThrow = false;
 
@@ -90,12 +91,6 @@ public class PhysicsGrabber : MonoBehaviour
         if (grabbing)
         {
             if (grabbedObject == null) { grabbing = false; }
-
-            if (Vector3.Distance(grabbedObject.position, transform.position) > maxGrabObjectRange) 
-            {
-                ReleaseObject();
-                grabPressed = false;
-            }
 
             MoveGrabbedObject();
 
@@ -177,12 +172,12 @@ public class PhysicsGrabber : MonoBehaviour
     {
         if (grabbing)
         {
-            grabbedObject.gameObject.layer = LayerMask.NameToLayer("Grabbable");
-            grabbedObject.linearDamping = grabbedObjectOriginalLinearDrag;
-            grabbedObject.angularDamping = grabbedObjectOriginalAngularDrag;
-
-            if (grabbedObject != null) 
+            if (grabbedObject != null)
             {
+                grabbedObject.gameObject.layer = LayerMask.NameToLayer("Grabbable");
+                grabbedObject.linearDamping = grabbedObjectOriginalLinearDrag;
+                grabbedObject.angularDamping = grabbedObjectOriginalAngularDrag;
+
                 if (grabbedObject.TryGetComponent<InteractableRigidbody>(out InteractableRigidbody body))
                 {
                     body.DeactivateObject();
@@ -193,14 +188,14 @@ public class PhysicsGrabber : MonoBehaviour
             grabbing = false;
             raisingObject = false;
             raisePressed = false;
+            chargingThrow = false;
 
-            
             kinematicBody.SetActive(false);
             OnDropObject.Invoke();
         }
     }
 
-    Vector3 chargeOffset = Vector3.zero;
+
     private void MoveGrabbedObject()
     {
         if (grabbedObject != null)
@@ -371,7 +366,7 @@ public class PhysicsGrabber : MonoBehaviour
 
             cameraController.SetZoom(0.0f);
 
-
+            chargeOffset = Vector3.zero;
             throwLockOutTime = throwLockOutDuration;
             throwForceTimer = 0.0f;
             chargingThrow = false;

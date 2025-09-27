@@ -34,7 +34,7 @@ public class GachaMachine : MonoBehaviour
         if (other.CompareTag("Coin")) 
         {
             AddCoin();
-            Destroy(other);
+            Destroy(other.gameObject);
         }
     }
 

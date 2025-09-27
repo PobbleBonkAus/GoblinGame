@@ -40,5 +40,9 @@ public class InteractableRigidbody : MonoBehaviour
         isGrabbed = true;
     }
 
+    public virtual void OnDrop() 
+    {
+        isGrabbed = false;
+    }
 
 }

@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class bomb : InteractableRigidbody
 {
@@ -10,19 +10,25 @@ public class bomb : InteractableRigidbody
     [SerializeField] Transform fusePoint;
     [SerializeField] ParticleSystem fuseParticle;
     [SerializeField] GameObject explosion;
+    
     private float currentBombTime = 0.0f;
 
 
     private void Awake()
     {
-        currentBombTime = 3.0f;
+        currentBombTime = bombTime;
+        fuseParticle.Stop();
     }
 
     public override void ActivateObject()
     {
         base.ActivateObject();
-        fuseParticle.gameObject.active = true;
         fuseParticle.Play();
+    }
+
+    public override void DeactivateObject()
+    {
+        //override so we dont deactivate it
     }
 
 
@@ -33,16 +39,27 @@ public class bomb : InteractableRigidbody
             currentBombTime -= Time.deltaTime;
             Countdown();
         }
-        fuseParticle.transform.position = fusePoint.position;
     }
 
     void Countdown() 
     {
-        Vector3 targetScale = new Vector3(wick.transform.localScale.x, 0.01f, wick.transform.localScale.z);
+        float t = 1f - (currentBombTime / bombTime); // 0 → 1
+        wick.localScale = new Vector3(
+            wick.localScale.x,
+            Mathf.Lerp(1f, 0.01f, t),
+            wick.localScale.z
+        );
 
-        wick.transform.localScale = Vector3.MoveTowards(wick.transform.localScale, targetScale, currentBombTime);
+        if(currentBombTime < 0.3f) 
+        {
+            transform.localScale = new Vector3(
+            Mathf.Lerp(1f, 1.5f, t),
+            Mathf.Lerp(1f, 1.5f, t),
+            Mathf.Lerp(1f, 1.5f, t)
+            );
+        }
 
-        if(currentBombTime < 0.0f)
+        if (currentBombTime < 0.0f)
         {
             Explode();
         }
@@ -67,6 +84,12 @@ public class bomb : InteractableRigidbody
 
         Destroy(gameObject);
     }
-    
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        if(collision.impulse.magnitude > 30.0f) 
+        {
+            ActivateObject();
+        }
+    }
 }

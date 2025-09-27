@@ -14,7 +14,9 @@ public class ObjectDeposit : MonoBehaviour
 
     [SerializeField] private Transform coinSpawn;
 
-    [SerializeField] UnityEvent OnDeposit;
+    [SerializeField] UnityEvent OnValuableDeposit;
+    [SerializeField] UnityEvent OnJunkDeposit;
+
 
     void RecieveObject(Rigidbody body) 
     {
@@ -30,14 +32,14 @@ public class ObjectDeposit : MonoBehaviour
         {
             StartCoroutine(SpawnCoins(value));
             Destroy(body.gameObject);
+            OnValuableDeposit.Invoke();
         }
         else
         {
             Debug.Log("JUNK");
-            //body.linearVelocity = coinSpawn.forward * ejectionForce;
             StartCoroutine(SpitJunkBackOut(body));
+            OnJunkDeposit.Invoke();
         }
-
     }
     
     IEnumerator SpawnCoins(int itemValue) 
@@ -71,7 +73,7 @@ public class ObjectDeposit : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {     
-        if (other.attachedRigidbody) 
+        if (!other.isTrigger && other.attachedRigidbody) 
         {
             RecieveObject(other.attachedRigidbody);
         }

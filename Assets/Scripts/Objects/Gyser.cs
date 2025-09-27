@@ -11,9 +11,7 @@ public class Gyser : MonoBehaviour
     [SerializeField]
     private Transform gyserDirectionTransform;
 
-    List<Rigidbody> rigidbodies = new List<Rigidbody>();
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    bool shooting = false;
     void Start()
     {
         StartCoroutine(ShootWater());   
@@ -22,34 +20,26 @@ public class Gyser : MonoBehaviour
 
     IEnumerator<WaitForSeconds> ShootWater() 
     {
+        shooting = false;
         yield return new WaitForSeconds(timer);
-
-        for (int i = 0; i < rigidbodies.Count; i++) 
-        {
-            rigidbodies[i].AddForce(gyserDirectionTransform.up * gyserForce, ForceMode.Impulse);
-        }
-
-        StartCoroutine(ShootWater());
+        shooting = true;
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerStay(Collider other)
     {
-        if (other.attachedRigidbody != null) 
+        if (other.isTrigger) return;
+
+        if (other.attachedRigidbody != null)
         {
-            if (!rigidbodies.Contains(other.attachedRigidbody)) 
+            if (shooting)
             {
-                rigidbodies.Add(other.attachedRigidbody);
-            }
+                other.attachedRigidbody.AddForce(transform.up * gyserForce, ForceMode.Impulse);
+                if(other.TryGetComponent<PlayerController>(out var player)) 
+                {
+                    player.StartRagdoll();
+                }
+                StartCoroutine(ShootWater());
+            }          
         }
     }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (rigidbodies.Contains(other.attachedRigidbody)) 
-        {
-            rigidbodies.Remove(other.attachedRigidbody);
-        }
-    }
-
-
 }
