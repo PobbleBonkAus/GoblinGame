@@ -32,6 +32,7 @@ Shader "RockFace_GGTCP2 "
 		[TCP2HeaderHelp(Triplanar Mapping)]
 		_TriGround ("Ground", 2D) = "white" {}
 		_TriSide ("Walls", 2D) = "white" {}
+		 _WallsTextureDepth ("Walls Texture Depth", 2D) = "white" {}
 		[TCP2Vector4Floats(Contrast X,Contrast Y,Contrast Z,Smoothing,1,16,1,16,1,16,0.01,1)] _TriplanarBlendStrength ("Triplanar Parameters", Vector) = (2,8,2,0.5)
 		[TCP2Separator]
 		
@@ -82,6 +83,7 @@ Shader "RockFace_GGTCP2 "
 		// Shader Properties
 		TCP2_TEX2D_WITH_SAMPLER(_TriGround);
 		TCP2_TEX2D_WITH_SAMPLER(_TriSide);
+		TCP2_TEX2D_WITH_SAMPLER(_WallsTextureDepth);
 		TCP2_TEX2D_WITH_SAMPLER(_StylizedThreshold);
 
 		CBUFFER_START(UnityPerMaterial)
@@ -89,6 +91,7 @@ Shader "RockFace_GGTCP2 "
 			// Shader Properties
 			float4 _TriGround_ST;
 			float4 _TriSide_ST;
+			float4 _WallsTextureDepth_ST;
 			float4 _TriplanarBlendStrength;
 			fixed4 _BaseColor;
 			half4 _Emission;
@@ -172,9 +175,7 @@ Shader "RockFace_GGTCP2 "
 			#ifdef _ADDITIONAL_LIGHTS_VERTEX
 				half3 vertexLights : TEXCOORD2;
 			#endif
-				float3 pack0 : TEXCOORD3; /* pack0.xyz = objPos */
-				float3 pack1 : TEXCOORD4; /* pack1.xyz = objNormal */
-				float2 pack2 : TEXCOORD5; /* pack2.xy = texcoord0 */
+				float2 pack0 : TEXCOORD3; /* pack0.xy = texcoord0 */
 				UNITY_VERTEX_INPUT_INSTANCE_ID
 				UNITY_VERTEX_OUTPUT_STEREO
 			};
@@ -197,10 +198,9 @@ Shader "RockFace_GGTCP2 "
 				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
 
 				// Texture Coordinates
-				output.pack2.xy = input.texcoord0.xy;
+				output.pack0.xy = input.texcoord0.xy;
 
-				output.pack0.xyz = input.vertex.xyz;
-				output.pack1.xyz = input.normal.xyz;
+				float3 worldPos = mul(UNITY_MATRIX_M, input.vertex).xyz;
 				VertexPositionInputs vertexInput = GetVertexPositionInputs(input.vertex.xyz);
 			#if defined(REQUIRES_VERTEX_SHADOW_COORD_INTERPOLATOR)
 				output.shadowCoord = GetShadowCoord(vertexInput);
@@ -232,13 +232,14 @@ Shader "RockFace_GGTCP2 "
 
 				float3 positionWS = input.worldPosAndFog.xyz;
 				float3 normalWS = normalize(input.normal);
+				float3 normalWS_Vertex = normalWS;
 
 				// Shader Properties Sampling
 				float4 __triplanarParameters = ( _TriplanarBlendStrength.xyzw );
 				float4 __mainColor = ( _BaseColor.rgba );
 				float __ambientIntensity = ( 1.0 );
 				float3 __emission = ( _Emission.rgb );
-				float __stylizedThreshold = ( TCP2_TEX2D_SAMPLE(_StylizedThreshold, _StylizedThreshold, input.pack2.xy * _StylizedThreshold_ST.xy + _StylizedThreshold_ST.zw).a );
+				float __stylizedThreshold = ( TCP2_TEX2D_SAMPLE(_StylizedThreshold, _StylizedThreshold, input.pack0.xy * _StylizedThreshold_ST.xy + _StylizedThreshold_ST.zw).a );
 				float __stylizedThresholdScale = ( 1.0 );
 				float __rampThreshold = ( _RampThreshold );
 				float __rampSmoothing = ( _RampSmoothing );
@@ -254,17 +255,22 @@ Shader "RockFace_GGTCP2 "
 				half4 albedoAlpha = half4(albedo, alpha);
 				
 				// Triplanar Texture Blending
-				half2 uv_ground = input.pack0.xyz.xz;
-				half2 uv_sideX = input.pack0.xyz.zy;
-				half2 uv_sideZ = input.pack0.xyz.xy;
-				float3 triplanarNormal = input.pack1.xyz;
+				half2 uv_ground = positionWS.xz;
+				half2 uv_sideX = positionWS.zy;
+				half2 uv_sideZ = positionWS.xy;
+				float3 triplanarNormal = normalWS_Vertex;
+				
+				half3 objPositionInWorld = UNITY_MATRIX_M._m03_m13_m23;
+				uv_ground.xy -= objPositionInWorld.xz;
+				uv_sideX.xy -= objPositionInWorld.zy;
+				uv_sideZ.xy -= objPositionInWorld.xy;
 				
 				//ground
 				half4 triplanar = ( TCP2_TEX2D_SAMPLE(_TriGround, _TriGround, uv_ground * _TriGround_ST.xy + _TriGround_ST.zw).rgba );
 				
 				//walls
-				fixed4 tex_sideX = ( TCP2_TEX2D_SAMPLE(_TriSide, _TriSide, uv_sideX * _TriSide_ST.xy + _TriSide_ST.zw).rgba );
-				fixed4 tex_sideZ = ( TCP2_TEX2D_SAMPLE(_TriSide, _TriSide, uv_sideZ * _TriSide_ST.xy + _TriSide_ST.zw).rgba );
+				fixed4 tex_sideX = ( TCP2_TEX2D_SAMPLE(_TriSide, _TriSide, uv_sideX * _TriSide_ST.xy + _TriSide_ST.zw).rgba * TCP2_TEX2D_SAMPLE(_WallsTextureDepth, _WallsTextureDepth, uv_sideX * _WallsTextureDepth_ST.xy + _WallsTextureDepth_ST.zw).rrrr );
+				fixed4 tex_sideZ = ( TCP2_TEX2D_SAMPLE(_TriSide, _TriSide, uv_sideZ * _TriSide_ST.xy + _TriSide_ST.zw).rgba * TCP2_TEX2D_SAMPLE(_WallsTextureDepth, _WallsTextureDepth, uv_sideZ * _WallsTextureDepth_ST.xy + _WallsTextureDepth_ST.zw).rrrr );
 				
 				//blending
 				half3 blendWeights = pow(abs(triplanarNormal), __triplanarParameters.xyz / __triplanarParameters.w);
@@ -489,8 +495,7 @@ Shader "RockFace_GGTCP2 "
 			#if defined(DEPTH_NORMALS_PASS)
 				float3 normalWS : TEXCOORD0;
 			#endif
-				float3 pack0 : TEXCOORD1; /* pack0.xyz = objPos */
-				float3 pack1 : TEXCOORD2; /* pack1.xyz = objNormal */
+				float3 pack0 : TEXCOORD1; /* pack0.xyz = positionWS */
 			#if defined(DEPTH_ONLY_PASS)
 				UNITY_VERTEX_INPUT_INSTANCE_ID
 				UNITY_VERTEX_OUTPUT_STEREO
@@ -526,8 +531,9 @@ Shader "RockFace_GGTCP2 "
 					UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
 				#endif
 
-				output.pack0.xyz = input.vertex.xyz;
-				output.pack1.xyz = input.normal.xyz;
+				float3 worldPos = mul(UNITY_MATRIX_M, input.vertex).xyz;
+				VertexPositionInputs vertexInput = GetVertexPositionInputs(input.vertex.xyz);
+				output.pack0.xyz = vertexInput.positionWS;
 
 				#if defined(DEPTH_ONLY_PASS)
 					output.positionCS = TransformObjectToHClip(input.vertex.xyz);
@@ -554,6 +560,8 @@ Shader "RockFace_GGTCP2 "
 				#if defined(DEPTH_ONLY_PASS)
 					UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
 				#endif
+
+				float3 positionWS = input.pack0.xyz;
 
 				half3 albedo = half3(1,1,1);
 				half alpha = 1;
@@ -676,5 +684,5 @@ Shader "RockFace_GGTCP2 "
 	CustomEditor "ToonyColorsPro.ShaderGenerator.MaterialInspector_SG2"
 }
 
-/* TCP_DATA u config(ver:"2.9.18";unity:"6000.0.42f1";tmplt:"SG2_Template_URP";features:list["UNITY_5_4","UNITY_5_5","UNITY_5_6","UNITY_2017_1","UNITY_2018_1","UNITY_2018_2","UNITY_2018_3","UNITY_2019_1","UNITY_2019_2","UNITY_2019_3","UNITY_2019_4","UNITY_2020_1","UNITY_2021_1","UNITY_2021_2","UNITY_2022_2","ENABLE_DEPTH_NORMALS_PASS","ENABLE_FORWARD_PLUS","SS_MULTIPLICATIVE","TEXTURED_THRESHOLD","SKETCH_SHADER_FEATURE","SKETCH_AMBIENT","AUTO_TRANSPARENT_BLENDING","SS_SHADER_FEATURE","RIM_SHADER_FEATURE","RAMP_BANDS_CRISP_NO_AA","WIND_SHADER_FEATURE","ALPHA_TO_COVERAGE","EMISSION","SPECULAR_SHADER_FEATURE","BLEND_TEX1","BLEND_TEX2","BLEND_TEX3","BLEND_TEX4","TEXBLEND_NORMALIZE","TRIPLANAR","TRIPLANAR_OBJECT_SPACE","TEMPLATE_LWRP"];flags:list[];flags_extra:dict[];keywords:dict[RENDER_TYPE="Opaque",RampTextureDrawer="[TCP2Gradient]",RampTextureLabel="Ramp Texture",SHADER_TARGET="3.0",RIM_LABEL="Rim Lighting",BLEND_TEX1_CHNL="r",BLEND_TEX2_CHNL="g",BLEND_TEX3_CHNL="b",BLEND_TEX4_CHNL="a",BASEGEN_ALBEDO_DOWNSCALE="1",BASEGEN_MASKTEX_DOWNSCALE="1/2",BASEGEN_METALLIC_DOWNSCALE="1/4",BASEGEN_SPECULAR_DOWNSCALE="1/4",BASEGEN_DIFFUSEREMAPMIN_DOWNSCALE="1/4",BASEGEN_MASKMAPREMAPMIN_DOWNSCALE="1/4"];shaderProperties:list[,,sp(name:"Ramp Threshold";imps:list[imp_mp_range(def:0.2;min:0.01;max:1;prop:"_RampThreshold";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"d0d52c54-5eb0-463d-8984-1a54580991d6";op:Multiply;lbl:"Threshold";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),sp(name:"Ramp Smoothing";imps:list[imp_mp_range(def:1;min:0.001;max:1;prop:"_RampSmoothing";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"50a6cf14-4633-40c7-8910-272cfa5e5d5b";op:Multiply;lbl:"Smoothing";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),sp(name:"Bands Count";imps:list[imp_mp_range(def:2;min:1;max:20;prop:"_BandsCount";md:"[IntRange]";gbv:False;custom:False;refs:"";pnlock:False;guid:"29b76750-c6e7-439d-8e0d-fe8ce7a6c0a0";op:Multiply;lbl:"Bands Count";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),,,,sp(name:"Ground Texture";imps:list[imp_mp_texture(uto:True;tov:"";tov_lbl:"";gto:False;sbt:False;scr:False;scv:"";scv_lbl:"";gsc:False;roff:False;goff:False;sin_anm:False;sin_anmv:"";sin_anmv_lbl:"";gsin:False;notile:False;triplanar_local:False;def:"white";locked_uv:True;uv:0;cc:4;chan:"RGBA";mip:-1;mipprop:False;ssuv_vert:False;ssuv_obj:False;uv_type:Texcoord;uv_chan:"XZ";tpln_scale:1;uv_shaderproperty:__NULL__;uv_cmp:__NULL__;sep_sampler:__NULL__;prop:"_TriGround";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"e8043932-986c-4a01-aeff-b9c289c3b730";op:Multiply;lbl:"Ground";gpu_inst:False;dots_inst:False;locked:True;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),sp(name:"Walls Texture";imps:list[imp_mp_texture(uto:True;tov:"";tov_lbl:"";gto:False;sbt:False;scr:False;scv:"";scv_lbl:"";gsc:False;roff:False;goff:False;sin_anm:False;sin_anmv:"";sin_anmv_lbl:"";gsin:False;notile:False;triplanar_local:False;def:"white";locked_uv:True;uv:0;cc:4;chan:"RGBA";mip:-1;mipprop:False;ssuv_vert:False;ssuv_obj:False;uv_type:Texcoord;uv_chan:"XZ";tpln_scale:1;uv_shaderproperty:__NULL__;uv_cmp:__NULL__;sep_sampler:__NULL__;prop:"_TriSide";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"0953863f-38ce-49d9-8016-69880303385a";op:Multiply;lbl:"Walls";gpu_inst:False;dots_inst:False;locked:True;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),,,,,,,,,,,,,,,,,,,sp(name:"Albedo";imps:list[imp_mp_texture(uto:True;tov:"";tov_lbl:"";gto:True;sbt:False;scr:False;scv:"";scv_lbl:"";gsc:False;roff:False;goff:False;sin_anm:False;sin_anmv:"";sin_anmv_lbl:"";gsin:False;notile:True;triplanar_local:False;def:"white";locked_uv:False;uv:0;cc:4;chan:"RGBA";mip:-1;mipprop:False;ssuv_vert:False;ssuv_obj:False;uv_type:Texcoord;uv_chan:"XZ";tpln_scale:1;uv_shaderproperty:__NULL__;uv_cmp:__NULL__;sep_sampler:__NULL__;prop:"_BaseMap";md:"[MainTexture]";gbv:False;custom:False;refs:"";pnlock:False;guid:"9a59654c-7142-46fe-8075-20e005629c27";op:Multiply;lbl:"Albedo";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),sp(name:"Specular Color";imps:list[imp_mp_color(def:RGBA(0.7450981, 0.7529413, 0.7803922, 1);hdr:False;cc:3;chan:"RGB";prop:"_SpecularColor";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"b858d15b-46fe-45d0-8583-714dbe89c351";op:Multiply;lbl:"Specular Color";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),sp(name:"Diffuse Tint";imps:list[imp_mp_color(def:RGBA(1, 1, 1, 1);hdr:False;cc:3;chan:"RGB";prop:"_DiffuseTint";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"cbe2dd48-17d5-4b84-ba21-07bef40222f2";op:Multiply;lbl:"Diffuse Tint";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False)];customTextures:list[];codeInjection:codeInjection(injectedFiles:list[];mark:False);matLayers:list[]) */
-/* TCP_HASH 0b1972c1aedfbd59b748ea6360fcc819 */
+/* TCP_DATA u config(ver:"2.9.18";unity:"6000.0.42f1";tmplt:"SG2_Template_URP";features:list["UNITY_5_4","UNITY_5_5","UNITY_5_6","UNITY_2017_1","UNITY_2018_1","UNITY_2018_2","UNITY_2018_3","UNITY_2019_1","UNITY_2019_2","UNITY_2019_3","UNITY_2019_4","UNITY_2020_1","UNITY_2021_1","UNITY_2021_2","UNITY_2022_2","ENABLE_DEPTH_NORMALS_PASS","ENABLE_FORWARD_PLUS","SS_MULTIPLICATIVE","TEXTURED_THRESHOLD","SKETCH_SHADER_FEATURE","SKETCH_AMBIENT","AUTO_TRANSPARENT_BLENDING","SS_SHADER_FEATURE","RIM_SHADER_FEATURE","RAMP_BANDS_CRISP_NO_AA","WIND_SHADER_FEATURE","ALPHA_TO_COVERAGE","EMISSION","SPECULAR_SHADER_FEATURE","BLEND_TEX1","BLEND_TEX2","BLEND_TEX3","BLEND_TEX4","TEXBLEND_NORMALIZE","TRIPLANAR","TRIPLANAR_OBJ_POS_OFFSET","TEMPLATE_LWRP"];flags:list[];flags_extra:dict[];keywords:dict[RENDER_TYPE="Opaque",RampTextureDrawer="[TCP2Gradient]",RampTextureLabel="Ramp Texture",SHADER_TARGET="3.0",RIM_LABEL="Rim Lighting",BLEND_TEX1_CHNL="r",BLEND_TEX2_CHNL="g",BLEND_TEX3_CHNL="b",BLEND_TEX4_CHNL="a",BASEGEN_ALBEDO_DOWNSCALE="1",BASEGEN_MASKTEX_DOWNSCALE="1/2",BASEGEN_METALLIC_DOWNSCALE="1/4",BASEGEN_SPECULAR_DOWNSCALE="1/4",BASEGEN_DIFFUSEREMAPMIN_DOWNSCALE="1/4",BASEGEN_MASKMAPREMAPMIN_DOWNSCALE="1/4"];shaderProperties:list[,,sp(name:"Ramp Threshold";imps:list[imp_mp_range(def:0.2;min:0.01;max:1;prop:"_RampThreshold";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"d0d52c54-5eb0-463d-8984-1a54580991d6";op:Multiply;lbl:"Threshold";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),sp(name:"Ramp Smoothing";imps:list[imp_mp_range(def:1;min:0.001;max:1;prop:"_RampSmoothing";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"50a6cf14-4633-40c7-8910-272cfa5e5d5b";op:Multiply;lbl:"Smoothing";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),sp(name:"Bands Count";imps:list[imp_mp_range(def:2;min:1;max:20;prop:"_BandsCount";md:"[IntRange]";gbv:False;custom:False;refs:"";pnlock:False;guid:"29b76750-c6e7-439d-8e0d-fe8ce7a6c0a0";op:Multiply;lbl:"Bands Count";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),,,,sp(name:"Ground Texture";imps:list[imp_mp_texture(uto:True;tov:"";tov_lbl:"";gto:False;sbt:False;scr:False;scv:"";scv_lbl:"";gsc:False;roff:False;goff:False;sin_anm:False;sin_anmv:"";sin_anmv_lbl:"";gsin:False;notile:False;triplanar_local:False;def:"white";locked_uv:True;uv:0;cc:4;chan:"RGBA";mip:-1;mipprop:False;ssuv_vert:False;ssuv_obj:False;uv_type:Texcoord;uv_chan:"XZ";tpln_scale:1;uv_shaderproperty:__NULL__;uv_cmp:__NULL__;sep_sampler:__NULL__;prop:"_TriGround";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"e8043932-986c-4a01-aeff-b9c289c3b730";op:Multiply;lbl:"Ground";gpu_inst:False;dots_inst:False;locked:True;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),sp(name:"Walls Texture";imps:list[imp_mp_texture(uto:True;tov:"";tov_lbl:"";gto:False;sbt:False;scr:False;scv:"";scv_lbl:"";gsc:False;roff:False;goff:False;sin_anm:False;sin_anmv:"";sin_anmv_lbl:"";gsin:False;notile:False;triplanar_local:False;def:"white";locked_uv:True;uv:0;cc:4;chan:"RGBA";mip:-1;mipprop:False;ssuv_vert:False;ssuv_obj:False;uv_type:Texcoord;uv_chan:"XZ";tpln_scale:1;uv_shaderproperty:__NULL__;uv_cmp:__NULL__;sep_sampler:__NULL__;prop:"_TriSide";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"0953863f-38ce-49d9-8016-69880303385a";op:Multiply;lbl:"Walls";gpu_inst:False;dots_inst:False;locked:True;impl_index:0),imp_mp_texture(uto:True;tov:"";tov_lbl:"";gto:False;sbt:False;scr:False;scv:"";scv_lbl:"";gsc:False;roff:False;goff:False;sin_anm:False;sin_anmv:"";sin_anmv_lbl:"";gsin:False;notile:False;triplanar_local:True;def:"white";locked_uv:False;uv:0;cc:4;chan:"RRRR";mip:-1;mipprop:False;ssuv_vert:False;ssuv_obj:False;uv_type:Texcoord;uv_chan:"XZ";tpln_scale:1;uv_shaderproperty:__NULL__;uv_cmp:__NULL__;sep_sampler:__NULL__;prop:"_WallsTextureDepth";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"cc239583-7008-4809-b228-4145634f7d82";op:Multiply;lbl:"Walls Texture Depth";gpu_inst:False;dots_inst:False;locked:False;impl_index:-1)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),,,,,,,,,,,,,,,,,,,sp(name:"Albedo";imps:list[imp_mp_texture(uto:True;tov:"";tov_lbl:"";gto:True;sbt:False;scr:False;scv:"";scv_lbl:"";gsc:False;roff:False;goff:False;sin_anm:False;sin_anmv:"";sin_anmv_lbl:"";gsin:False;notile:True;triplanar_local:False;def:"white";locked_uv:False;uv:0;cc:4;chan:"RGBA";mip:-1;mipprop:False;ssuv_vert:False;ssuv_obj:False;uv_type:Texcoord;uv_chan:"XZ";tpln_scale:1;uv_shaderproperty:__NULL__;uv_cmp:__NULL__;sep_sampler:__NULL__;prop:"_BaseMap";md:"[MainTexture]";gbv:False;custom:False;refs:"";pnlock:False;guid:"9a59654c-7142-46fe-8075-20e005629c27";op:Multiply;lbl:"Albedo";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),sp(name:"Specular Color";imps:list[imp_mp_color(def:RGBA(0.7450981, 0.7529413, 0.7803922, 1);hdr:False;cc:3;chan:"RGB";prop:"_SpecularColor";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"b858d15b-46fe-45d0-8583-714dbe89c351";op:Multiply;lbl:"Specular Color";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False),sp(name:"Diffuse Tint";imps:list[imp_mp_color(def:RGBA(1, 1, 1, 1);hdr:False;cc:3;chan:"RGB";prop:"_DiffuseTint";md:"";gbv:False;custom:False;refs:"";pnlock:False;guid:"cbe2dd48-17d5-4b84-ba21-07bef40222f2";op:Multiply;lbl:"Diffuse Tint";gpu_inst:False;dots_inst:False;locked:False;impl_index:0)];layers:list[];unlocked:list[];layer_blend:dict[];custom_blend:dict[];clones:dict[];isClone:False)];customTextures:list[];codeInjection:codeInjection(injectedFiles:list[];mark:False);matLayers:list[]) */
+/* TCP_HASH c9756a096fa49d1dd4d88df0c7b43f49 */
