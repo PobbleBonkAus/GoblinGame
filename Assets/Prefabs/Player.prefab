@@ -12126,7 +12126,7 @@ MonoBehaviour:
   leftFootDust: {fileID: 5822926008086345850}
   rightFootDust: {fileID: 3385002379520747456}
   clapEffect: {fileID: 0}
-  footstep: {fileID: 8300000, guid: 3e7ece91ad15b41469ce81e8189f64ad, type: 3}
+  footstep: {fileID: 8300000, guid: fe854090472723d4aa49364374548271, type: 3}
   clap: {fileID: 8300000, guid: 3e7ece91ad15b41469ce81e8189f64ad, type: 3}
 --- !u!114 &4979119103046316047
 MonoBehaviour:
