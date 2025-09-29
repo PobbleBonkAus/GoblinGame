@@ -128,9 +128,9 @@ Material:
     - _SrcBlendAlpha: 1
     - _Surface: 0
     - _UseSpecular: 0
-    - _WavesFrequency: 4
+    - _WavesFrequency: 2
     - _WavesHeight: 0.2
-    - _WavesSpeed: 1
+    - _WavesSpeed: 0.5
     - _WorkflowMode: 1
     - _ZWrite: 1
     - __dummy__: 0

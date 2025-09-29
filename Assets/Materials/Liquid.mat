@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: liquid
+  m_Name: Liquid
   m_Shader: {fileID: -6465566751694194690, guid: d29687d0eaeb6ab4e9e0eca8662ee28d, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
