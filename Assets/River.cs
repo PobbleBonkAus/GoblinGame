@@ -10,7 +10,7 @@ public class RiverPoint : MonoBehaviour
     {
         if (other.attachedRigidbody) 
         {
-            other.attachedRigidbody.AddForce(transform.forward * flowForce, ForceMode.Force);
+            other.attachedRigidbody.AddForce((transform.forward + Vector3.down) * flowForce, ForceMode.Force);
         }
     }
 
