@@ -254,9 +254,9 @@ public class PlayerController : MonoBehaviour
 
         isRagdolled = true;
         variedRighteningForce = 0.0f;
-        rb.AddForce((rb.linearVelocity + Random.insideUnitSphere) * ragdollImpulse, ForceMode.Impulse);
-        rb.AddForce(transform.up * ragdollImpulse, ForceMode.Impulse);
-        rb.AddTorque(Random.rotation.eulerAngles * ragdollTorqueKick, ForceMode.Impulse);
+       // rb.AddForce((rb.linearVelocity + Random.insideUnitSphere) * ragdollImpulse, ForceMode.Impulse);
+        //rb.AddForce(transform.up * ragdollImpulse, ForceMode.Impulse);
+        //rb.AddTorque(Random.rotation.eulerAngles * ragdollTorqueKick, ForceMode.Impulse);
         gameObject.layer = LayerMask.NameToLayer("Grabbable");
 
         eyeDazeGameObject.SetActive(true);
