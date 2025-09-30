@@ -35,25 +35,25 @@ public class GnomeBurrow : MonoBehaviour
             body.MovePosition(HoleA.transform.position);
             HoleA.GetComponent<Collider>().enabled = false;
         }
-        else
-        {
-            Debug.Log("What Hole");
-        }
 
-            yield return new WaitForSeconds(launchDelay);
+        yield return new WaitForSeconds(launchDelay);
 
         body.isKinematic = false;
 
         if (hole == HoleA.transform)
         {
             LaunchOut(body, HoleB.transform);
+            HoleB.GetComponent<Collider>().enabled = false;
             StartCoroutine(HoleB.ReEnableCollider());
         }
         else
         {
             LaunchOut(body, HoleA.transform);
+            HoleA.GetComponent<Collider>().enabled = false;
             StartCoroutine(HoleA.ReEnableCollider());
         }
     }
+
+
 
 }

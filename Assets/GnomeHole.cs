@@ -5,32 +5,27 @@ public class GnomeHole : MonoBehaviour
 {
     [SerializeField] GnomeBurrow gnomeBurrow;
 
-
-
-
-    public IEnumerator<WaitForSeconds> ReEnableCollider() 
-    {
-        yield return new WaitForSeconds(2.0f);
-        GetComponent<Collider>().enabled = true;   
-    }
-
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log(other.name);
+
         if (other.attachedRigidbody == null) return;
 
         if (other.CompareTag("Player") && other.TryGetComponent<PlayerController>(out PlayerController playerController)) 
         {
+            //the player has entered
             gnomeBurrow.OnHoleEnter(transform, other.attachedRigidbody);
         }
         else
         {
             if (other.CompareTag("Player")) return;
-
+            //an object that is not the player has entered
             gnomeBurrow.OnHoleEnter(transform, other.attachedRigidbody);
         }
     }
 
-
-
+    public IEnumerator<WaitForSeconds> ReEnableCollider() 
+    {
+        yield return new WaitForSeconds(3.0f);
+        GetComponent<Collider>().enabled = true;
+    }
 }

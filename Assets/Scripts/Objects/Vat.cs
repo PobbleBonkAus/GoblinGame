@@ -21,6 +21,11 @@ public class Vat : MonoBehaviour
     [SerializeField] private int secondMilestone = 6;
     [SerializeField] private int thirdMilestone = 9;
 
+    [Header("Keys")]
+    [SerializeField] Transform KeySpawn;
+    [SerializeField] GameObject Key;
+    [SerializeField] GameObject KeyEjectionSpeed;
+
     private bool draining = false;
 
     private float currentLiquid = 0f;
@@ -117,5 +122,14 @@ public class Vat : MonoBehaviour
             thirdTriggered = true;
             OnThirdMilestone.Invoke();
         }
+    }
+
+    public void SpawnKey() 
+    {
+        GameObject instance = Instantiate(Key);
+        instance.transform.position = KeySpawn.position;
+        instance.transform.rotation = KeySpawn.rotation;
+
+       // instance.GetComponent<Rigidbody>().isKinematic = true;
     }
 }

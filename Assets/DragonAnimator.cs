@@ -49,7 +49,7 @@ public class DragonAnimator : MonoBehaviour
         }
         else
         {
-            Vector3 forwardPos = transform.position + transform.forward * 5f;
+            Vector3 forwardPos = headPivot.transform.position - transform.forward * 5f;
             headLookTarget.position = Vector3.Lerp(
                 headLookTarget.position,
                 forwardPos,

@@ -10,6 +10,7 @@ public class Gyser : MonoBehaviour
     private float gyserForce = 1000.0f;
     [SerializeField]
     private Transform gyserDirectionTransform;
+    [SerializeField] ParticleSystem gyserParticles;
 
     bool shooting = false;
     void Start()
@@ -23,6 +24,7 @@ public class Gyser : MonoBehaviour
         shooting = false;
         yield return new WaitForSeconds(timer);
         shooting = true;
+        gyserParticles.Play();
     }
 
     private void OnTriggerStay(Collider other)

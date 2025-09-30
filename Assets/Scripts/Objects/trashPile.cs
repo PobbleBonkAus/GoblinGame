@@ -8,11 +8,16 @@ public class trashPile : MonoBehaviour
     [SerializeField] GameObject[] trashSpawns;
     [SerializeField] int amountOfTrash = 10;
 
-    Vector3 baseScale;
+    [SerializeField] GameObject state1;
+    [SerializeField] GameObject state2;
+    [SerializeField] GameObject state3;
+
+    int currentAmountLeft;
 
     private void Awake()
     {
-        baseScale = transform.localScale;
+        currentAmountLeft = amountOfTrash;
+        state1.gameObject.SetActive(true);
     }
 
     public void SpawnTrashPile(PhysicsGrabber playerGrabber) 
@@ -21,29 +26,38 @@ public class trashPile : MonoBehaviour
         instance.transform.position = playerGrabber.transform.position;
         playerGrabber.ForceGrabObject(instance.GetComponent<Rigidbody>());
 
-        amountOfTrash -= 1;
-        if (amountOfTrash > 0) 
+        currentAmountLeft -= 1;
+        if (currentAmountLeft > 0) 
         {
             UpdateTrashPile();
         }
         else
         {
-            Destroy(instance);
+            Destroy(gameObject);
         }
 
     }
 
     void UpdateTrashPile()
     {
-        transform.localScale -= baseScale / amountOfTrash; 
-    }
-
-    IEnumerator<WaitForSeconds> ReeneableCollider() 
-    {
-        GetComponent<Collider>().enabled = false;
-        yield return new WaitForSeconds(1);
-        GetComponent<Collider>().enabled = true;
-
+        if ((currentAmountLeft < amountOfTrash * 0.33))
+        {
+            state1.SetActive(false);
+            state2.SetActive(false);
+            state3.SetActive(true);
+        }
+        else if ((currentAmountLeft < amountOfTrash * 0.66))
+        {
+            state1.SetActive(false);
+            state2.SetActive(true);
+            state3.SetActive(false);
+        }
+        else
+        {
+            state1.SetActive(true);
+            state2.SetActive(false);
+            state3.SetActive(false);
+        }
     }
 
 
@@ -59,5 +73,6 @@ public class trashPile : MonoBehaviour
             }
         }
     }
-    
+
+
 }

@@ -16,8 +16,8 @@ public class MilestoneDoor : MonoBehaviour
         leftDoor.isKinematic = false;
         rightDoor.isKinematic = false;
 
-        // Apply torque around the hinge axis (usually Y for upright doors)
-        leftDoor.AddTorque(Vector3.up * torqueStrength, ForceMode.Impulse);
-        rightDoor.AddTorque(Vector3.up * -torqueStrength, ForceMode.Impulse);
+        // Apply torque around the hinge axis 
+        leftDoor.AddTorque(Vector3.up * -torqueStrength, ForceMode.Impulse);
+        rightDoor.AddTorque(Vector3.up * torqueStrength, ForceMode.Impulse);
     }
 }
