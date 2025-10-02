@@ -10,16 +10,17 @@ public class Lightbulb : InteractableRigidbody
     private void Awake()
     {
         renderer = bulb.GetComponent<MeshRenderer>();
-        renderer.sharedMaterial = unlitMat;
+        renderer.sharedMaterials[0] = unlitMat;
     }
 
     public override void ActivateObject(PhysicsGrabber grabber) 
     {
-        renderer.sharedMaterial = litMat;
+        Debug.Log("Light");
+        renderer.sharedMaterials[0] = litMat;
     }
 
     public override void DeactivateObject() 
     {
-        renderer.sharedMaterial = unlitMat;
+        renderer.sharedMaterials[0] = unlitMat;
     }
 }

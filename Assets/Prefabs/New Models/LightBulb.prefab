@@ -51,7 +51,7 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: 3f4be69a3f1adb944b26eceff64aba65, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: a54202a621f90f7429a2902c4bf1084a, type: 2}
+      objectReference: {fileID: 2100000, guid: 0b225efe35989314aa06170b25c3d498, type: 2}
     - target: {fileID: -7511558181221131132, guid: 3f4be69a3f1adb944b26eceff64aba65, type: 3}
       propertyPath: 'm_Materials.Array.data[1]'
       value: 
@@ -76,7 +76,7 @@ PrefabInstance:
       addedObject: {fileID: 2031643616747613867}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3f4be69a3f1adb944b26eceff64aba65, type: 3}
       insertIndex: -1
-      addedObject: {fileID: -7377646668366966735}
+      addedObject: {fileID: 5035704182099062338}
   m_SourcePrefab: {fileID: 100100000, guid: 3f4be69a3f1adb944b26eceff64aba65, type: 3}
 --- !u!1 &8206469476220219604 stripped
 GameObject:
@@ -132,7 +132,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &-7377646668366966735
+--- !u!114 &5035704182099062338
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -141,11 +141,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 8206469476220219604}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 658d27a322a20e348bd8f65f39c619f5, type: 3}
+  m_Script: {fileID: 11500000, guid: 121e70fcf2b3cd44a89a81f61f8512d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  value: 1
+  value: 2
   type: 0
   isActivated: 0
   isGrabbed: 0
   hitClip: {fileID: 0}
+  litMat: {fileID: 2100000, guid: 12a4ace69fc70d641ad03d9a2955d6b4, type: 2}
+  unlitMat: {fileID: 2100000, guid: ad92092b879b146408a3db045340fdd6, type: 2}
+  bulb: {fileID: 8838573954726718062}
+--- !u!4 &8838573954726718062 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 3f4be69a3f1adb944b26eceff64aba65, type: 3}
+  m_PrefabInstance: {fileID: 9016863221641645445}
+  m_PrefabAsset: {fileID: 0}

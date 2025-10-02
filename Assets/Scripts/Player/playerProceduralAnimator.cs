@@ -273,8 +273,11 @@ public class playerProceduralAnimator : MonoBehaviour
                     leftFootLerp = 0f;
                     stepLeftFoot = false;
                     stepWaitTimer = 0f;
-
-                    AudioController.instance.PlayAudioClip(footstep, transform);
+                    if (transform && footstep) 
+                    {
+                        AudioController.instance.PlayAudioClip(footstep, transform);
+                    }
+                    
                     leftFootDust.Play();                    
                 }
                 else
@@ -303,7 +306,10 @@ public class playerProceduralAnimator : MonoBehaviour
                     stepLeftFoot = true;
                     stepWaitTimer = 0f;
 
-                    AudioController.instance.PlayAudioClip(footstep,transform);
+                    if (transform && footstep)
+                    {
+                        AudioController.instance.PlayAudioClip(footstep, transform);
+                    }
                     rightFootDust.Play();
                 }
                 else

@@ -60,6 +60,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 0f129eb1fcb77924b83029ca2dc4072b, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: c1ec02849f3b09247a983c0994657c71, type: 2}
+    - target: {fileID: -3475714523541924860, guid: 0f129eb1fcb77924b83029ca2dc4072b, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: fce51ad777cc5c54ebd742728110ed62, type: 2}
     - target: {fileID: -3133498875991405556, guid: 0f129eb1fcb77924b83029ca2dc4072b, type: 3}
       propertyPath: m_Layer
       value: 6
@@ -103,6 +111,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 3293315613705775411}
   m_SourcePrefab: {fileID: 100100000, guid: 0f129eb1fcb77924b83029ca2dc4072b, type: 3}
+--- !u!4 &169933563251235731 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 0f129eb1fcb77924b83029ca2dc4072b, type: 3}
+  m_PrefabInstance: {fileID: 419117140516076664}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &653137396630667561 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 0f129eb1fcb77924b83029ca2dc4072b, type: 3}
@@ -151,6 +164,7 @@ MonoBehaviour:
   type: 0
   isActivated: 0
   isGrabbed: 0
-  litMat: {fileID: 2100000, guid: ea699a88c13637444b0b98d7cf703ef2, type: 2}
-  unlitMat: {fileID: 2100000, guid: 72f8ba1960f271a44ac1128954f3b0e1, type: 2}
-  bulb: {fileID: 0}
+  hitClip: {fileID: 0}
+  litMat: {fileID: 2100000, guid: 6c9c0e23fb579b94cb84eb1d4b09cbe8, type: 2}
+  unlitMat: {fileID: 2100000, guid: c1ec02849f3b09247a983c0994657c71, type: 2}
+  bulb: {fileID: 169933563251235731}

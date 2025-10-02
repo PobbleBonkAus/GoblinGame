@@ -20,20 +20,6 @@ public class InteractableRigidbody : MonoBehaviour
         EQUIPABLE, //Cosmetics
     }
 
-    private void Awake()
-    {
-        initialPos = transform;
-    }
-
-    public void Update()
-    {
-        if (transform.position.y < -3.0f)
-        {
-            transform.SetPositionAndRotation(initialPos.position, initialPos.rotation);
-        }
-    }
-
-
     public virtual void ActivateObject(PhysicsGrabber grabber) 
     {
         isActivated = true;
