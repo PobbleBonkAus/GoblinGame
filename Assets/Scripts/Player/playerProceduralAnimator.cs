@@ -194,8 +194,8 @@ public class playerProceduralAnimator : MonoBehaviour
         Quaternion toRotation = Quaternion.LookRotation(targetDir, body.transform.up);
         headTransform.rotation = Quaternion.Slerp(headTransform.rotation, toRotation, headLerpSpeed * Time.time);
 
-        headTransform.transform.localEulerAngles = new Vector3(Mathf.Clamp(-Mathf.DeltaAngle(headTransform.transform.localEulerAngles.x, 0), -30, 30), headTransform.transform.localEulerAngles.y, 0); // clamp angle x -30 to 30
-        headTransform.transform.localEulerAngles = new Vector3(headTransform.transform.localEulerAngles.x, Mathf.Clamp(-Mathf.DeltaAngle(headTransform.transform.localEulerAngles.y, 0), -50, 50), 0);  // clamp angle y -50 to 50
+        headTransform.transform.localEulerAngles = new Vector3(Mathf.Clamp(-Mathf.DeltaAngle(headTransform.transform.localEulerAngles.x, 0), -60, 60), headTransform.transform.localEulerAngles.y, 0); // clamp angle x -30 to 30
+        headTransform.transform.localEulerAngles = new Vector3(headTransform.transform.localEulerAngles.x, Mathf.Clamp(-Mathf.DeltaAngle(headTransform.transform.localEulerAngles.y, 0), -60, 60), 0);  // clamp angle y -50 to 50
 
     }
 

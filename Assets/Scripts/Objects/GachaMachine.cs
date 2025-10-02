@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GachaMachine : MonoBehaviour
@@ -9,13 +10,27 @@ public class GachaMachine : MonoBehaviour
     [SerializeField] private int minimumCoinsRequired = 3;
     [SerializeField] private float cosmeticEjectionDelay = 2.0f;
 
+    [SerializeField] private Transform gatchaCrank;
+    [SerializeField] private float crankSpeed;
+
     int currentCoinsInputed = 0;
+
+    bool addingCoin = false;
+
+    private void Update()
+    {
+        if (addingCoin)
+        {
+            gatchaCrank.transform.Rotate(Vector3.forward, crankSpeed);
+        }
+    }
 
     void AddCoin() 
     {
         currentCoinsInputed += 1;
         if(currentCoinsInputed >= minimumCoinsRequired) 
         {
+            addingCoin = true;
             StartCoroutine(SpawnRandomCosmetic());
         }
     }
@@ -23,7 +38,7 @@ public class GachaMachine : MonoBehaviour
     IEnumerator SpawnRandomCosmetic() 
     {
         yield return new WaitForSeconds(cosmeticEjectionDelay);
-
+        addingCoin = false;
         GameObject cosmetic = Instantiate(cosmetics[Random.Range(0, cosmetics.Length)]);
         cosmetic.transform.SetPositionAndRotation(cosmeticSpawnPoint.position, Random.rotation);
         cosmetic.GetComponent<Rigidbody>().AddForce(cosmeticSpawnPoint.forward * ejectionForce,ForceMode.Impulse);

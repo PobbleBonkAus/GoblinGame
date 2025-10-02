@@ -26,6 +26,8 @@ public class DragonAnimator : MonoBehaviour
     Quaternion targetRotation;
     bool diving = false;
 
+    public bool useHeadLook = true;
+
     private void Start()
     {
         bodyStartPos = bodyPivot.localPosition;
@@ -39,7 +41,7 @@ public class DragonAnimator : MonoBehaviour
             WobbleBody();
         }
 
-        if (currentLookTarget)
+        if (currentLookTarget && useHeadLook)
         {
             headLookTarget.position = Vector3.Lerp(
                 headLookTarget.position,

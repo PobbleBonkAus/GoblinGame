@@ -14,6 +14,8 @@ public class trashPile : MonoBehaviour
 
     int currentAmountLeft;
 
+    bool canGrabFrom = true;
+
     private void Awake()
     {
         currentAmountLeft = amountOfTrash;
@@ -58,11 +60,20 @@ public class trashPile : MonoBehaviour
             state2.SetActive(false);
             state3.SetActive(false);
         }
+
     }
 
+    IEnumerator<WaitForSeconds> WaitTime() 
+    {
+        canGrabFrom = false;
+        yield return new WaitForSeconds(1.0f);
+        canGrabFrom = true;
+    }
 
     private void OnTriggerStay(Collider other)
     {
+        if (!canGrabFrom) return;
+
         if (other.GetComponentInChildren<PhysicsGrabber>())
         {
             PhysicsGrabber grabber = other.GetComponentInChildren<PhysicsGrabber>();
@@ -70,6 +81,8 @@ public class trashPile : MonoBehaviour
             {
                 Debug.Log("spawn trash");
                 SpawnTrashPile(grabber);
+
+                StartCoroutine(WaitTime());
             }
         }
     }

@@ -20,9 +20,9 @@ public class bomb : InteractableRigidbody
         fuseParticle.Stop();
     }
 
-    public override void ActivateObject()
+    public override void ActivateObject(PhysicsGrabber grabber)
     {
-        base.ActivateObject();
+        base.ActivateObject(grabber);
         fuseParticle.Play();
     }
 
@@ -89,7 +89,8 @@ public class bomb : InteractableRigidbody
     {
         if(collision.impulse.magnitude > 30.0f) 
         {
-            ActivateObject();
+            fuseParticle.Play();
+            isActivated = true;
         }
     }
 }

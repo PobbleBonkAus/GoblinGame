@@ -51,9 +51,9 @@ public class PlayerUI : MonoBehaviour
         while (timer < duration)
         {
             timer += Time.deltaTime;
-            fadeToBlackImage.color = Color.Lerp(from, to, timer / duration);
+            //fadeToBlackImage.color = Color.Lerp(from, to, timer / duration);
             yield return null;
         }
-        fadeToBlackImage.color = to; // snap to final color
+        //fadeToBlackImage.color = to; // snap to final color
     }
 }

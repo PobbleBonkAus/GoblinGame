@@ -5417,6 +5417,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  blackRenderer: {fileID: 0}
 --- !u!222 &7670843920174307867
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5690,6 +5691,7 @@ MonoBehaviour:
   cam: {fileID: 2946067421182195168}
   target: {fileID: 5555270248037194145}
   player: {fileID: 2722708969919576874}
+  minCamY: 3
   lookSensitivity: 266.2
   smoothCamera: 1
   smoothCameraLerp: 0.06
@@ -11998,7 +12000,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &3973427406031044781
 RectTransform:
   m_ObjectHideFlags: 0
@@ -12025,7 +12027,7 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7484565907587596897}
-  m_CullTransparentMesh: 1
+  m_CullTransparentMesh: 0
 --- !u!114 &6484644683095243585
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12038,7 +12040,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   m_Color: {r: 0, g: 0, b: 0, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
@@ -12434,7 +12436,7 @@ MonoBehaviour:
   heavyObjectMultiplier: 80
   springSnapBackForce: -0.4
   kinematicBody: {fileID: 7899023277092317841}
-  cosmeticHandler: {fileID: 0}
+  cosmeticHandler: {fileID: 4979119103046316047}
   player: {fileID: 4395257486556739307}
   grabCollider: {fileID: 865081390670594358}
   playerRoot: {fileID: 2722708969919576874}
@@ -12982,7 +12984,7 @@ Rigidbody:
   serializedVersion: 4
   m_Mass: 1
   m_Drag: 0
-  m_AngularDrag: 6
+  m_AngularDrag: 20
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -13029,7 +13031,7 @@ MonoBehaviour:
   ragdollTorqueKick: 0.003
   ragdollJumpKick: 0
   ragdollImpulse: 0
-  colliionRagdollLimit: 30
+  colliionRagdollLimit: 10
   isInOcean: 0
   jumpForce: 10.8
   downwardsImpulse: 12.99
@@ -13052,6 +13054,7 @@ MonoBehaviour:
   cam: {fileID: 3028761874667257503}
   playerUI: {fileID: 4431265629851340168}
   groundCheckOrigin: {fileID: 108663793620656103}
+  cosmetics: {fileID: 4979119103046316047}
   wallCheckLayerMask:
     serializedVersion: 2
     m_Bits: 128
@@ -13110,6 +13113,7 @@ MonoBehaviour:
   type: 0
   isActivated: 0
   isGrabbed: 0
+  hitClip: {fileID: 0}
 --- !u!1 &9013674627826794646
 GameObject:
   m_ObjectHideFlags: 0

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7559516915376304329}
   - component: {fileID: 6452757198285643946}
   - component: {fileID: 9190670834952383662}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: potion2 cork
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -97,7 +97,7 @@ GameObject:
   - component: {fileID: 1926592092946922216}
   - component: {fileID: 2455399045508802123}
   - component: {fileID: 5632841927871497972}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: potion2 liquid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -183,7 +183,7 @@ GameObject:
   - component: {fileID: 8285570150913627980}
   - component: {fileID: 610570649367652744}
   - component: {fileID: 6425290794442455217}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Potion2
   m_TagString: Untagged
   m_Icon: {fileID: 0}

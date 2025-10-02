@@ -25,7 +25,7 @@ public class PhysicsGrabber : MonoBehaviour
 
     [Header("References")]
     [SerializeField] private GameObject kinematicBody;
-    [SerializeField] private CosmeticHandler cosmeticHandler;
+    [SerializeField] public CosmeticHandler cosmeticHandler;
     [SerializeField] private PlayerController player;
     [SerializeField] private SphereCollider grabCollider;
     [SerializeField] private Transform playerRoot; // Main pivot of player body
@@ -168,7 +168,7 @@ public class PhysicsGrabber : MonoBehaviour
 
     }
 
-    private void ReleaseObject()
+    public void ReleaseObject()
     {
         if (grabbing)
         {
@@ -309,8 +309,11 @@ public class PhysicsGrabber : MonoBehaviour
     public void DoRaiseObject(InputAction.CallbackContext obj)
     {
         raisingObject = true;
-        if (grabbedObject != null){ grabbedObject.GetComponent<InteractableRigidbody>().ActivateObject(); }
-        
+        if (grabbedObject != null)
+        {
+            grabbedObject.GetComponent<InteractableRigidbody>().ActivateObject(this);
+        }
+
         raisePressed = true;
     }
 

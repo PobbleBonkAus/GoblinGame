@@ -45,7 +45,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float righteningTrigger = 5.0f;
     [SerializeField] float minRighteningAngle = 3.0f;
     private float variedRighteningForce = 100.0f;
-
+    private float defaultAngularDamp;
     [Header("Expressions")]
     [SerializeField] Renderer[] eyeRenderers;
     [SerializeField][Range(1, 4)] float eyeBlankStare;
@@ -58,7 +58,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] Transform cam;
     [SerializeField] PlayerUI playerUI;
     [SerializeField] Transform groundCheckOrigin;
-    
+    [SerializeField] CosmeticHandler cosmetics;
+
     private Vector3 groundPoint;
     private Vector3 currentSlopeNormal = Vector3.zero;
     private Transform orientation;
@@ -75,6 +76,7 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         orientation = new GameObject().transform;
         orientation.position = transform.position;
+        defaultAngularDamp = rb.angularDamping;
     }
 
 
@@ -256,13 +258,15 @@ public class PlayerController : MonoBehaviour
         if (rb == null) return;
 
 
+        cosmetics.UnequipCosmetic();
+
         isRagdolled = true;
         variedRighteningForce = 0.0f;
         rb.AddForce((rb.linearVelocity + Random.insideUnitSphere) * ragdollImpulse, ForceMode.Impulse);
         //rb.AddForce(transform.up * ragdollImpulse, ForceMode.Impulse);
         rb.AddTorque(Random.rotation.eulerAngles * ragdollTorqueKick, ForceMode.Impulse);
         gameObject.layer = LayerMask.NameToLayer("Grabbable");
-
+        rb.angularDamping = 2.0f;
         eyeDazeGameObject.SetActive(true);
         eyeRenderers[0].material.SetFloat("_EyePlacement", eyeDazed);
         eyeRenderers[1].material.SetFloat("_EyePlacement", eyeDazed);
@@ -274,7 +278,7 @@ public class PlayerController : MonoBehaviour
     {
         isRagdolled = false;
         gameObject.layer = LayerMask.NameToLayer("Player");
-
+        rb.angularDamping = defaultAngularDamp;
         eyeDazeGameObject.SetActive(false);
         eyeRenderers[0].material.SetFloat("_EyePlacement", eyeBlankStare);
         eyeRenderers[1].material.SetFloat("_EyePlacement", eyeBlankStare);
@@ -290,7 +294,7 @@ public class PlayerController : MonoBehaviour
             currentSlopeNormal = hit.normal;
             if (jumpPressed) 
             {
-                AudioController.instance.PlayAudioClip(landAudio, transform);
+               // AudioController.instance.PlayAudioClip(landAudio, transform);
                 jumpPressed = false;
             }
 
@@ -310,6 +314,7 @@ public class PlayerController : MonoBehaviour
         rb.MovePosition(GameManager.instance.GetNearestBeachSpawn(transform.position));
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
+        rb.isKinematic = false;
     }
 
     public Vector3 collisionVelocity = Vector3.zero;
@@ -327,6 +332,7 @@ public class PlayerController : MonoBehaviour
         if (collision.impulse.magnitude > colliionRagdollLimit)
         {
             collisionVelocity = collision.relativeVelocity;
+
             StartRagdoll();
         }
     }

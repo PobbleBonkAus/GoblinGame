@@ -9,6 +9,8 @@ public class InteractableRigidbody : MonoBehaviour
     public bool isActivated;
     public bool isGrabbed;
 
+    private Transform initialPos;
+
     [SerializeField] AudioClip hitClip;
     public enum ObjectType 
     {
@@ -18,7 +20,21 @@ public class InteractableRigidbody : MonoBehaviour
         EQUIPABLE, //Cosmetics
     }
 
-    public virtual void ActivateObject() 
+    private void Awake()
+    {
+        initialPos = transform;
+    }
+
+    public void Update()
+    {
+        if (transform.position.y < -3.0f)
+        {
+            transform.SetPositionAndRotation(initialPos.position, initialPos.rotation);
+        }
+    }
+
+
+    public virtual void ActivateObject(PhysicsGrabber grabber) 
     {
         isActivated = true;
     }

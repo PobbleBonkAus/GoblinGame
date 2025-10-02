@@ -13,7 +13,7 @@ public class Lightbulb : InteractableRigidbody
         renderer.sharedMaterial = unlitMat;
     }
 
-    public override void ActivateObject() 
+    public override void ActivateObject(PhysicsGrabber grabber) 
     {
         renderer.sharedMaterial = litMat;
     }

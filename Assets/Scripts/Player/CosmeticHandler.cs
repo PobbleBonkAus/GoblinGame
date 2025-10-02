@@ -39,8 +39,11 @@ public class CosmeticHandler : MonoBehaviour
 
 
 
-    public void UnequipCosmetic() 
+    public void UnequipCosmetic()       
     {
+        if (!currentCosmetic) return;
+
+        Debug.Log("unequip");
         currentCosmetic.GetComponent<Rigidbody>().isKinematic = false;
         currentCosmetic.gameObject.layer = LayerMask.NameToLayer("Grabbable");
         currentCosmetic.GetComponent<Collider>().enabled = true;

@@ -360,6 +360,28 @@
                 },
                 {
                     "name": "",
+                    "id": "6b3dc6e6-fdf8-43d2-b421-f949231c89a7",
+                    "path": "<Gamepad>/buttonEast",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Jump",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "da101fcb-c6ea-4e85-a298-a167dfae2952",
+                    "path": "<Gamepad>/buttonWest",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Jump",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "83545141-b2a2-4be2-a2a5-c1c18ce7fa85",
                     "path": "<Gamepad>/buttonEast",
                     "interactions": "",
@@ -372,7 +394,7 @@
                 {
                     "name": "",
                     "id": "8e452403-984c-43a5-b605-834d56e9dd11",
-                    "path": "<Gamepad>/buttonWest",
+                    "path": "<Gamepad>/leftStickPress",
                     "interactions": "",
                     "processors": "",
                     "groups": "",

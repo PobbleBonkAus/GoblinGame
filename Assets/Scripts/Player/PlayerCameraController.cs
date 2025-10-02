@@ -7,6 +7,8 @@ public class PlayerCameraController : MonoBehaviour
     [SerializeField] private Transform target; //placed above the player
     [SerializeField] private Transform player;
 
+    [SerializeField] private float minCamY = 3.0f;
+
     [Header("looking")]
     [SerializeField] private float lookSensitivity = 10.0f;
     [SerializeField] private bool smoothCamera = false;
@@ -61,6 +63,9 @@ public class PlayerCameraController : MonoBehaviour
         Vector3 desiredCameraPos = target.transform.position - transform.forward * currentDistance;
         cam.transform.position = Vector3.Lerp(cam.transform.position, desiredCameraPos + Vector3.up * lookOffset, zoomLerp);
         cam.transform.LookAt(target.position);
+
+        cam.transform.position = new Vector3(cam.transform.position.x,
+            Mathf.Clamp(cam.transform.position.y, minCamY, 100.0f), cam.transform.position.z);
 
         target.position = player.position + Vector3.up * targetYOffset;
     }
