@@ -11700,10 +11700,10 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6796583080785168567}
-  serializedVersion: 5
+  serializedVersion: 4
   m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
+  m_Drag: 0
+  m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -12126,7 +12126,7 @@ MonoBehaviour:
   leftFootDust: {fileID: 5822926008086345850}
   rightFootDust: {fileID: 3385002379520747456}
   clapEffect: {fileID: 0}
-  footstep: {fileID: 8300000, guid: fe854090472723d4aa49364374548271, type: 3}
+  footstep: {fileID: 0}
   clap: {fileID: 8300000, guid: 3e7ece91ad15b41469ce81e8189f64ad, type: 3}
 --- !u!114 &4979119103046316047
 MonoBehaviour:
@@ -12465,10 +12465,10 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7802046003944811974}
-  serializedVersion: 5
+  serializedVersion: 4
   m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
+  m_Drag: 0
+  m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -12750,10 +12750,10 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7899023277092317841}
-  serializedVersion: 5
+  serializedVersion: 4
   m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
+  m_Drag: 0
+  m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -12944,10 +12944,10 @@ Rigidbody:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8996484223380350940}
-  serializedVersion: 5
+  serializedVersion: 4
   m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 8.06
+  m_Drag: 0
+  m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -13021,8 +13021,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   jumpAudio: {fileID: 8300000, guid: 70fdaf4c51142cb4dadf8bea76c34f0a, type: 3}
-  landAudio: {fileID: 8300000, guid: 497274a46d302ef4ebf35013051a3f69, type: 3}
-  ragdollAudio: {fileID: 8300000, guid: 97f42a05df250504eb27ca5d37cd31ba, type: 3}
+  landAudio: {fileID: 8300000, guid: 434f2de418efc904c93ed82f130975a1, type: 3}
+  ragdollAudio: {fileID: 0}
   collisionVelocity: {x: 0, y: 0, z: 0}
 --- !u!114 &2910426281273310292
 MonoBehaviour:

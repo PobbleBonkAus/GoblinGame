@@ -50,7 +50,8 @@ MonoBehaviour:
     m_Bits: 128
   radius: 50
   desnisty: 50
-  treeOBJs: []
+  treeOBJs:
+  - {fileID: 0}
   MakeTrees: 0
   wireLocation: {x: 0, y: 0, z: 0}
 --- !u!114 &5391161767617536067

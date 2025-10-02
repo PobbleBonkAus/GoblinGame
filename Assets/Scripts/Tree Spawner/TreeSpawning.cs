@@ -46,6 +46,7 @@ public class TreeSpawning : MonoBehaviour
             //spawn chosen random tree at random location with original location of tree prefab
 
             Instantiate(treeOBJs[treeNumber], randomLocationInRadius, Quaternion.identity);
+            treeOBJs[treeNumber].active = true;
         }
         MakeTrees = false;
     }
