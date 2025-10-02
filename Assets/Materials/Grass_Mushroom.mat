@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Grass
+  m_Name: Grass_Mushroom
   m_Shader: {fileID: 4800000, guid: 4d37be8684e25a44ab4953355b190366, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -131,7 +131,7 @@ Material:
     - _ZWrite: 0
     - __dummy__: 0
     m_Colors:
-    - _BaseColor: {r: 0.14117648, g: 0.5058824, b: 0.5254902, a: 1}
+    - _BaseColor: {r: 0.015686275, g: 0.36078432, b: 0.5803922, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _HColor: {r: 0.75, g: 0.75, b: 0.75, a: 1}

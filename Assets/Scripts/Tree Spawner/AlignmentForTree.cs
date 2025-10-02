@@ -32,7 +32,7 @@ public class AlignmentForTree : MonoBehaviour
         }
         else
         {
-            gameObject.SetActive(false);
+            //gameObject.SetActive(false);
         }
 
     }

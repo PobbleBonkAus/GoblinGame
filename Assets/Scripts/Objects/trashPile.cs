@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 public class trashPile : MonoBehaviour
 {
     [SerializeField] GameObject[] trashSpawns;
-    [SerializeField] int amountOfTrash = 10;
+    [SerializeField][Range(5,12)] int amountOfTrash = 10;
 
     [SerializeField] GameObject state1;
     [SerializeField] GameObject state2;
