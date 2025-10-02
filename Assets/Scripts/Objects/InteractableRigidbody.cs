@@ -8,21 +8,14 @@ public class InteractableRigidbody : MonoBehaviour
 
     public bool isActivated;
     public bool isGrabbed;
+
+    [SerializeField] AudioClip hitClip;
     public enum ObjectType 
     {
         SMALL, //Can be lifted above head, doesnt apply force on player
         LARGE, //Cannot be equiped or lifted above head, applies force on player
         BREAKABLE, //Breaks lol
         EQUIPABLE, //Cosmetics
-    }
-
-    private void Update()
-    {
-        if(transform.position.y < -10.0f) 
-        {
-            transform.position = new Vector3(Random.Range(-30, 30), 100, Random.Range(-30, 30));
-            GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
-        }
     }
 
     public virtual void ActivateObject() 
@@ -43,6 +36,14 @@ public class InteractableRigidbody : MonoBehaviour
     public virtual void OnDrop() 
     {
         isGrabbed = false;
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.impulse.magnitude > 3.0f) 
+        {
+            AudioController.instance.PlayAudioClip(hitClip, transform);
+        }
     }
 
 }

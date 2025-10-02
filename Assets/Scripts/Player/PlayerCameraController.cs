@@ -4,7 +4,8 @@ using UnityEngine.InputSystem;
 public class PlayerCameraController : MonoBehaviour
 {
     [SerializeField] private Camera cam;
-    [SerializeField] private Transform target; // What the camera pivots around (usually the player)
+    [SerializeField] private Transform target; //placed above the player
+    [SerializeField] private Transform player;
 
     [Header("looking")]
     [SerializeField] private float lookSensitivity = 10.0f;
@@ -14,6 +15,10 @@ public class PlayerCameraController : MonoBehaviour
     [SerializeField] private float minLookAngle = 5.0f;
 
     [SerializeField] private float lookOffset = 3.0f;
+
+    [Header("TargetSmoothing")]
+    [SerializeField] private float targetlerpSpeed = 0.01f;
+    [SerializeField] private float targetYOffset = 4.0f;
 
     [Header("Zooming")]
     [SerializeField] private float zoomSpeed = 1.0f;
@@ -39,6 +44,8 @@ public class PlayerCameraController : MonoBehaviour
         initialFieldOfView = cam.fieldOfView;
         targetZoom = initialFieldOfView;
         transform.SetParent(null);
+        cam.transform.SetParent(null);
+        target.transform.SetParent(null);
     }
 
     private void Update()
@@ -54,6 +61,8 @@ public class PlayerCameraController : MonoBehaviour
         Vector3 desiredCameraPos = target.transform.position - transform.forward * currentDistance;
         cam.transform.position = Vector3.Lerp(cam.transform.position, desiredCameraPos + Vector3.up * lookOffset, zoomLerp);
         cam.transform.LookAt(target.position);
+
+        target.position = player.position + Vector3.up * targetYOffset;
     }
 
     private void Look()

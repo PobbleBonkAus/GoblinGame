@@ -294,36 +294,6 @@ public class PhysicsGrabber : MonoBehaviour
         }
     }
 
-    public void StoreGrabbedItem()
-    {
-        if (grabbedObject.CompareTag("Cosmetic"))
-        {
-            cosmeticHandler.TryEquipCosmetic(grabbedObject.gameObject);
-        }
-        else
-        {
-            if (storedItem)
-            {
-                DropStoredItem();
-            }
-            else if (grabbedObject != null && objectType != ObjectType.LARGE)
-            {
-                storedItem = grabbedObject;
-                ReleaseObject();
-                storedItem.gameObject.layer = LayerMask.NameToLayer("StoredObject");
-                storedItem.transform.SetPositionAndRotation(storedItemTransform.position, storedItemTransform.rotation);
-                storedItem.isKinematic = true;
-            }
-        }
-    }
-
-    public void DropStoredItem()
-    {
-        storedItem.gameObject.layer = LayerMask.NameToLayer("Grabbable");
-        storedItem.isKinematic = false;
-        storedItem = null;
-    }
-
     public void DoGrabObject(InputAction.CallbackContext obj)
     {
         grabPressed = true;
@@ -361,7 +331,14 @@ public class PhysicsGrabber : MonoBehaviour
             StartCoroutine(EnableHeadCollider());
             
             Rigidbody releasedObject = grabbedObject;
+            if (grabbedObject.CompareTag("Player")) 
+            {
+                PlayerController player = grabbedObject.GetComponent<PlayerController>();
+                player.StartRagdoll();
+            }
+
             ReleaseObject();
+            
             releasedObject.AddForce(((transform.forward) + (Vector3.up/2.0f)) * throwForce * throwForceTimer);
 
             cameraController.SetZoom(0.0f);
@@ -378,17 +355,6 @@ public class PhysicsGrabber : MonoBehaviour
         chargingThrow = true;
     }
 
-    public void DoPickUp(InputAction.CallbackContext obj)
-    {
-        if (storedItem != null)
-        {
-            DropStoredItem();
-        }
-        else
-        {
-            StoreGrabbedItem();
-        }
-    }
 
     IEnumerator<WaitForSeconds> EnableHeadCollider() 
     {

@@ -246,6 +246,10 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void DoReset(InputAction.CallbackContext obj) 
+    {
+        ResetPlayer();
+    }
 
     public void StartRagdoll() 
     {
@@ -254,9 +258,9 @@ public class PlayerController : MonoBehaviour
 
         isRagdolled = true;
         variedRighteningForce = 0.0f;
-       // rb.AddForce((rb.linearVelocity + Random.insideUnitSphere) * ragdollImpulse, ForceMode.Impulse);
+        rb.AddForce((rb.linearVelocity + Random.insideUnitSphere) * ragdollImpulse, ForceMode.Impulse);
         //rb.AddForce(transform.up * ragdollImpulse, ForceMode.Impulse);
-        //rb.AddTorque(Random.rotation.eulerAngles * ragdollTorqueKick, ForceMode.Impulse);
+        rb.AddTorque(Random.rotation.eulerAngles * ragdollTorqueKick, ForceMode.Impulse);
         gameObject.layer = LayerMask.NameToLayer("Grabbable");
 
         eyeDazeGameObject.SetActive(true);
@@ -309,6 +313,13 @@ public class PlayerController : MonoBehaviour
     }
 
     public Vector3 collisionVelocity = Vector3.zero;
+
+    public void ResetPlayer() 
+    {
+        rb.MovePosition(GameManager.instance.playerSpawn.position);
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+    }
 
     private void OnCollisionEnter(Collision collision)
     {

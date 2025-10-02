@@ -5688,13 +5688,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 2946067421182195168}
-  target: {fileID: 2722708969919576874}
+  target: {fileID: 5555270248037194145}
+  player: {fileID: 2722708969919576874}
   lookSensitivity: 266.2
   smoothCamera: 1
   smoothCameraLerp: 0.06
   maxLookAngle: 80
   minLookAngle: -35
   lookOffset: 3
+  targetlerpSpeed: 0.01
+  targetYOffset: 1.5
   zoomSpeed: 1
   zoomLerp: 0.45
   maxZoom: 10
@@ -6171,6 +6174,37 @@ LineRenderer:
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
+--- !u!1 &4044530206642882674
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5555270248037194145}
+  m_Layer: 3
+  m_Name: CameraTarget
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5555270248037194145
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4044530206642882674}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 3.54, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2722708969919576874}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4229403102123672742
 GameObject:
   m_ObjectHideFlags: 0
@@ -12935,6 +12969,7 @@ Transform:
   - {fileID: 8782199234064376268}
   - {fileID: 8689652738958153101}
   - {fileID: 3308486406709807866}
+  - {fileID: 5555270248037194145}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &6211814258153673963
@@ -12947,7 +12982,7 @@ Rigidbody:
   serializedVersion: 4
   m_Mass: 1
   m_Drag: 0
-  m_AngularDrag: 0.05
+  m_AngularDrag: 6
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}

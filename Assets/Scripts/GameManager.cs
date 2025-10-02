@@ -12,12 +12,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject[] statues;
     [SerializeField] float statueRaiseSpeed = 0.5f;
     [SerializeField] Transform[] beachSpawns;
-
+    [SerializeField] public Transform playerSpawn;
 
     bool raisingStatue;
     GameObject statueBeingRaised;
-
-    public static GameManager gameManager;
 
     public GameObject[] players = new GameObject[3];
 
