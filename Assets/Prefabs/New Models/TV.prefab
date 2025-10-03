@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7881294026162887866}
   - component: {fileID: 8563240189271897163}
   - component: {fileID: 1698735806661574784}
-  - component: {fileID: -8126955117934164656}
+  - component: {fileID: 5053400043014441492}
   m_Layer: 6
   m_Name: TV
   m_TagString: Untagged
@@ -139,7 +139,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &-8126955117934164656
+--- !u!114 &5053400043014441492
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -148,11 +148,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 1570560791460296743}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 658d27a322a20e348bd8f65f39c619f5, type: 3}
+  m_Script: {fileID: 11500000, guid: bbe67bf54ee9b9c4199c546cecfcfc02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  value: 1
-  type: 1
+  value: 2
+  type: 0
   isActivated: 0
   isGrabbed: 0
   hitClip: {fileID: 0}
+  litMat: {fileID: 2100000, guid: f6c2a083782d6684c90162555228e6c9, type: 2}
+  unlitMat: {fileID: 2100000, guid: 44f3fa1671348a543bf5c0ff23699cc0, type: 2}
+  renderer: {fileID: 7881294026162887866}

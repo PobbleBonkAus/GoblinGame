@@ -112,6 +112,8 @@ public class AudioController : MonoBehaviour
 
     public float GetVolumeFromSource(Transform sourceTransform)
     {
+        if (sourceTransform == null) return 0.0f;
+
         float distance = DistanceToNearestPlayer(sourceTransform.position);
 
         if (distance <= minAudioRange)

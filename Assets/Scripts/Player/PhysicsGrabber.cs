@@ -43,7 +43,7 @@ public class PhysicsGrabber : MonoBehaviour
     private float throwLockOutTime = 0.0f;
     Vector3 chargeOffset = Vector3.zero;
     [HideInInspector] public float throwForceTimer = 0.0f;
-    private bool chargingThrow = false;
+    public bool chargingThrow = false;
 
 
 
@@ -103,11 +103,6 @@ public class PhysicsGrabber : MonoBehaviour
             {
                 ReleaseObject();
             }
-        }
-
-        if (storedItem != null)
-        {
-            storedItem.transform.SetPositionAndRotation(storedItemTransform.position, storedItemTransform.rotation);
         }
     }
 
@@ -342,7 +337,7 @@ public class PhysicsGrabber : MonoBehaviour
 
             ReleaseObject();
             
-            releasedObject.AddForce(((transform.forward) + (Vector3.up/2.0f)) * throwForce * throwForceTimer);
+            releasedObject.AddForce(((cameraController.transform.forward) + (Vector3.up/2.0f)) * throwForce * throwForceTimer);
 
             cameraController.SetZoom(0.0f);
 

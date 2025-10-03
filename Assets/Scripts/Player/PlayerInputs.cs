@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class PlayerInputs : MonoBehaviour
 {
@@ -11,7 +12,6 @@ public class PlayerInputs : MonoBehaviour
     public playerProceduralAnimator playerAnimator;
     public PlayerController playerController;
     public PlayerCameraController cameraController;
-    public TutorialIcons tutorial;
     public OptionsMenu optionsMenu;
 
     void OnEnable() => inputActions.Enable();
@@ -27,7 +27,6 @@ public class PlayerInputs : MonoBehaviour
         cameraController.look = playerInputActions.FindAction("Look");
 
         playerInputActions.FindAction("Jump").started += playerController.DoJump;
-        playerInputActions.FindAction("Reset").started += playerController.DoReset;
 
         playerInputActions.FindAction("Grab").performed += playerPhysicsGrabber.DoGrabObject;
         playerInputActions.FindAction("Grab").canceled += playerPhysicsGrabber.DoReleaseObject;
@@ -40,12 +39,29 @@ public class PlayerInputs : MonoBehaviour
 
         playerInputActions.FindAction("Ragdoll").started += playerController.DoRagdoll;
 
-        //tutorial actions
-        playerInputActions.FindAction("Move").performed += tutorial.DoWalkAction;
-        playerInputActions.FindAction("Jump").performed += tutorial.DoJumpAction;
-        playerInputActions.FindAction("Grab").performed += tutorial.DoGrabAction;
-
+        playerInputActions.FindAction("ToggleOptionsMenu").started += DoOpenOptions;
+        playerInputActions.FindAction("ResetPlayer").started += DoResetPlayer;
+        playerInputActions.FindAction("ResetGame").started += DoResetGame;
     }
 
+    public void DoOpenOptions(InputAction.CallbackContext obj)
+    {
+        optionsMenu.gameObject.SetActive(!optionsMenu.gameObject.activeSelf);
+    }
 
+    public void DoResetPlayer(InputAction.CallbackContext obj) 
+    {
+        if (optionsMenu.gameObject.activeSelf) 
+        {
+            playerController.ResetPlayer();
+            optionsMenu.gameObject.SetActive(false);
+        }
+    }
+
+    public void DoResetGame(InputAction.CallbackContext obj) 
+    {
+
+        SceneManager.LoadScene("Main", LoadSceneMode.Single);
+        
+    }
 }

@@ -71,6 +71,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] AudioClip landAudio;
     [SerializeField] AudioClip ragdollAudio;
 
+    [Header("Options")]
+    [SerializeField] GameObject optionsMenu;
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -248,11 +250,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void DoReset(InputAction.CallbackContext obj) 
-    {
-        ResetPlayer();
-    }
-
     public void StartRagdoll() 
     {
         if (rb == null) return;
@@ -325,6 +322,7 @@ public class PlayerController : MonoBehaviour
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
     }
+
 
     private void OnCollisionEnter(Collision collision)
     {

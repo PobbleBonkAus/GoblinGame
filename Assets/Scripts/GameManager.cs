@@ -102,4 +102,6 @@ public class GameManager : MonoBehaviour
         Debug.Log("Player " + playerInput.playerIndex + " left!");
         players[playerInput.playerIndex] = null;
     }
+
+  
 }

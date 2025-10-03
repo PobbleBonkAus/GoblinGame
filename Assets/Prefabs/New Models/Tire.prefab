@@ -161,7 +161,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.55
+  m_Radius: 0.64
   m_Center: {x: -1.69, y: -0.00000014901161, z: 0}
 --- !u!135 &7326380935216227823
 SphereCollider:
@@ -182,7 +182,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.55
+  m_Radius: 0.64
   m_Center: {x: 1.69, y: -0.00000014901161, z: 0}
 --- !u!135 &7347709939253538804
 SphereCollider:
@@ -203,7 +203,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.55
+  m_Radius: 0.64
   m_Center: {x: -1.37, y: -0.00000014901161, z: 1.01}
 --- !u!135 &628322253889949095
 SphereCollider:
@@ -224,7 +224,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.55
+  m_Radius: 0.64
   m_Center: {x: -1.37, y: -0.00000014901161, z: -1.01}
 --- !u!135 &7795882450933380213
 SphereCollider:
@@ -245,7 +245,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.55
+  m_Radius: 0.64
   m_Center: {x: 1.37, y: -0.00000014901161, z: 1.01}
 --- !u!135 &3394167425321863547
 SphereCollider:
@@ -266,7 +266,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.55
+  m_Radius: 0.64
   m_Center: {x: 1.37, y: -0.00000014901161, z: -1.01}
 --- !u!135 &2780330287621134673
 SphereCollider:
@@ -287,7 +287,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.55
+  m_Radius: 0.64
   m_Center: {x: -0.42, y: -0.00000014901161, z: 1.65}
 --- !u!135 &1441456684967861789
 SphereCollider:
@@ -308,7 +308,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.55
+  m_Radius: 0.64
   m_Center: {x: 0.42, y: -0.00000014901161, z: 1.65}
 --- !u!135 &5277313879974981924
 SphereCollider:
@@ -329,7 +329,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.55
+  m_Radius: 0.64
   m_Center: {x: -0.42, y: -0.00000014901161, z: -1.65}
 --- !u!135 &7787210542321778387
 SphereCollider:
@@ -350,5 +350,5 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.55
+  m_Radius: 0.64
   m_Center: {x: 0.42, y: -0.00000014901161, z: -1.65}

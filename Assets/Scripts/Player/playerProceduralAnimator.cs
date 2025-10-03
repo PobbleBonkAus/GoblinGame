@@ -122,7 +122,7 @@ public class playerProceduralAnimator : MonoBehaviour
 
     IEnumerator<WaitForSeconds> LateStart() 
     {
-        yield return new WaitForSeconds(3.0f);
+        yield return new WaitForSeconds(0.5f);
 
         leftHand.SetParent(null);
         rightHand.SetParent(null);
@@ -147,6 +147,7 @@ public class playerProceduralAnimator : MonoBehaviour
 
     private void Update()
     {
+        Debug.Log(transform.position - leftHandTarget.position);
         if (player.IsGrounded() && !player.isRagdolled) 
         {
             UpdateFootTargetPositions();
@@ -184,6 +185,11 @@ public class playerProceduralAnimator : MonoBehaviour
         if (physicsGrabber.grabbing)
         {
             targetDir = (physicsGrabber.globalGrabPoint - headTransform.position).normalized;
+        }
+
+        if (physicsGrabber.chargingThrow) 
+        {
+            targetDir = camera.forward;
         }
 
         if (player.isRagdolled) 
@@ -335,33 +341,37 @@ public class playerProceduralAnimator : MonoBehaviour
             //THis is the default position
             leftHand.position = SpringLerp(leftHand.position, leftHandTarget.position, ref leftHandVel);
             rightHand.position = SpringLerp(rightHand.position, rightHandTarget.position, ref rightHandVel);
-            return;
+            Debug.Log("ragdoll");
         }
-
-        if (physicsGrabber.grabbing)
+        else if (physicsGrabber.grabbing)
         {   //move hands onto grab point on the grabbed object
-            leftHand.position = Vector3.Lerp(leftHand.position, physicsGrabber.globalGrabPoint + (transform.right * 0.4f), armLerpSpeed);
-            rightHand.position = Vector3.Lerp(rightHand.position, physicsGrabber.globalGrabPoint - (transform.right * 0.4f), armLerpSpeed);
+           leftHand.position = Vector3.Lerp(leftHand.position, physicsGrabber.globalGrabPoint + (transform.right * 0.4f), armLerpSpeed);
+           rightHand.position = Vector3.Lerp(rightHand.position, physicsGrabber.globalGrabPoint - (transform.right * 0.4f), armLerpSpeed);
+            Debug.Log("grabbing");
         }
         else if(physicsGrabber.grabPressed)
         { 
             //move hands in front of the player to show the player is trying to grab
             leftHand.position = SpringLerp(leftHand.position, physicsGrabber.transform.position + (transform.right * 0.4f), ref leftHandVel);
             rightHand.position = SpringLerp(rightHand.position, physicsGrabber.transform.position - (transform.right * 0.4f), ref rightHandVel);
+            Debug.Log("grabPressed");
         }
         else if(physicsGrabber.raisePressed)
         {
             //move hands in above of the player to show the player is trying to raise
             leftHand.position = SpringLerp(leftHand.position, (transform.position + transform.up * 2.0f) + (transform.right * 0.75f) + (transform.forward * 0.1f), ref leftHandVel);
             rightHand.position = SpringLerp(rightHand.position, (transform.position + transform.up * 2.0f) - (transform.right * 0.75f) + (transform.forward * 0.1f), ref rightHandVel);
+            Debug.Log("raise pressed");
         }
         else
         {
-            //THis is the default position
-            leftHand.position = SpringLerp(leftHand.position, leftHandTarget.position, ref leftHandVel);
-            rightHand.position = SpringLerp(rightHand.position, rightHandTarget.position, ref rightHandVel);
+            leftHand.position = Vector3.Lerp(leftHand.position, leftHandTarget.position, armLerpSpeed * 2.0f);
+            rightHand.position = Vector3.Lerp(rightHand.position, rightHandTarget.position, armLerpSpeed * 2.0f);
+            Debug.Log("default");
 
         }
+
+        
     }
     
     private void BobbleHead() 
@@ -481,7 +491,7 @@ public class playerProceduralAnimator : MonoBehaviour
         if (!other.attachedRigidbody) return;
         if(other.attachedRigidbody.linearVelocity.magnitude > 1.0f || other.CompareTag("Player")) 
         {
-            if (other.transform.IsChildOf(transform.parent)) return;
+            if (other.transform.IsChildOf(transform.parent) || other.CompareTag("Cosmetic")) return;
             headLookTarget = other.transform;
         }
     }

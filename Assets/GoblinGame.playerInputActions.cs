@@ -199,6 +199,24 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ResetPlayer"",
+                    ""type"": ""Button"",
+                    ""id"": ""b51599bb-b2ae-4ac9-a8e2-a5267e636cf2"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ResetGame"",
+                    ""type"": ""Button"",
+                    ""id"": ""849e6760-2c4f-4b89-8031-6f83d8f1ce9f"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -641,6 +659,72 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""action"": ""ToggleOptionsMenu"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""66f37da3-73cb-405c-ba82-0e6fe7e2f82a"",
+                    ""path"": ""<Gamepad>/select"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ResetPlayer"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1741f438-fb91-4669-9bf9-6705bbce31ea"",
+                    ""path"": """",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ResetPlayer"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""Two Modifiers"",
+                    ""id"": ""8ca84204-d07c-4a83-b27b-c9420668b09f"",
+                    ""path"": ""TwoModifiers(modifiersOrder=2)"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ResetGame"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""modifier1"",
+                    ""id"": ""8c765c4d-160c-4f6e-b6a6-15fd1e0288a7"",
+                    ""path"": ""<Gamepad>/select"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ResetGame"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""modifier2"",
+                    ""id"": ""69b726f3-9c9a-4da8-83c6-0bf3f55bf0fe"",
+                    ""path"": ""<Gamepad>/leftStickPress"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ResetGame"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""binding"",
+                    ""id"": ""0addb15a-ebd7-4eac-8414-bc880b2af113"",
+                    ""path"": ""<Gamepad>/rightTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ResetGame"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         },
@@ -1238,6 +1322,8 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Player_Reset = m_Player.FindAction("Reset", throwIfNotFound: true);
         m_Player_Quit = m_Player.FindAction("Quit", throwIfNotFound: true);
         m_Player_ToggleOptionsMenu = m_Player.FindAction("ToggleOptionsMenu", throwIfNotFound: true);
+        m_Player_ResetPlayer = m_Player.FindAction("ResetPlayer", throwIfNotFound: true);
+        m_Player_ResetGame = m_Player.FindAction("ResetGame", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1343,6 +1429,8 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Reset;
     private readonly InputAction m_Player_Quit;
     private readonly InputAction m_Player_ToggleOptionsMenu;
+    private readonly InputAction m_Player_ResetPlayer;
+    private readonly InputAction m_Player_ResetGame;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1402,6 +1490,14 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/ToggleOptionsMenu".
         /// </summary>
         public InputAction @ToggleOptionsMenu => m_Wrapper.m_Player_ToggleOptionsMenu;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/ResetPlayer".
+        /// </summary>
+        public InputAction @ResetPlayer => m_Wrapper.m_Player_ResetPlayer;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/ResetGame".
+        /// </summary>
+        public InputAction @ResetGame => m_Wrapper.m_Player_ResetGame;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1464,6 +1560,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @ToggleOptionsMenu.started += instance.OnToggleOptionsMenu;
             @ToggleOptionsMenu.performed += instance.OnToggleOptionsMenu;
             @ToggleOptionsMenu.canceled += instance.OnToggleOptionsMenu;
+            @ResetPlayer.started += instance.OnResetPlayer;
+            @ResetPlayer.performed += instance.OnResetPlayer;
+            @ResetPlayer.canceled += instance.OnResetPlayer;
+            @ResetGame.started += instance.OnResetGame;
+            @ResetGame.performed += instance.OnResetGame;
+            @ResetGame.canceled += instance.OnResetGame;
         }
 
         /// <summary>
@@ -1511,6 +1613,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @ToggleOptionsMenu.started -= instance.OnToggleOptionsMenu;
             @ToggleOptionsMenu.performed -= instance.OnToggleOptionsMenu;
             @ToggleOptionsMenu.canceled -= instance.OnToggleOptionsMenu;
+            @ResetPlayer.started -= instance.OnResetPlayer;
+            @ResetPlayer.performed -= instance.OnResetPlayer;
+            @ResetPlayer.canceled -= instance.OnResetPlayer;
+            @ResetGame.started -= instance.OnResetGame;
+            @ResetGame.performed -= instance.OnResetGame;
+            @ResetGame.canceled -= instance.OnResetGame;
         }
 
         /// <summary>
@@ -1895,6 +2003,20 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnToggleOptionsMenu(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "ResetPlayer" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnResetPlayer(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "ResetGame" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnResetGame(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

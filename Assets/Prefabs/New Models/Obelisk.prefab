@@ -13,7 +13,8 @@ GameObject:
   - component: {fileID: 8582042901380644358}
   - component: {fileID: 4221166023875848967}
   - component: {fileID: -1778694333258708717}
-  - component: {fileID: 954773513285506731}
+  - component: {fileID: 7361211695932390415}
+  - component: {fileID: 1881676628212544312}
   m_Layer: 0
   m_Name: Obelisk
   m_TagString: Untagged
@@ -29,7 +30,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 563455394550950007}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0.0039139395, y: 0.89323014, z: 0.007777372, w: 0.44951546}
   m_LocalPosition: {x: -18.456781, y: 2.857962, z: 2.6775963}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -134,8 +135,23 @@ MonoBehaviour:
   isActivated: 0
   isGrabbed: 0
   hitClip: {fileID: 0}
---- !u!64 &954773513285506731
-MeshCollider:
+--- !u!114 &7361211695932390415
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 563455394550950007}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3bc2cf3e1cd93ec47b1fb3280ff1f0ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ground:
+    serializedVersion: 2
+    m_Bits: 0
+--- !u!65 &1881676628212544312
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -152,7 +168,6 @@ MeshCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -639505261512174861, guid: 9c18d33fbfd69f34d88d37fc6d9c0ad8, type: 3}
+  serializedVersion: 3
+  m_Size: {x: 1.2979072, y: 3.8616273, z: 1.4073273}
+  m_Center: {x: 0.0012013915, y: -0.21637665, z: 0.0023894904}
