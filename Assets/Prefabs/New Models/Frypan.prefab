@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3599161869466777526}
   - component: {fileID: 8147905437018430588}
   - component: {fileID: 5686757315894218772}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Frypan
   m_TagString: Untagged
   m_Icon: {fileID: 0}
