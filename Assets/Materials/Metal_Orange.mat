@@ -131,6 +131,7 @@ Material:
     - _RampThreshold: 0.2
     - _ReceiveShadows: 1
     - _ReceiveShadowsOff: 1
+    - _ReflectionCubemapRoughness: 1
     - _ReflectionSmoothness: 0.5
     - _RenderingMode: 0
     - _Smoothness: 0.5
@@ -146,7 +147,7 @@ Material:
     - _ZWrite: 1
     - __dummy__: 0
     m_Colors:
-    - _BaseColor: {r: 0.97647065, g: 0.7725491, b: 0.34509805, a: 1}
+    - _BaseColor: {r: 0.882353, g: 0.67058825, b: 0.28627452, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _HColor: {r: 0.98823535, g: 0.78823537, b: 0.454902, a: 1}
