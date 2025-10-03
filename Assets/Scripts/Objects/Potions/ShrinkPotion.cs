@@ -2,8 +2,6 @@ using UnityEngine;
 
 public class ShrinkPotion : potionBottle
 {
-   
-
     public override void ApplyAffect(Rigidbody body)
     {
         base.ApplyAffect(body);

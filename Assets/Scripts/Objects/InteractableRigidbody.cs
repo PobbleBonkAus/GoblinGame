@@ -9,9 +9,12 @@ public class InteractableRigidbody : MonoBehaviour
     public bool isActivated;
     public bool isGrabbed;
 
-    private Transform initialPos;
+    private Vector3 initialPos;
+    private Quaternion initialRotation;
 
     [SerializeField] AudioClip hitClip;
+
+    GameObject emberEffect;
     public enum ObjectType 
     {
         SMALL, //Can be lifted above head, doesnt apply force on player
@@ -47,5 +50,7 @@ public class InteractableRigidbody : MonoBehaviour
             AudioController.instance.PlayAudioClip(hitClip, transform);
         }
     }
+
+
 
 }
