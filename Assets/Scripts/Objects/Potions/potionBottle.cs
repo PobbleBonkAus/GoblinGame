@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using UnityEditor.Rendering.Universal;
 using UnityEngine;
 
 public class potionBottle : InteractableRigidbody
