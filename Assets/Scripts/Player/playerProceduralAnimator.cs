@@ -197,8 +197,14 @@ public class playerProceduralAnimator : MonoBehaviour
             targetDir = body.forward;
         }
 
+        
+
         Quaternion toRotation = Quaternion.LookRotation(targetDir, body.transform.up);
-        headTransform.rotation = Quaternion.Slerp(headTransform.rotation, toRotation, headLerpSpeed * Time.time);
+        if (Quaternion.Angle(camera.rotation, toRotation) < 90) 
+        {
+            headTransform.rotation = Quaternion.Slerp(headTransform.rotation, toRotation, headLerpSpeed * Time.time);
+
+        }
 
         headTransform.transform.localEulerAngles = new Vector3(Mathf.Clamp(-Mathf.DeltaAngle(headTransform.transform.localEulerAngles.x, 0), -60, 60), headTransform.transform.localEulerAngles.y, 0); // clamp angle x -30 to 30
         headTransform.transform.localEulerAngles = new Vector3(headTransform.transform.localEulerAngles.x, Mathf.Clamp(-Mathf.DeltaAngle(headTransform.transform.localEulerAngles.y, 0), -60, 60), 0);  // clamp angle y -50 to 50
