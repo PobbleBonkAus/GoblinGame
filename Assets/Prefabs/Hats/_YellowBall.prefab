@@ -159,8 +159,9 @@ MonoBehaviour:
   type: 0
   isActivated: 0
   isGrabbed: 0
-  hitClip: {fileID: 0}
+  hitClip: {fileID: 8300000, guid: 434f2de418efc904c93ed82f130975a1, type: 3}
   particleObject: {fileID: 6356990202525970674, guid: ae4e9751a963dcf4da55e50ce876957f, type: 3}
+  openAudio: {fileID: 8300000, guid: 6e0e4973195b01848839a2450b485a66, type: 3}
 --- !u!4 &5729300967699538235 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: a825cbc3b1a0a31408dc16286c48c9dd, type: 3}

@@ -152,3 +152,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   value: 0
   type: 0
+  isActivated: 0
+  isGrabbed: 0
+  hitClip: {fileID: 0}

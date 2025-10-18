@@ -153,6 +153,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   value: 1
   type: 0
+  isActivated: 0
+  isGrabbed: 0
+  hitClip: {fileID: 0}
 --- !u!1001 &7827856506119391491
 PrefabInstance:
   m_ObjectHideFlags: 0

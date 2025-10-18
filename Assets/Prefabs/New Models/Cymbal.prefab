@@ -155,7 +155,7 @@ MonoBehaviour:
   type: 0
   isActivated: 0
   isGrabbed: 0
-  hitClip: {fileID: 0}
+  hitClip: {fileID: 8300000, guid: 96eadbc8385a6d54b9157c1680ebfcba, type: 3}
 --- !u!1001 &6755666883786620262
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -10,7 +10,9 @@ public class bomb : InteractableRigidbody
     [SerializeField] Transform fusePoint;
     [SerializeField] ParticleSystem fuseParticle;
     [SerializeField] GameObject explosion;
-    
+
+    [SerializeField] AudioClip sparkNoise;
+
     private float currentBombTime = 0.0f;
 
 

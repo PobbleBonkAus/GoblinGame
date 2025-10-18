@@ -17,6 +17,9 @@ public class ObjectDeposit : MonoBehaviour
     [SerializeField] UnityEvent OnValuableDeposit;
     [SerializeField] UnityEvent OnJunkDeposit;
 
+    [SerializeField] AudioClip depositNoise;
+    [SerializeField] AudioClip ejectionNoise;
+
 
     void RecieveObject(Rigidbody body) 
     {

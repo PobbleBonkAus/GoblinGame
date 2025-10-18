@@ -132,6 +132,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   value: 10
   type: 1
+  isActivated: 0
+  isGrabbed: 0
+  hitClip: {fileID: 0}
 --- !u!64 &4261622157405510362
 MeshCollider:
   m_ObjectHideFlags: 0

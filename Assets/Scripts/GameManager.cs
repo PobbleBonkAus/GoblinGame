@@ -21,6 +21,8 @@ public class GameManager : MonoBehaviour
 
     int playerIndex = 0;
 
+    public bool InputDetected = false;
+
     public static GameManager instance { get; private set; }
 
     private void Awake()
@@ -36,10 +38,7 @@ public class GameManager : MonoBehaviour
 
     }
 
-    private void Start()
-    {
-        playerInputManager.joinBehavior = PlayerJoinBehavior.JoinPlayersWhenButtonIsPressed;
-    }
+    
 
     private void Update()
     {
@@ -103,5 +102,8 @@ public class GameManager : MonoBehaviour
         players[playerInput.playerIndex] = null;
     }
 
-  
+    public void PlayerLeave(PlayerInput playerInput) 
+    {
+        OnPlayerLeft(playerInput);
+    }
 }

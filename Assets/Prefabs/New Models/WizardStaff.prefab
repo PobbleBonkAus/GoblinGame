@@ -218,4 +218,4 @@ MonoBehaviour:
   type: 0
   isActivated: 0
   isGrabbed: 0
-  hitClip: {fileID: 0}
+  hitClip: {fileID: 8300000, guid: 434f2de418efc904c93ed82f130975a1, type: 3}

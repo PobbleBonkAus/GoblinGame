@@ -197,15 +197,16 @@ public class playerProceduralAnimator : MonoBehaviour
             targetDir = body.forward;
         }
 
-        
-
-        Quaternion toRotation = Quaternion.LookRotation(targetDir, body.transform.up);
-        if (Quaternion.Angle(camera.rotation, toRotation) < 90) 
+        if(Vector3.Dot(camera.forward,body.transform.forward) < -0.855) 
         {
-            headTransform.rotation = Quaternion.Slerp(headTransform.rotation, toRotation, headLerpSpeed * Time.time);
-
+            targetDir = camera.forward;
         }
 
+        Quaternion toRotation = Quaternion.LookRotation(targetDir, body.transform.up);
+
+        headTransform.rotation = Quaternion.Slerp(headTransform.rotation, toRotation, headLerpSpeed * Time.time);
+
+       
         headTransform.transform.localEulerAngles = new Vector3(Mathf.Clamp(-Mathf.DeltaAngle(headTransform.transform.localEulerAngles.x, 0), -60, 60), headTransform.transform.localEulerAngles.y, 0); // clamp angle x -30 to 30
         headTransform.transform.localEulerAngles = new Vector3(headTransform.transform.localEulerAngles.x, Mathf.Clamp(-Mathf.DeltaAngle(headTransform.transform.localEulerAngles.y, 0), -60, 60), 0);  // clamp angle y -50 to 50
 
@@ -253,7 +254,7 @@ public class playerProceduralAnimator : MonoBehaviour
         Vector3 velocity = body.GetComponent<Rigidbody>().linearVelocity;
         Vector3 offset = velocity * velocityFactor;
         velocityMagnitude = velocity.magnitude;
-
+        
         if(playerRigidbody.linearVelocity.magnitude < 0.4f) 
         {
             if (TryGetFootTarget(leftLegRenderer.transform.position, offset, out Vector3 target))
@@ -271,7 +272,7 @@ public class playerProceduralAnimator : MonoBehaviour
 
             return;
         }
-
+        
         // Step left foot
         if (stepLeftFoot && leftFootLerp >= 1f && stepWaitTimer >= stepWaitTime)
         {

@@ -239,6 +239,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   value: 2
   type: 0
+  isActivated: 0
+  isGrabbed: 0
+  hitClip: {fileID: 0}
 --- !u!4 &7775864462881757243 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2b84854a39f64e4438e70c755f3b8c91, type: 3}

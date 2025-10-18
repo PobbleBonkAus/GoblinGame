@@ -213,7 +213,7 @@ MonoBehaviour:
   type: 0
   isActivated: 0
   isGrabbed: 0
-  hitClip: {fileID: 0}
+  hitClip: {fileID: 8300000, guid: 728d52e834fac034fa5a84c82eb7569c, type: 3}
 --- !u!4 &6587123249886766029 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: f26cc3f112c0b1b498fe7ba624a2a9e8, type: 3}

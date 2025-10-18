@@ -154,7 +154,7 @@ MonoBehaviour:
   type: 0
   isActivated: 0
   isGrabbed: 0
-  hitClip: {fileID: 0}
+  hitClip: {fileID: 8300000, guid: 434f2de418efc904c93ed82f130975a1, type: 3}
   litMat: {fileID: 2100000, guid: 6c9c0e23fb579b94cb84eb1d4b09cbe8, type: 2}
   unlitMat: {fileID: 2100000, guid: c1ec02849f3b09247a983c0994657c71, type: 2}
   renderer: {fileID: 13046133877628304}

@@ -42,6 +42,7 @@ public class PlayerInputs : MonoBehaviour
         playerInputActions.FindAction("ToggleOptionsMenu").started += DoOpenOptions;
         playerInputActions.FindAction("ResetPlayer").started += DoResetPlayer;
         playerInputActions.FindAction("ResetGame").started += DoResetGame;
+        playerInputActions.FindAction("Leave").performed += DoLeaveGame;
     }
 
     public void DoOpenOptions(InputAction.CallbackContext obj)
@@ -63,5 +64,12 @@ public class PlayerInputs : MonoBehaviour
 
         SceneManager.LoadScene("Main", LoadSceneMode.Single);
         
+    }
+
+    public void DoLeaveGame(InputAction.CallbackContext obj)
+    {
+
+        GameManager.instance.PlayerLeave(GetComponent<PlayerInput>());
+
     }
 }

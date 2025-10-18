@@ -45,7 +45,7 @@ public class InteractableRigidbody : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.impulse.magnitude > 3.0f) 
+        if (collision.relativeVelocity.magnitude > 3.0f) 
         {
             AudioController.instance.PlayAudioClip(hitClip, transform);
         }

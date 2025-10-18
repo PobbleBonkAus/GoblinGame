@@ -62,6 +62,8 @@ public class AudioController : MonoBehaviour
             else
             {
                 audioSource.volume = GetVolumeFromSource(audioSources[audioSource]);
+                audioSource.pitch = Random.Range(0.8f, 1.2f);
+
                 audioSource.PlayOneShot(clip);
                 audioSources[audioSource] = audioOrigin;
                 break;
@@ -82,6 +84,8 @@ public class AudioController : MonoBehaviour
                 audioSource.loop = true;
                 audioSource.clip = clip;
                 audioSource.volume = GetVolumeFromSource(audioSources[audioSource]);
+
+
                 audioSource.Play();
                 audioSources[audioSource] = audioOrigin;
 

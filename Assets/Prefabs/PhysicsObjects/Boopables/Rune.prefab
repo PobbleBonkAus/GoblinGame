@@ -133,6 +133,7 @@ MonoBehaviour:
   type: 0
   isActivated: 0
   isGrabbed: 0
+  hitClip: {fileID: 0}
 --- !u!64 &8674075065979764495
 MeshCollider:
   m_ObjectHideFlags: 0

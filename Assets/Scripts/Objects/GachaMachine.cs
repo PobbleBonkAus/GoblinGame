@@ -13,6 +13,10 @@ public class GachaMachine : MonoBehaviour
     [SerializeField] private Transform gatchaCrank;
     [SerializeField] private float crankSpeed;
 
+
+    [SerializeField] AudioClip coinDepositNoise;
+    [SerializeField] AudioClip gatchaSpawnNoise;
+
     int currentCoinsInputed = 0;
 
     bool addingCoin = false;
@@ -31,6 +35,7 @@ public class GachaMachine : MonoBehaviour
         if(currentCoinsInputed >= minimumCoinsRequired) 
         {
             addingCoin = true;
+            AudioController.instance.PlayAudioClip(coinDepositNoise, transform);
             StartCoroutine(SpawnRandomCosmetic());
         }
     }
@@ -38,6 +43,8 @@ public class GachaMachine : MonoBehaviour
     IEnumerator SpawnRandomCosmetic() 
     {
         yield return new WaitForSeconds(cosmeticEjectionDelay);
+        AudioController.instance.PlayAudioClip(gatchaSpawnNoise, transform);
+
         addingCoin = false;
         GameObject cosmetic = Instantiate(cosmetics[Random.Range(0, cosmetics.Length)]);
         cosmetic.transform.SetPositionAndRotation(cosmeticSpawnPoint.position, Random.rotation);

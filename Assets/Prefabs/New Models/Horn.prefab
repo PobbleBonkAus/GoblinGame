@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6345746787205092589}
   - component: {fileID: 2456130984414519096}
   - component: {fileID: -907946205202288796}
-  - component: {fileID: 2551931965250526034}
+  - component: {fileID: 471471336662636937}
   m_Layer: 6
   m_Name: Horn
   m_TagString: Untagged
@@ -139,7 +139,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &2551931965250526034
+--- !u!114 &471471336662636937
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -148,14 +148,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 2305896489709167476}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 658d27a322a20e348bd8f65f39c619f5, type: 3}
+  m_Script: {fileID: 11500000, guid: 498c49d5509385a43ae20e7644ebb4c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  value: 1
+  value: 0
   type: 0
   isActivated: 0
   isGrabbed: 0
-  hitClip: {fileID: 0}
+  hitClip: {fileID: 8300000, guid: 434f2de418efc904c93ed82f130975a1, type: 3}
+  hornToot: {fileID: 8300000, guid: ab57a32b6f0ffa84ebec954f06a0b32a, type: 3}
 --- !u!1001 &4876110178881107254
 PrefabInstance:
   m_ObjectHideFlags: 0
