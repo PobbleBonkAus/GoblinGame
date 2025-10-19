@@ -331,6 +331,10 @@ PrefabInstance:
       propertyPath: value
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1231378827486637482, guid: e8ab5b2ceb6377b4691cc6e9395a43ed, type: 3}
+      propertyPath: 'm_Materials.Array.data[1]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 0894f69aeb7cade418234091dddb5a15, type: 2}
     - target: {fileID: 1391248586020566819, guid: e8ab5b2ceb6377b4691cc6e9395a43ed, type: 3}
       propertyPath: m_LocalPosition.x
       value: -96.77142
@@ -8865,7 +8869,7 @@ PrefabInstance:
     - target: {fileID: 1454391250279848596, guid: 024334becbc6ebc4ab50497e0b81ff03, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 0d8a99da60cda5945870b83389827f73, type: 2}
+      objectReference: {fileID: 2100000, guid: 281171d3a0b6e0a42b2a888bd22ba51f, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -14040,7 +14044,7 @@ PrefabInstance:
     - target: {fileID: 3427184951466017822, guid: 5a426031f7ff08d459d9f2ebcd312458, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: df43184abd56fd44483d43b099ca3185, type: 2}
+      objectReference: {fileID: 2100000, guid: 1ab998ce622bcc1418e3bb7fb6d68164, type: 2}
     - target: {fileID: 3550674622187927972, guid: 5a426031f7ff08d459d9f2ebcd312458, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -14180,7 +14184,7 @@ PrefabInstance:
     - target: {fileID: 5873158270179074991, guid: 5a426031f7ff08d459d9f2ebcd312458, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: df43184abd56fd44483d43b099ca3185, type: 2}
+      objectReference: {fileID: 2100000, guid: 4e3a66e05a46e4340af9730cdca0e784, type: 2}
     - target: {fileID: 5882118932253189005, guid: 5a426031f7ff08d459d9f2ebcd312458, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -15548,7 +15552,7 @@ PrefabInstance:
     - target: {fileID: 8582042901380644358, guid: 582f53fa842a1af45b16e12c758cf8ef, type: 3}
       propertyPath: 'm_Materials.Array.data[1]'
       value: 
-      objectReference: {fileID: 2100000, guid: c73de1767041a7f45bd240be8729e8b2, type: 2}
+      objectReference: {fileID: 2100000, guid: 938d60dda77da7b43b5e417942b16b51, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -15625,6 +15629,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: eaeb299baab825f43ae6fc3b3cfae424, type: 3}
       propertyPath: m_Name
       value: MushroomVolume
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: eaeb299baab825f43ae6fc3b3cfae424, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -20403,6 +20411,10 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 8557837357291924245, guid: dd0c4e2192953734fb90a1e07bb2b11b, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 959bad4379c2b8a4880bab464e1a5ca8, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -25232,7 +25244,7 @@ PrefabInstance:
     - target: {fileID: 8582042901380644358, guid: 582f53fa842a1af45b16e12c758cf8ef, type: 3}
       propertyPath: 'm_Materials.Array.data[1]'
       value: 
-      objectReference: {fileID: 2100000, guid: 73341620f78e1b44093c14c3741ffe58, type: 2}
+      objectReference: {fileID: 2100000, guid: 938d60dda77da7b43b5e417942b16b51, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -28943,6 +28955,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 710262451}
     m_Modifications:
+    - target: {fileID: -6703010401589232540, guid: fc439fa0c6e369d4eb5c14e8a31c0adb, type: 3}
+      propertyPath: type
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3491859080064876636, guid: fc439fa0c6e369d4eb5c14e8a31c0adb, type: 3}
       propertyPath: m_Name
       value: Skull (3)
