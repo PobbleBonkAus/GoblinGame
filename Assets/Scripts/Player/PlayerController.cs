@@ -70,6 +70,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] AudioClip jumpAudio;
     [SerializeField] AudioClip landAudio;
     [SerializeField] AudioClip ragdollAudio;
+    [SerializeField] AudioClip[] goblinChuckles;
 
     [Header("Options")]
     [SerializeField] GameObject optionsMenu;
@@ -120,14 +121,16 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Tab))
         {
-            rb.Move(GameObject.FindGameObjectWithTag("PlayerSpawn").transform.position, Quaternion.identity);
-            rb.linearVelocity = Vector3.zero;
+            ResetPlayer();
         }
     }
 
     void Move()
     {
-        if (isRagdolled) return;
+        if (isRagdolled) 
+        {
+            return;
+        }
 
         moveInput = move.ReadValue<Vector2>();
 
@@ -323,6 +326,22 @@ public class PlayerController : MonoBehaviour
         rb.angularVelocity = Vector3.zero;
     }
 
+    bool goblinCanChuckle = true;
+    IEnumerator GoblinChuckleTimeout()
+    {
+        goblinCanChuckle = false;
+        yield return new WaitForSeconds(2.0f);
+        goblinCanChuckle = true;
+    }
+    public void PlayRandomGoblinNoise() 
+    {
+        if (goblinCanChuckle) 
+        {
+            AudioClip goblinClip = goblinChuckles[Random.Range(0, goblinChuckles.Length)];
+            AudioController.instance.PlayAudioClip(goblinClip, transform);
+            StartCoroutine(GoblinChuckleTimeout());
+        }
+    }
 
     private void OnCollisionEnter(Collision collision)
     {

@@ -33,6 +33,14 @@ public class AudioController : MonoBehaviour
         {
             audioSources[gameObject.AddComponent<AudioSource>()] = transform;
         }
+
+        StartCoroutine(PauseOnStart());
+
+    }
+    IEnumerator<WaitForSeconds> PauseOnStart() 
+    {
+        yield return new WaitForSeconds(2.0f);
+        source.enabled = true;
     }
 
     private void Update()

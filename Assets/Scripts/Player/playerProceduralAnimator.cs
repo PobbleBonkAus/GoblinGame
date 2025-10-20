@@ -500,6 +500,7 @@ public class playerProceduralAnimator : MonoBehaviour
         {
             if (other.transform.IsChildOf(transform.parent) || other.CompareTag("Cosmetic")) return;
             headLookTarget = other.transform;
+            player.PlayRandomGoblinNoise();
         }
     }
 
