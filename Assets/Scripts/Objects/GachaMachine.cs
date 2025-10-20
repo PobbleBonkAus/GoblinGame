@@ -25,7 +25,7 @@ public class GachaMachine : MonoBehaviour
     {
         if (addingCoin)
         {
-            gatchaCrank.transform.Rotate(Vector3.forward, crankSpeed);
+            gatchaCrank.transform.Rotate(Vector3.forward, -crankSpeed);
         }
     }
 

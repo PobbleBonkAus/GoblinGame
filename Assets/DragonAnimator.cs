@@ -10,6 +10,7 @@ public class DragonAnimator : MonoBehaviour
 
     [SerializeField] MultiAimConstraint headAim;
     [SerializeField] Transform headLookTarget;
+    [SerializeField] Transform pitLookTransform;
 
     [SerializeField] float bodyWobbleSpeed = 2.0f;
     [SerializeField] float maxBodyWobble = 2.0f;
@@ -26,6 +27,7 @@ public class DragonAnimator : MonoBehaviour
     Quaternion targetRotation;
     bool diving = false;
 
+    [SerializeField] ParticleSystem fireBreathParticles;
     public bool useHeadLook = true;
 
     private void Start()
@@ -40,6 +42,8 @@ public class DragonAnimator : MonoBehaviour
         {
             WobbleBody();
         }
+
+        headPivot.transform.LookAt(headLookTarget, Vector3.up);
 
         if (currentLookTarget && useHeadLook)
         {
@@ -104,10 +108,12 @@ public class DragonAnimator : MonoBehaviour
     IEnumerator DiveAnimation()
     {
         diving = true;
+        useHeadLook = false;
         targetRotation = Quaternion.Euler(targetAngle, transform.eulerAngles.y, 0f);
+        fireBreathParticles.Play();
 
         yield return new WaitForSeconds(waitTime);
-
+        useHeadLook = true;
         diving = false;
     }
 
