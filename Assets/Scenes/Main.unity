@@ -563,6 +563,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 710262451}
     m_Modifications:
+    - target: {fileID: 471471336662636937, guid: eed950d086afcea4aad94cf711ed5670, type: 3}
+      propertyPath: value
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2305896489709167476, guid: eed950d086afcea4aad94cf711ed5670, type: 3}
       propertyPath: m_Name
       value: Horn
@@ -11329,7 +11333,7 @@ AudioSource:
   m_audioClip: {fileID: 8300000, guid: b85cadb2277f7624a9ab213816e74eb5, type: 3}
   m_Resource: {fileID: 8300000, guid: b85cadb2277f7624a9ab213816e74eb5, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.6
   m_Pitch: 1
   Loop: 1
   Mute: 0
