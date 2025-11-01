@@ -9,6 +9,7 @@ public class AudioController : MonoBehaviour
     [SerializeField] float maxAudioRange = 100.0f;
     [SerializeField] float minAudioRange = 1.0f;
 
+
     public static AudioController instance { get; private set; }
     int maxAudioSources = 30;
 
