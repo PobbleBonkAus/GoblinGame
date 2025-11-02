@@ -22,7 +22,12 @@ public class MainMenuScript : MonoBehaviour
     [SerializeField] GameObject galleryMenuObject;
     [SerializeField] Selectable galleryDefaultSelected;
 
-  
+    [Header("Goblin Gallery / Goober Journey")]
+    [SerializeField] GameObject goblinGalleryArrows;
+    [SerializeField] GameObject goblinGalleryViewer;
+    [SerializeField] GameObject gooberJourneyArrows;
+    [SerializeField] GameObject gooberJourneyViewer;
+
 
     [Header("Settings")]
     [SerializeField] CinemachineCamera settingsCamera;
@@ -32,8 +37,9 @@ public class MainMenuScript : MonoBehaviour
     private void Awake()
     {
         MainMenu();
-        
+        showGoblinGallery();
     }
+    
 
     public void PlayGame() 
     {
@@ -74,6 +80,26 @@ public class MainMenuScript : MonoBehaviour
         settingsMenuObject.SetActive(false);
 
         eventSystem.SetSelectedGameObject(galleryDefaultSelected.gameObject);
+    }
+    public void showGoblinGallery()
+    {
+        //Goblin Gallery
+        goblinGalleryArrows.SetActive(true);
+        goblinGalleryViewer.SetActive(true);
+
+        //Goober Journey
+        gooberJourneyArrows.SetActive(false);
+        gooberJourneyViewer.SetActive(false);
+    }
+    public void showGooberJourney()
+    {
+        //Goblin Gallery
+        goblinGalleryArrows.SetActive(false);
+        goblinGalleryViewer.SetActive(false);
+        
+        //Goober Journey
+        gooberJourneyArrows.SetActive(true);
+        gooberJourneyViewer.SetActive(true);
     }
     public void Settings()
     {

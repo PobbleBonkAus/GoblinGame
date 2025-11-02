@@ -5,11 +5,12 @@ public class GalleryScrolling : MonoBehaviour
 {
     [SerializeField] Sprite[] galleryImageCollection;
     [SerializeField] SpriteRenderer galleryImage;
-    private int galleryCounter = 0;
+    private int galleryCounter;
 
     private void Start()
     {
-        
+
+        galleryCounter = Mathf.RoundToInt(Random.RandomRange(0, galleryImageCollection.Length - 1));
     }
     private void Update()
     {
