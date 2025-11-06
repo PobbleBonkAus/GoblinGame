@@ -226,6 +226,15 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""QuitToMenu"",
+                    ""type"": ""Button"",
+                    ""id"": ""196d2705-f042-4928-ad56-b49ba39f5f80"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -743,6 +752,28 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": "";Gamepad"",
                     ""action"": ""Leave"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""90ebb98c-0c03-4fee-a78b-5686cd52cab9"",
+                    ""path"": ""<Gamepad>/buttonNorth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""QuitToMenu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a766579e-125b-489a-a44b-79f7b9d5fe9e"",
+                    ""path"": ""<Keyboard>/backquote"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""QuitToMenu"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1345,6 +1376,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Player_ResetPlayer = m_Player.FindAction("ResetPlayer", throwIfNotFound: true);
         m_Player_ResetGame = m_Player.FindAction("ResetGame", throwIfNotFound: true);
         m_Player_Leave = m_Player.FindAction("Leave", throwIfNotFound: true);
+        m_Player_QuitToMenu = m_Player.FindAction("QuitToMenu", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1453,6 +1485,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_ResetPlayer;
     private readonly InputAction m_Player_ResetGame;
     private readonly InputAction m_Player_Leave;
+    private readonly InputAction m_Player_QuitToMenu;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1525,6 +1558,10 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @Leave => m_Wrapper.m_Player_Leave;
         /// <summary>
+        /// Provides access to the underlying input action "Player/QuitToMenu".
+        /// </summary>
+        public InputAction @QuitToMenu => m_Wrapper.m_Player_QuitToMenu;
+        /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
         public InputActionMap Get() { return m_Wrapper.m_Player; }
@@ -1595,6 +1632,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Leave.started += instance.OnLeave;
             @Leave.performed += instance.OnLeave;
             @Leave.canceled += instance.OnLeave;
+            @QuitToMenu.started += instance.OnQuitToMenu;
+            @QuitToMenu.performed += instance.OnQuitToMenu;
+            @QuitToMenu.canceled += instance.OnQuitToMenu;
         }
 
         /// <summary>
@@ -1651,6 +1691,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Leave.started -= instance.OnLeave;
             @Leave.performed -= instance.OnLeave;
             @Leave.canceled -= instance.OnLeave;
+            @QuitToMenu.started -= instance.OnQuitToMenu;
+            @QuitToMenu.performed -= instance.OnQuitToMenu;
+            @QuitToMenu.canceled -= instance.OnQuitToMenu;
         }
 
         /// <summary>
@@ -2056,6 +2099,13 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnLeave(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "QuitToMenu" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnQuitToMenu(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

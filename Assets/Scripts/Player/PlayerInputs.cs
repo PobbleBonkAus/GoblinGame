@@ -43,6 +43,8 @@ public class PlayerInputs : MonoBehaviour
         playerInputActions.FindAction("ResetPlayer").started += DoResetPlayer;
         playerInputActions.FindAction("ResetGame").started += DoResetGame;
         playerInputActions.FindAction("Leave").performed += DoLeaveGame;
+        playerInputActions.FindAction("QuitToMenu").performed += DoQuitToMenu; 
+
     }
 
     public void DoOpenOptions(InputAction.CallbackContext obj)
@@ -64,6 +66,14 @@ public class PlayerInputs : MonoBehaviour
 
         SceneManager.LoadScene("Main", LoadSceneMode.Single);
         
+    }
+
+    public void DoQuitToMenu(InputAction.CallbackContext obj)
+    {
+        if (optionsMenu.gameObject.activeSelf)
+        {
+            SceneManager.LoadScene("TitleScreen", LoadSceneMode.Single);
+        }
     }
 
     public void DoLeaveGame(InputAction.CallbackContext obj)

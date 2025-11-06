@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 using Unity.Cinemachine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.UIElements;
 
 
 
@@ -28,6 +29,7 @@ public class MainMenuScript : MonoBehaviour
     [SerializeField] GameObject gooberJourneyArrows;
     [SerializeField] GameObject gooberJourneyViewer;
 
+  
 
     [Header("Settings")]
     [SerializeField] CinemachineCamera settingsCamera;
@@ -39,6 +41,7 @@ public class MainMenuScript : MonoBehaviour
     {
         MainMenu();
         showGoblinGallery();
+        Screen.SetResolution(1920,1080, true);
     }
     
 
@@ -101,6 +104,8 @@ public class MainMenuScript : MonoBehaviour
         //Goober Journey
         gooberJourneyArrows.SetActive(true);
         gooberJourneyViewer.SetActive(true);
+
+        
     }
     public void Settings()
     {

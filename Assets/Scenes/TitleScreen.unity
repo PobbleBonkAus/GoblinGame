@@ -976,7 +976,7 @@ GameObject:
   - component: {fileID: 85816473}
   - component: {fileID: 85816472}
   m_Layer: 5
-  m_Name: Next
+  m_Name: galleryNext
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3347,7 +3347,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &238648456
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5386,7 +5386,7 @@ GameObject:
   - component: {fileID: 373002469}
   - component: {fileID: 373002468}
   m_Layer: 5
-  m_Name: Previous
+  m_Name: journeyPrevious
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -18522,7 +18522,7 @@ GameObject:
   - component: {fileID: 1144585152}
   - component: {fileID: 1144585151}
   m_Layer: 5
-  m_Name: Next
+  m_Name: journeyNext
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -22420,7 +22420,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 21300000, guid: 14c787e14ca5a87488cb8f4a91c23bd6, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -25802,8 +25802,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1626019928}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.0005245531, y: 0.99296504, z: -0.11832482, w: 0.0044019753}
-  m_LocalPosition: {x: -120.87, y: 0.58, z: 1.97}
+  m_LocalRotation: {x: 0, y: -0.52635545, z: 0, w: 0.8502646}
+  m_LocalPosition: {x: -39.65, y: 14.63, z: 60.21}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -27695,7 +27695,7 @@ GameObject:
   - component: {fileID: 1764312090}
   - component: {fileID: 1764312089}
   m_Layer: 5
-  m_Name: Previous
+  m_Name: galleryPrevious
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28810,7 +28810,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1836362893
 RectTransform:
   m_ObjectHideFlags: 0

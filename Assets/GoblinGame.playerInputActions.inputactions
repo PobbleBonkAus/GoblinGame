@@ -140,6 +140,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "QuitToMenu",
+                    "type": "Button",
+                    "id": "196d2705-f042-4928-ad56-b49ba39f5f80",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -657,6 +666,28 @@
                     "processors": "",
                     "groups": ";Gamepad",
                     "action": "Leave",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "90ebb98c-0c03-4fee-a78b-5686cd52cab9",
+                    "path": "<Gamepad>/buttonNorth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "QuitToMenu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a766579e-125b-489a-a44b-79f7b9d5fe9e",
+                    "path": "<Keyboard>/backquote",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "QuitToMenu",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
