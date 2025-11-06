@@ -147,7 +147,7 @@ public class playerProceduralAnimator : MonoBehaviour
 
     private void Update()
     {
-        Debug.Log(transform.position - leftHandTarget.position);
+        //Debug.Log(transform.position - leftHandTarget.position);
         if (player.IsGrounded() && !player.isRagdolled) 
         {
             UpdateFootTargetPositions();
@@ -500,6 +500,7 @@ public class playerProceduralAnimator : MonoBehaviour
         {
             if (other.transform.IsChildOf(transform.parent) || other.CompareTag("Cosmetic")) return;
             headLookTarget = other.transform;
+            player.PlayRandomGoblinNoise();
         }
     }
 

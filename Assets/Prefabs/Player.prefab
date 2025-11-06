@@ -12908,7 +12908,11 @@ MonoBehaviour:
     m_Bits: 128
   jumpAudio: {fileID: 8300000, guid: 70fdaf4c51142cb4dadf8bea76c34f0a, type: 3}
   landAudio: {fileID: 8300000, guid: 434f2de418efc904c93ed82f130975a1, type: 3}
-  ragdollAudio: {fileID: 0}
+  ragdollAudio: {fileID: 8300000, guid: a21fa0d8f714b284bae706bd10d78675, type: 3}
+  goblinChuckles:
+  - {fileID: 8300000, guid: 679e89c0a3c087540addc9e25a109b9d, type: 3}
+  - {fileID: 8300000, guid: 260d77a2b2795984ea7f96bea0fb404e, type: 3}
+  - {fileID: 8300000, guid: cc614403c6f7b994eaa0587f6655ab3a, type: 3}
   optionsMenu: {fileID: 4143457802842962886}
   collisionVelocity: {x: 0, y: 0, z: 0}
 --- !u!114 &2910426281273310292
@@ -13540,6 +13544,7 @@ PrefabInstance:
     - {fileID: 6093553877732850902, guid: 9b26900e97d4d0a4d82e5d988675da35, type: 3}
     - {fileID: 45609132543354913, guid: 9b26900e97d4d0a4d82e5d988675da35, type: 3}
     - {fileID: 2623291630127728441, guid: 9b26900e97d4d0a4d82e5d988675da35, type: 3}
+    - {fileID: 8702944960575813500, guid: 9b26900e97d4d0a4d82e5d988675da35, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9b26900e97d4d0a4d82e5d988675da35, type: 3}

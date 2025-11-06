@@ -118,9 +118,11 @@ public class DragonAnimator : MonoBehaviour
         diving = true;
         useHeadLook = false;
         targetRotation = Quaternion.Euler(targetAngle, transform.eulerAngles.y, 0f);
+        yield return new WaitForSeconds(waitTime/2.0f);
         fireBreathParticles.Play();
 
         yield return new WaitForSeconds(waitTime);
+
         useHeadLook = true;
         diving = false;
     }

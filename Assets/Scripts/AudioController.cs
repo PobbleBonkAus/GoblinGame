@@ -1,5 +1,8 @@
+using NUnit.Framework;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
 
 public class AudioController : MonoBehaviour
 {
@@ -9,13 +12,17 @@ public class AudioController : MonoBehaviour
     [SerializeField] float maxAudioRange = 100.0f;
     [SerializeField] float minAudioRange = 1.0f;
 
+
     public static AudioController instance { get; private set; }
     int maxAudioSources = 30;
 
     Dictionary<AudioSource,Transform> audioSources;
 
+    [SerializeField][UnityEngine.Range(0f,1f)] float maxVolume;
+
     private void Awake()
     {
+        maxVolume = MenuStatic.soundVolumeGlobal;
         // If there is an instance, and it's not me, delete myself.
 
         if (instance != null && instance != this)
@@ -32,7 +39,16 @@ public class AudioController : MonoBehaviour
         for(int i = 0; i < maxAudioSources; i++) 
         {
             audioSources[gameObject.AddComponent<AudioSource>()] = transform;
+            
         }
+
+        StartCoroutine(PauseOnStart());
+
+    }
+    IEnumerator<WaitForSeconds> PauseOnStart() 
+    {
+        yield return new WaitForSeconds(2.0f);
+        source.enabled = true;
     }
 
     private void Update()
@@ -128,7 +144,7 @@ public class AudioController : MonoBehaviour
 
         // Linear falloff
         float t = (distance - minAudioRange) / (maxAudioRange - minAudioRange);
-        return Mathf.Clamp01(1f - t);
+        return Mathf.Clamp01(maxVolume - t);
     }
 
 

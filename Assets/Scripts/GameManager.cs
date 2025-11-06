@@ -13,7 +13,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] float statueRaiseSpeed = 0.5f;
     [SerializeField] Transform[] beachSpawns;
     [SerializeField] public Transform playerSpawn;
-
+    [SerializeField] Camera splashScreen;
     bool raisingStatue;
     GameObject statueBeingRaised;
 
@@ -89,11 +89,11 @@ public class GameManager : MonoBehaviour
 
     }
 
-
     public void OnPlayerJoined(PlayerInput playerInput) 
     {
         Debug.Log("Player " + playerInput.playerIndex + " joined!");
         players[playerInput.playerIndex] = playerInput.gameObject;
+        splashScreen.gameObject.SetActive(false);
     }
 
     public void OnPlayerLeft(PlayerInput playerInput)

@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
@@ -15,6 +16,9 @@ public class InteractableRigidbody : MonoBehaviour
     [SerializeField] AudioClip hitClip;
 
     GameObject emberEffect;
+
+    bool playingAudio = false;
+
     public enum ObjectType 
     {
         SMALL, //Can be lifted above head, doesnt apply force on player
@@ -45,12 +49,21 @@ public class InteractableRigidbody : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
+        if (playingAudio) return;
+
         if (collision.relativeVelocity.magnitude > 3.0f) 
         {
+            StartCoroutine(PauseAudioPlaying());
             AudioController.instance.PlayAudioClip(hitClip, transform);
         }
     }
 
+    IEnumerator PauseAudioPlaying() 
+    {
+        playingAudio = true;
+        yield return new WaitForSeconds(0.5f);
+        playingAudio = false;
+    }
 
 
 }
