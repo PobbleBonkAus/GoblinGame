@@ -30,6 +30,9 @@ public class DragonAnimator : MonoBehaviour
     [SerializeField] ParticleSystem fireBreathParticles;
     public bool useHeadLook = true;
 
+    [Header("Animations")]
+    [SerializeField] Animator dragonAnimator;
+
     private void Start()
     {
         bodyStartPos = bodyPivot.localPosition;
@@ -40,7 +43,10 @@ public class DragonAnimator : MonoBehaviour
     {
         if (!diving)
         {
-            WobbleBody();
+            //dragonAnimator.SetBool("pushing", false);
+            //dragonAnimator.SetBool("breathing", false);
+            dragonAnimator.ResetTrigger("fireBreath");
+            dragonAnimator.ResetTrigger("pushObject");
         }
 
         headPivot.transform.LookAt(headLookTarget, Vector3.up);
@@ -65,19 +71,21 @@ public class DragonAnimator : MonoBehaviour
 
         if (diving)
         {
-            bodyPivot.rotation = Quaternion.Slerp(
-                bodyPivot.rotation,
-                targetRotation,
-                Time.deltaTime * diveSpeed
-            );
+            //bodyPivot.rotation = Quaternion.Slerp(
+            //    bodyPivot.rotation,
+            //    targetRotation,
+            //    Time.deltaTime * diveSpeed
+            //);
+            dragonAnimator.SetTrigger("fireBreath");
+            //dragonAnimator.ResetTrigger("fireBreath");
         }
         else
         {
-            bodyPivot.rotation = Quaternion.Slerp(
-                bodyPivot.rotation,
-                transform.rotation,
-                Time.deltaTime * diveSpeed
-            );
+            //bodyPivot.rotation = Quaternion.Slerp(
+            //    bodyPivot.rotation,
+            //    transform.rotation,
+            //    Time.deltaTime * diveSpeed
+            //);
         }
     }
 
