@@ -145,6 +145,8 @@ public class SettingsController : MonoBehaviour
         themeText.text = themeToString(themeCounter);
         audioSource.clip = gameThemes[themeCounter];
         audioSource.Play();
+
+        MenuStatic.musicClipGlobal = gameThemes[themeCounter];
     }
     #endregion
 
@@ -152,8 +154,21 @@ public class SettingsController : MonoBehaviour
     public void musicVolumeChange()
     {
         audioSource.volume = musicSlider.value;
+
+        //Setting for in game volume
+        MenuStatic.musicVolumeGlobal = musicSlider.value;
+       
     }
+    #endregion
 
+    #region Sound Effect
+    public void soundVolumeChange()
+    {
+        
 
+        //Setting for in game volume
+        MenuStatic.soundVolumeGlobal = soundSlider.value;
+        Debug.Log(MenuStatic.soundVolumeGlobal);
+    }
     #endregion
 }

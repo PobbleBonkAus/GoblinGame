@@ -34,6 +34,7 @@ public class MainMenuScript : MonoBehaviour
     [SerializeField] GameObject settingsMenuObject;
     [SerializeField] Selectable settingsDefaultSelected;
 
+    
     private void Awake()
     {
         MainMenu();

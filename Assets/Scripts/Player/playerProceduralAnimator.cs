@@ -147,7 +147,7 @@ public class playerProceduralAnimator : MonoBehaviour
 
     private void Update()
     {
-        Debug.Log(transform.position - leftHandTarget.position);
+        //Debug.Log(transform.position - leftHandTarget.position);
         if (player.IsGrounded() && !player.isRagdolled) 
         {
             UpdateFootTargetPositions();
