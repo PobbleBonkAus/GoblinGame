@@ -7,6 +7,7 @@ public class GnomeBurrow : MonoBehaviour
     [SerializeField] GnomeHole HoleB;
     [SerializeField] float launchForce;
     [SerializeField] float launchDelay;
+    [SerializeField] Vector3 spawnOffset;
 
     void LaunchOut(Rigidbody body, Transform hole)
     {
@@ -27,12 +28,12 @@ public class GnomeBurrow : MonoBehaviour
 
         if(hole == HoleA.transform)
         {
-            body.MovePosition(HoleB.transform.position);
+            body.MovePosition(HoleB.transform.position + spawnOffset);
             HoleB.GetComponent<Collider>().enabled = false;
         }
         else if (hole == HoleB.transform)
         {
-            body.MovePosition(HoleA.transform.position);
+            body.MovePosition(HoleA.transform.position + spawnOffset);
             HoleA.GetComponent<Collider>().enabled = false;
         }
 
