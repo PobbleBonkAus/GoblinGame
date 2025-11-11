@@ -12388,7 +12388,7 @@ GameObject:
   - component: {fileID: 6208202181723915416}
   - component: {fileID: 865081390670594358}
   - component: {fileID: 3300101354973309404}
-  m_Layer: 3
+  m_Layer: 15
   m_Name: PhysicsGrabber
   m_TagString: Player
   m_Icon: {fileID: 0}

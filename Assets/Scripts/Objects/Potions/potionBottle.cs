@@ -35,7 +35,7 @@ public class potionBottle : InteractableRigidbody
         float angle = Vector3.Angle(transform.up, Vector3.up);
 
         // consider tipped if more than ~90 degrees from upright
-        pouring = angle > 60f && liquidAmount > 0f;
+        pouring = angle > 10f && liquidAmount > 0f;
 
         if (pouring && liquidAmount > 0f)
         {
